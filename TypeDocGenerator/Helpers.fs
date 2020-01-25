@@ -41,7 +41,7 @@ let getDocComment (comment: Comment) (prefixBlankCount: int) =
     ((summary + returns).Split "\n" |> Array.map(fun x -> blanks + x) |> Array.reduce(fun accu next -> accu + "\n" + next)) + "\n"
 
 let rec getType (typeInfo: Type) = 
-    let genericType =
+    let mutable genericType =
         match typeInfo.Type with
         | "intrinsic" -> 
             match typeInfo.Name with
@@ -112,13 +112,19 @@ let rec getType (typeInfo: Type) =
                 | _ -> "object"
             | _ -> "object"
         | _ -> "object"
-    let innerTypes = 
+    let mutable innerTypes = 
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments args
         | _ -> ""
-    if (genericType = "Task" && innerTypes = "<void>") 
-    then genericType
-    else genericType + innerTypes
+    if genericType = "Task" && innerTypes = "<void>" then innerTypes <- "" else ()
+    if genericType = "Array" then 
+        match innerTypes with
+        | "" -> ()
+        | _ -> genericType <- innerTypes.Substring(1, innerTypes.Length - 2) + "[]"
+    else ()
+    if genericType = "Set" then genericType <- "ISet" else ()
+    if genericType = "Map" then genericType <- "IDictionary" else ()
+    genericType + innerTypes
 and getGenericTypeArguments (typeInfos: Type list) = 
     let innerTypes = typeInfos |> List.map getType
     match innerTypes with
