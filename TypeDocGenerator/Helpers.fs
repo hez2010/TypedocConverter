@@ -125,7 +125,7 @@ and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate consta
         nodes 
         |> List.where(fun x -> x.Kind = ReflectionKind.TypeParameter)
         |> List.map (fun x -> x.Name)
-    ("<" + System.String.Join(", ", types) + ">", "") // types, contraints
+    {| Types = "<" + System.String.Join(", ", types) + ">"; Constraints = "" |} // types, contraints
 
 let getMethodParameters (parameters: Reflection list) = 
     parameters
