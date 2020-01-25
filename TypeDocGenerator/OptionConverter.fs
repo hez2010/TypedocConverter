@@ -18,9 +18,12 @@ type OptionConverter() =
         )
     override __.ReadJson(reader: JsonReader, objectType: Type, _existingValue: obj, serializer: JsonSerializer) : obj = 
         let innerType = objectType.GetGenericArguments().[0]
-        let value = serializer.Deserialize(reader, if innerType.IsValueType 
-                                                   then (typedefof<_ Nullable>).MakeGenericType([|innerType|])
-                                                   else innerType
+        let value = 
+            serializer.Deserialize(
+                reader, 
+                if innerType.IsValueType 
+                then (typedefof<_ Nullable>).MakeGenericType([|innerType|])
+                else innerType
         )
         let cases = FSharpType.GetUnionCases objectType
         if isNull value then FSharpValue.MakeUnion(cases.[0], [||])

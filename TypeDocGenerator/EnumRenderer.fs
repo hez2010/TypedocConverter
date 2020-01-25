@@ -1,7 +1,7 @@
 ﻿module EnumRenderer
 
 open Definitions
-open Helper
+open Helpers
 open System
 open System.Text
 
@@ -30,10 +30,16 @@ let renderEnum (section: string) (node: Reflection): string =
                  | None -> []
     
     let body = StringBuilder()
-    body.AppendFormat("namespace {0}\n{{\n", toPascalCase section) |> ignore
+    body.AppendFormat("namespace {0}\n{{\n", toPascalCase (if section = "" then "TypeDocGenerator" else section)) |> ignore
+    match node.Comment with
+    | Some comment -> body.AppendFormat("{0}", getDocComment comment 4) |> ignore
+    | _ -> ()
     body.AppendFormat("    {0}enum {1}\n    {{\n", getModifier node.Flags, toPascalCase node.Name) |> ignore
     values |> List.iteri (fun i x ->
         let comma = if i = values.Length - 1 then "" else ","
+        match x.Comment with
+        | Some comment -> body.AppendFormat("{0}", getDocComment comment 8) |> ignore
+        | _ -> ()
         let mutable intValue = 0
         match x.DefaultValue with
         | Some value -> if Int32.TryParse(value, &intValue) then body.AppendFormat("        {0} = {1}{2}\n", toPascalCase x.Name, intValue, comma) |> ignore
@@ -42,5 +48,5 @@ let renderEnum (section: string) (node: Reflection): string =
                              | _ -> body.AppendFormat("        {0}{1}\n", x.Name, comma) |> ignore
         | _ -> body.AppendFormat("        {0}{1}\n", x.Name, comma) |> ignore
     )
-    body.AppendLine "    }\n}" |> ignore
+    body.AppendLine "    }\n}\n" |> ignore
     body.ToString()

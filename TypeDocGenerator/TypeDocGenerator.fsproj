@@ -5,7 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Definitions.fs" />
-    <Compile Include="Helper.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="ClassRenderer.fs" />
+    <Compile Include="InterfaceRenderer.fs" />
     <Compile Include="EnumRenderer.fs" />
     <Compile Include="Renderer.fs" />
     <Compile Include="OptionConverter.fs" />

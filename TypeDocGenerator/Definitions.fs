@@ -61,7 +61,7 @@ type Reflection = {
     CssClasses: string option
     DefaultValue: string option
     Type: Type option
-    TypeParameters: Reflection list option
+    TypeParameter: Reflection list option
     Signatures: Reflection list option
     IndexSignature: Reflection list option
     GetSignature: Reflection option
@@ -82,6 +82,7 @@ type Reflection = {
     Files: SourceFile list option
     Readme: string option
     PackageInfo: obj option
+    Parameters: Reflection list option
 }
 and DeclarationHierarchy = {
     Type: Type list
@@ -93,6 +94,11 @@ and Type = {
     Id: int option
     Name: string option
     ElementType: Type option
+    Value: string option
+    Types: Type list option
+    TypeArguments: Type list option
+    Constraint: Type option
+    Declaration: Reflection option
 }
 and Decorator = {
     Name: string
@@ -144,7 +150,7 @@ and SourceReference = {
 }
 and Comment = {
     ShortText: string
-    Text: string
+    Text: string option
     Returns: string option
     Tags: CommentTag list option
 }

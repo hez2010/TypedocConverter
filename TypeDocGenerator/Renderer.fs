@@ -2,14 +2,11 @@ module Renderer
 
 open Definitions
 open EnumRenderer
-
-
-let renderInterface section node = 
-    0
+open InterfaceRenderer
+open ClassRenderer
 
 let rec renderNode (section: string) (node: Reflection): string =
     match node.Kind with
-    | ReflectionKind.Enum -> renderEnum section node
     | ReflectionKind.Global ->
         match node.Children with
         | Some children -> renderNodes section children
@@ -23,7 +20,9 @@ let rec renderNode (section: string) (node: Reflection): string =
         match node.Children with
         | Some children -> renderNodes section children
         | _ -> ""
-    | ReflectionKind.Interface
+    | ReflectionKind.Enum -> renderEnum section node
+    | ReflectionKind.Interface -> renderInterface section node
+    | ReflectionKind.Class -> renderClass section node
     | _ -> ""
 
 and renderNodes section (nodes: Reflection list) =
