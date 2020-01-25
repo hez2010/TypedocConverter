@@ -1,5 +1,6 @@
-# TypeDocGenerator
-This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.
+# Typedoc Generator
+This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.  
+Currently it support TypeScript doc to C# binding.
 
 ## Languages support
 - [x] C#
@@ -21,6 +22,7 @@ This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type
     - [x] Methods
     - [x] Events
   - [ ] Split entities to different files
+  - [ ] Rename conflict identifiers
   - [ ] ...
 - [ ] ...
 
