@@ -13,9 +13,9 @@ let getDocComment (comment: Comment) (prefixBlankCount: int) =
     let escapeSymbols (text: string) = 
         if isNull text then ""
         else text
+                .Replace("&", "&amp;")
                 .Replace("<", "&lt;")
                 .Replace(">", "&gt;")
-                .Replace("&", "&amp;")
     let toCommentText (text: string) = 
         if isNull text then ""
         else text.Split "\n" |> Array.map (fun t -> "/// " + escapeSymbols t) |> Array.reduce(fun accu next -> accu + "\n" + next)
@@ -114,10 +114,10 @@ let rec getType (typeInfo: Type) =
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments args
         | _ -> ""
-    if genericType = "Promise" && innerTypes = "<void>" 
+    if genericType = "Promise"
     then 
         genericType <- "Task"
-        innerTypes <- ""
+        if innerTypes = "<void>" then innerTypes <- "" else ()
     else ()
     if genericType = "Array" then 
         match innerTypes with
