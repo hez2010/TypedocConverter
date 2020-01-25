@@ -25,13 +25,11 @@ let renderClass (section: string) (node: Reflection): string =
         match node.Children with
         | Some children -> 
             children |> List.where(fun x -> x.Kind = ReflectionKind.Property)
-                     |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited properties
         | _ -> []
     let methods = 
         match node.Children with
         | Some children -> 
             children |> List.where(fun x -> x.Kind = ReflectionKind.Method)
-                     |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited methods
         | _ -> []
     properties 
         |> List.iter (
@@ -56,7 +54,7 @@ let renderClass (section: string) (node: Reflection): string =
                 match x.Comment with
                 | Some comment -> body.AppendFormat("{0}", getDocComment comment 8) |> ignore
                 | _ -> ()
-                body.AppendFormat("        {0}{1} {2}{3}({4});\n",
+                body.AppendFormat("        {0}{1} {2}{3}({4}) {{ }}\n",
                     getModifier x.Flags,
                     match (match x.Signatures with
                           | Some signatures -> 
