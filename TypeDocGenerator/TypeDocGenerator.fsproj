@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="Definitions.fs" />
     <Compile Include="Helper.fs" />
+    <Compile Include="EnumRenderer.fs" />
     <Compile Include="Renderer.fs" />
     <Compile Include="OptionConverter.fs" />
     <Compile Include="Program.fs" />
