@@ -1,5 +1,7 @@
 ﻿module Helper
 
+open Definitions
+
 let rec toPascalCase (str: string) =
     if str.Length = 0
     then str
@@ -8,7 +10,7 @@ let rec toPascalCase (str: string) =
          else str.Substring(0, 1).ToUpper() + str.Substring(1)
 
 
-let getModifier flags = 
+let getModifier (flags: ReflectionFlags) = 
     let mutable modifier = []
     match flags.IsPublic with
     | Some flag -> if flag then modifier <- modifier |> List.append [ "public" ] else ()
