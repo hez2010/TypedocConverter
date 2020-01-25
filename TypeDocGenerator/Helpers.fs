@@ -55,9 +55,7 @@ let rec getType (typeInfo: Type) =
             | _ -> "object"
         | "reference" | "typeParameter" -> 
             match typeInfo.Name with
-            | Some name -> 
-                if name = "Promise" then "Task"
-                else toPascalCase name
+            | Some name -> toPascalCase name
             | _ -> "object"
         | "array" -> 
             match typeInfo.ElementType with
@@ -116,11 +114,17 @@ let rec getType (typeInfo: Type) =
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments args
         | _ -> ""
-    if genericType = "Task" && innerTypes = "<void>" then innerTypes <- "" else ()
+    if genericType = "Promise" && innerTypes = "<void>" 
+    then 
+        genericType <- "Task"
+        innerTypes <- ""
+    else ()
     if genericType = "Array" then 
         match innerTypes with
         | "" -> ()
-        | _ -> genericType <- innerTypes.Substring(1, innerTypes.Length - 2) + "[]"
+        | _ -> 
+            genericType <- innerTypes.Substring(1, innerTypes.Length - 2) + "[]"
+            innerTypes <- ""
     else ()
     if genericType = "Set" then genericType <- "ISet" else ()
     if genericType = "Map" then genericType <- "IDictionary" else ()
