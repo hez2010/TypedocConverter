@@ -156,4 +156,4 @@ let getModifier (flags: ReflectionFlags) =
     | _ -> ()
     match modifier with
     | [] -> ""
-    | _ -> (modifier |> List.reduce(fun accu next -> accu + " " + next))
+    | _ -> (modifier |> List.reduce(fun accu next -> accu + " " + next)) + " "
