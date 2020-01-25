@@ -44,7 +44,7 @@ let renderClass (section: string) (node: Reflection): string =
                 match x.Comment with
                 | Some comment -> body.AppendFormat("{0}", getDocComment comment 8) |> ignore
                 | _ -> ()
-                body.AppendFormat("        {0}{1}{2} {3} {{ get; set; }}{4}\n", 
+                body.AppendFormat("        {0}{1}{2} {3} {{ get => throw new NotImplementedException(); set => throw new NotImplementedException(); }}{4}\n", 
                     getModifier x.Flags,
                     match x.Type with
                     | Some typeInfo -> getType typeInfo
