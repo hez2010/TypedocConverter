@@ -2,21 +2,24 @@
 This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.
 
 ## Languages support
-- [ ] C#
+- [x] C#
   - [x] Enums
     - [x] Direct value
     - [x] Referenced value
-  - [ ] Interfaces
-    - [ ] Inherits
-    - [ ] Generics
-    - [ ] Properties
-    - [ ] Methods
-  - [ ] Classes
-    - [ ] Inherits
-    - [ ] Generics
-    - [ ] Properties
-    - [ ] Methods
-    - [ ] Fields
+  - [x] Interfaces
+    - [x] Inherits
+    - [x] Generics
+    - [ ] Generics Constaints
+    - [x] Properties
+    - [x] Methods
+    - [x] Events
+  - [x] Classes
+    - [x] Inherits
+    - [x] Generics
+    - [ ] Generics Constaints
+    - [x] Properties
+    - [x] Methods
+    - [x] Events
   - [ ] Split entities to different files
   - [ ] ...
 - [ ] ...

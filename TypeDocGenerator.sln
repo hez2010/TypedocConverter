@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TypeDocGenerator", "TypeDocGenerator\TypeDocGenerator.fsproj", "{56DBCE76-FDF3-440A-95DD-99E4021914F2}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TypeDocGenerator", "TypeDocGenerator\TypeDocGenerator.fsproj", "{56DBCE76-FDF3-440A-95DD-99E4021914F2}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TypeDocGenerator.Test", "TypeDocGenerator.Test\TypeDocGenerator.Test.fsproj", "{5B2EA113-D74D-454E-9821-5E1DB9DB862F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TypeDocGenerator.Test", "TypeDocGenerator.Test\TypeDocGenerator.Test.fsproj", "{5B2EA113-D74D-454E-9821-5E1DB9DB862F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{18F14863-A3F7-44CA-8DC6-47DED7197A41}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{56DBCE76-FDF3-440A-95DD-99E4021914F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,5 +46,11 @@ Global
 		{5B2EA113-D74D-454E-9821-5E1DB9DB862F}.Release|x64.Build.0 = Release|Any CPU
 		{5B2EA113-D74D-454E-9821-5E1DB9DB862F}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B2EA113-D74D-454E-9821-5E1DB9DB862F}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ECA085AD-A7A0-4EDF-9584-56561006E77A}
 	EndGlobalSection
 EndGlobal
