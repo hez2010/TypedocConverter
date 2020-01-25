@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TypeDocGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "$(ProjectDir)/1.json"
+    }
+  }
+}
