@@ -55,7 +55,9 @@ let rec getType (typeInfo: Type) =
             | _ -> "object"
         | "reference" | "typeParameter" -> 
             match typeInfo.Name with
-            | Some name -> toPascalCase name
+            | Some name -> 
+                if name = "Promise" then "Task"
+                else toPascalCase name
             | _ -> "object"
         | "array" -> 
             match typeInfo.ElementType with
@@ -114,7 +116,9 @@ let rec getType (typeInfo: Type) =
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments args
         | _ -> ""
-    genericType + innerTypes
+    if (genericType = "Task" && innerTypes = "<void>") 
+    then genericType
+    else genericType + innerTypes
 and getGenericTypeArguments (typeInfos: Type list) = 
     let innerTypes = typeInfos |> List.map getType
     match innerTypes with

@@ -4,6 +4,7 @@ open Definitions
 open EnumRenderer
 open InterfaceRenderer
 open ClassRenderer
+open Helpers
 
 let rec renderNode (section: string) (node: Reflection): string =
     match node.Kind with
@@ -23,6 +24,15 @@ let rec renderNode (section: string) (node: Reflection): string =
     | ReflectionKind.Enum -> renderEnum section node
     | ReflectionKind.Interface -> renderInterface section node
     | ReflectionKind.Class -> renderClass section node
+    | ReflectionKind.TypeAlias -> 
+        match node.Type with
+        | Some typeInfo -> 
+            let original = System.Console.ForegroundColor
+            System.Console.ForegroundColor <- System.ConsoleColor.Yellow
+            System.Console.Error.WriteLine ("Warning: type alias " + toPascalCase node.Name + " = " + getType typeInfo + " is not supported")
+            System.Console.ForegroundColor <- original
+            ""
+        | _ -> ""
     | _ -> ""
 
 and renderNodes section (nodes: Reflection list) =

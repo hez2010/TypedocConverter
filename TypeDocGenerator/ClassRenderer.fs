@@ -6,7 +6,7 @@ open System.Text
 
 let renderClass (section: string) (node: Reflection): string =
     let body = StringBuilder()
-    body.AppendFormat("namespace {0}\n{{\n    using System;\n\n", toPascalCase (if section = "" then "TypeDocGenerator" else section)) |> ignore
+    body.AppendFormat("namespace {0}\n{{\n    using System;\n    using System.Threading.Tasks;\n\n", toPascalCase (if section = "" then "TypeDocGenerator" else section)) |> ignore
     match node.Comment with
     | Some comment -> body.AppendFormat("{0}", getDocComment comment 4) |> ignore
     | _ -> ()
