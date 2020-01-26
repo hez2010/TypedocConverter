@@ -32,7 +32,7 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map arrangeType) + ">"
 
 let printEntity (references: string list) (entity: Entity) = 
-    let thisNamespace = entity.Namespace.Split "." |> Array.map toPascalCase |> Array.reduce (append ".")
+    let thisNamespace = toPascalCase entity.Namespace
     printfn "namespace %s\n{" thisNamespace
     printfn "    using System;"
     printfn "    using System.Collections.Generic;"
@@ -143,13 +143,16 @@ let printEntity (references: string list) (entity: Entity) =
                     )
                     (
                         let mutable args = []
+                        let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte"; "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; "decimal"; "default"; "delegate"; "do"; "double"; "else"; "enum"; "event"; "explicit"; "extern"; "false"; "finally"; "fixed"; "float"; "for"; "foreach"; "goto"; "if"; "implicit"; "in"; "int"; "interface"; "internal"; "is"; "lock"; "long"; "namespace"; "new"; "null"; "object"; "operator"; "out"; "override"; "params"; "private"; "protected"; "public"; "readonly"; "ref"; "return"; "sbyte"; "sealed"; "short"; "sizeof"; "stackalloc"; "static"; "string"; "struct"; "switch"; "this"; "throw"; "true"; "try"; "typeof"; "uint"; "ulong"; "unchecked"; "unsafe"; "ushort"; "using"; "virtual"; "void"; "volatile"; "while";]
                         let rec getArg arg cnt = 
-                            if args |> List.contains (if cnt = 0 then arg else arg + string cnt)
-                            then getArg arg (cnt + 1)
-                            else 
-                                let newArg = if cnt = 0 then arg else arg + string cnt
-                                args <- args @ [newArg]
-                                newArg
+                            let outArg = 
+                                if args |> List.contains (if cnt = 0 then arg else arg + string cnt)
+                                then getArg arg (cnt + 1)
+                                else 
+                                    let newArg = if cnt = 0 then arg else arg + string cnt
+                                    args <- args @ [newArg]
+                                    newArg
+                            if conflictNames |> List.contains outArg then "@" + outArg else outArg
                         System.String.Join(
                             ", ", 
                             x.Parameter |> List.map 
@@ -176,5 +179,5 @@ let printEntities (entities: Entity list) =
         entities 
         |> List.map(fun x -> x.Namespace) 
         |> List.distinct 
-        |> List.map (fun x -> x.Split "." |> Array.map toPascalCase |> Array.reduce (append "."))
+        |> List.map toPascalCase
     entities |> List.iter (printEntity namespaces)

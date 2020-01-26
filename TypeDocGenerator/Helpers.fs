@@ -7,8 +7,11 @@ let rec toPascalCase (str: string) =
     if str.Length = 0
     then str
     else if str.Contains "." then 
-         str.Split "." |> Array.reduce (fun a n -> a + "." + n)
-         else str.Substring(0, 1).ToUpper() + str.Substring 1
+         str.Split "." |> Array.map toPascalCase |> Array.reduce (fun a n -> a + "." + n)
+         else 
+            str.Split([| "-"; "_" |], System.StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
+            |> Array.reduce (fun accu next -> accu + next)
 
 let getXmlDocComment (comment: Comment) =
     let escapeSymbols (text: string) = 
