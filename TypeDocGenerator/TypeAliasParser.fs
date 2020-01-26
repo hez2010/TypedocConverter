@@ -33,24 +33,26 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
                             ]
                         | _ -> []
                 )
-    [
-        {
-            Namespace = section
-            Name = node.Name
-            Comment = 
-                match node.Comment with
-                | Some comment -> getXmlDocComment comment
-                | _ -> ""
-            Methods = []
-            Events = []
-            Properties = []
-            Enums = enums
-            InheritedFrom = []
-            Type = EntityType.StringEnum
-            TypeParameter = []
-            Modifier = getModifier node.Flags
-        }
-    ]
+    if enums = [] then []
+    else 
+        [
+            {
+                Namespace = section
+                Name = node.Name
+                Comment = 
+                    match node.Comment with
+                    | Some comment -> getXmlDocComment comment
+                    | _ -> ""
+                Methods = []
+                Events = []
+                Properties = []
+                Enums = enums
+                InheritedFrom = []
+                Type = EntityType.StringEnum
+                TypeParameter = []
+                Modifier = getModifier node.Flags
+            }
+        ]
 
 let parseTypeAlias (section: string) (node: Reflection): Entity list =
     let typeInfo = node.Type
