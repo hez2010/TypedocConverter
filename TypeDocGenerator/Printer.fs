@@ -243,7 +243,7 @@ let printEntities (splitFile: bool) (output: string) (entities: Entity list) =
     else
         let path = output
         let dir = System.IO.Path.GetDirectoryName path
-        if not (System.IO.Directory.Exists dir) 
+        if dir <> "" && not (System.IO.Directory.Exists dir) 
         then System.IO.Directory.CreateDirectory dir |> ignore
         else ()
         use file = new System.IO.FileStream(path, System.IO.FileMode.Create)
