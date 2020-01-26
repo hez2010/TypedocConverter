@@ -21,7 +21,7 @@ Currently it support TypeScript doc to C# binding.
     - [x] Properties
     - [x] Methods
     - [x] Events
-  - [ ] Split entities to different files
+  - [x] Split entities to different files
   - [x] Auto rename conflict parameter names
   - [ ] ...
 - [ ] ...
