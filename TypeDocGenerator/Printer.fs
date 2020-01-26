@@ -31,11 +31,17 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | [] -> pascalizeTypeName typeInfo.Type
         | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map arrangeType) + ">"
 
-let printEntity (entity: Entity) = 
-    printfn "namespace %s\n{" (toPascalCase entity.Namespace)
+let printEntity (references: string list) (entity: Entity) = 
+    let thisNamespace = entity.Namespace.Split "." |> Array.map toPascalCase |> Array.reduce (append ".")
+    printfn "namespace %s\n{" thisNamespace
     printfn "    using System;"
     printfn "    using System.Collections.Generic;"
-    printfn "    using System.Threading.Tasks;\n"
+    printfn "    using System.Threading.Tasks;"
+    references
+    |> List.where(fun x -> x <> thisNamespace)
+    |> List.iter(fun x -> printfn "    using %s;" (x))
+    printf "\n"
+
     if (entity.Comment <> "") then printfn "%s" (arrangeComment entity.Comment 4) else ()
     printfn "    %s%s%s %s%s%s\n    {" 
         (
@@ -61,6 +67,7 @@ let printEntity (entity: Entity) =
             | [] -> ""
             | paras -> " : " + System.String.Join(", ", paras |> List.map arrangeType)
         )
+
     entity.Enums
     |> List.iteri
         (
@@ -76,6 +83,7 @@ let printEntity (entity: Entity) =
                     (if i = entity.Enums.Length - 1 then "" else ",")
 
         )
+
     entity.Properties
     |> List.iter
         (
@@ -106,6 +114,7 @@ let printEntity (entity: Entity) =
                         | Some value -> " = " + string value + ";"
                     )
         )
+
     entity.Events
     |> List.iter
         (
@@ -117,6 +126,7 @@ let printEntity (entity: Entity) =
                     (if x.IsOptional then "?" else "")
                     (toPascalCase x.Name)
         )
+
     entity.Methods
     |> List.iter
         (
@@ -158,7 +168,13 @@ let printEntity (entity: Entity) =
                         else " => throw new NotImplementedException();"
                     )
         )
+
     printfn "    }\n}\n"
 
 let printEntities (entities: Entity list) = 
-    entities |> List.iter printEntity
+    let namespaces = 
+        entities 
+        |> List.map(fun x -> x.Namespace) 
+        |> List.distinct 
+        |> List.map (fun x -> x.Split "." |> Array.map toPascalCase |> Array.reduce (append "."))
+    entities |> List.iter (printEntity namespaces)
