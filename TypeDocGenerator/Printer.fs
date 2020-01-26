@@ -70,6 +70,7 @@ let printEntity (references: string list) (entity: Entity) =
         (
             fun i x ->
                 if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
+                printfn "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
                 printfn "        %s%s%s"
                     (toPascalCase x.Name)
                     (
@@ -86,6 +87,7 @@ let printEntity (references: string list) (entity: Entity) =
         (
             fun x ->
                 if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
+                printfn "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
                 printfn "        %s%s%s %s { %s%s}%s"
                     (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
                     (arrangeType x.Type)

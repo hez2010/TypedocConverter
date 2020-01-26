@@ -60,6 +60,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
                         | "Promise" -> "System.Threading.Tasks.Task"
                         | "Set" -> "System.Collections.Generic.ISet"
                         | "Map" -> "System.Collections.Generic.IDictionary"
+                        | "Array" -> "System.Array"
                         | x -> x; 
                     InnerTypes = []; 
                     Name = None 
