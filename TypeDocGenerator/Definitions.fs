@@ -159,5 +159,3 @@ and CommentTag = {
     ParentName: string
     Text: string
 }
-
-type Entity = Reflection list

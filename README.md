@@ -22,7 +22,7 @@ Currently it support TypeScript doc to C# binding.
     - [x] Methods
     - [x] Events
   - [ ] Split entities to different files
-  - [ ] Rename conflict identifiers
+  - [x] Auto rename conflict parameter names
   - [ ] ...
 - [ ] ...
 

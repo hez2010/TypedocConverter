@@ -15,5 +15,6 @@ let main argv =
         jsonSettings.Converters.Add(OptionConverter())
         let json = File.ReadAllText argv.[0]
         let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
-        printfn "%s" (Renderer.renderNode "" root)
+        let entities = Parser.parseNode "" root
+        Printer.printEntities entities 
         0

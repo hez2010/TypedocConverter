@@ -5,12 +5,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Definitions.fs" />
+    <Compile Include="Entity.fs" />
     <Compile Include="Helpers.fs" />
-    <Compile Include="ClassRenderer.fs" />
-    <Compile Include="InterfaceRenderer.fs" />
-    <Compile Include="EnumRenderer.fs" />
-    <Compile Include="Renderer.fs" />
+    <Compile Include="InterfaceClassParser.fs" />
+    <Compile Include="EnumParser.fs" />
+    <Compile Include="Parser.fs" />
     <Compile Include="OptionConverter.fs" />
+    <Compile Include="Printer.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
