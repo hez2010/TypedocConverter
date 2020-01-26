@@ -212,9 +212,13 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                     )
         )
 
-    fprintfn writer "    }\n"
+    fprintfn writer "    }"
     
-    if entity.Type = EntityType.StringEnum then printConverter writer entity else ()
+    if entity.Type = EntityType.StringEnum 
+    then 
+        fprintf writer ""
+        printConverter writer entity 
+    else ()
     fprintfn writer "}\n"
 
 let printEntities (splitFile: bool) (output: string) (entities: Entity list) = 
