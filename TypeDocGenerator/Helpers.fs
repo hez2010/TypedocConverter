@@ -57,9 +57,9 @@ let rec getType (typeInfo: Type): EntityBodyType =
                 { 
                     Type =
                         match name with
-                        | "Promise" -> "Task"
-                        | "Set" -> "ISet"
-                        | "Map" -> "IDictionary"
+                        | "Promise" -> "System.Threading.Tasks.Task"
+                        | "Set" -> "System.Collections.Generic.ISet"
+                        | "Map" -> "System.Collections.Generic.IDictionary"
                         | x -> x; 
                     InnerTypes = []; 
                     Name = None 
@@ -67,15 +67,15 @@ let rec getType (typeInfo: Type): EntityBodyType =
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "array" -> 
             match typeInfo.ElementType with
-            | Some elementType -> { Type = "Array"; InnerTypes = [getType elementType]; Name = None }
-            | _ -> { Type = "Array"; InnerTypes = [{ Type = "object"; InnerTypes = []; Name = None }]; Name = None }
+            | Some elementType -> { Type = "System.Array"; InnerTypes = [getType elementType]; Name = None }
+            | _ -> { Type = "System.Array"; InnerTypes = [{ Type = "object"; InnerTypes = []; Name = None }]; Name = None }
         | "stringLiteral" -> { Type = "string"; InnerTypes = []; Name = None }
         | "tuple" ->
             match typeInfo.Types with
             | Some innerTypes -> 
                 match innerTypes with
                 | [] -> { Type = "object"; InnerTypes = []; Name = None }
-                | _ -> { Type = "ValueTuple"; InnerTypes = innerTypes |> List.map getType; Name = None }
+                | _ -> { Type = "System.ValueTuple"; InnerTypes = innerTypes |> List.map getType; Name = None }
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "union" -> 
             match typeInfo.Types with
@@ -118,11 +118,11 @@ let rec getType (typeInfo: Type): EntityBodyType =
                         | _ -> { Type = "void"; InnerTypes = []; Name = None }
                     let typeParas = getDelegateParas paras
                     match typeParas with
-                    | [] -> { Type = "Action"; InnerTypes = []; Name = None }
+                    | [] -> { Type = "System.Action"; InnerTypes = []; Name = None }
                     | _ -> 
                         if returnsType.Type = "void" 
-                        then { Type = "Action"; InnerTypes = typeParas; Name = None } 
-                        else { Type = "Func"; InnerTypes = typeParas @ [returnsType]; Name = None }
+                        then { Type = "System.Action"; InnerTypes = typeParas; Name = None } 
+                        else { Type = "System.Func"; InnerTypes = typeParas @ [returnsType]; Name = None }
                 | _ -> { Type = "object"; InnerTypes = []; Name = None }
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | _ -> { Type = "object"; InnerTypes = []; Name = None }
@@ -130,7 +130,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments args
         | _ -> []
-    if genericType.Type = "Task"
+    if genericType.Type = "System.Threading.Tasks.Task"
     then 
         match innerTypes with
         | (front::_) -> if front.Type = "void" then innerTypes <- [] else ()

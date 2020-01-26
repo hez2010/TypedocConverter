@@ -20,11 +20,11 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | "object" | "string" | "double" | "void" | "bool" -> name
         | _ -> toPascalCase name
     match typeInfo.Type with
-    | "Array" -> 
+    | "System.Array" -> 
         (match typeInfo.InnerTypes with
         | [x] -> arrangeType x
         | _ -> "object") + "[]"
-    | "ValueTuple" ->
+    | "System.ValueTuple" ->
         "(" + System.String.Join(", ", typeInfo.InnerTypes |> List.map arrangeType) + ")"
     | _ -> 
         match typeInfo.InnerTypes with
@@ -34,9 +34,6 @@ let rec arrangeType (typeInfo: EntityBodyType) =
 let printEntity (references: string list) (entity: Entity) = 
     let thisNamespace = toPascalCase entity.Namespace
     printfn "namespace %s\n{" thisNamespace
-    printfn "    using System;"
-    printfn "    using System.Collections.Generic;"
-    printfn "    using System.Threading.Tasks;"
     references
     |> List.where(fun x -> x <> thisNamespace)
     |> List.iter(fun x -> printfn "    using %s;" (x))
@@ -99,14 +96,14 @@ let printEntity (references: string list) (entity: Entity) =
                         then
                             if x.WithGet then "get; " else ""
                         else
-                            if x.WithGet then "get => throw new NotImplementedException(); " else ""
+                            if x.WithGet then "get => throw new System.NotImplementedException(); " else ""
                     )
                     (
                         if entity.Type = EntityType.Interface 
                         then
                             if x.WithGet then "set; " else ""
                         else
-                            if x.WithGet then "set => throw new NotImplementedException(); " else ""
+                            if x.WithGet then "set => throw new System.NotImplementedException(); " else ""
                     )
                     (
                         match x.InitialValue with
@@ -132,7 +129,7 @@ let printEntity (references: string list) (entity: Entity) =
         (
             fun x ->
                 if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
-                printfn "        %s%s %s%s(%s)%s"
+                printfn "        %s%s %s%s(%s)%s;"
                     (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
                     (arrangeType x.Type)
                     (toPascalCase x.Name)
@@ -167,8 +164,8 @@ let printEntity (references: string list) (entity: Entity) =
                         )
                     )
                     (
-                        if entity.Type = EntityType.Interface then ";"
-                        else " => throw new NotImplementedException();"
+                        if entity.Type = EntityType.Interface then ""
+                        else " => throw new System.NotImplementedException()"
                     )
         )
 

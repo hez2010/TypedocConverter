@@ -139,11 +139,11 @@ let renderInterfaceAndClass (section: string) (node: Reflection) (isInterface: b
                             | (front::_) -> 
                                 match front.Type with
                                 | Some typeInfo -> getType typeInfo
-                                | _ -> { Type = "Delegate"; Name = None; InnerTypes = [] }
+                                | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
                             | _ -> 
                                 match x.Type with
                                 | Some typeInfo -> getType typeInfo
-                                | _ -> { Type = "Delegate"; Name = None; InnerTypes = [] }
+                                | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
                             ;
                         Comment = 
                             match x.Comment with
