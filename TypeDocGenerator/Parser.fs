@@ -3,7 +3,7 @@ module Parser
 open Definitions
 open EnumParser
 open InterfaceClassParser
-open Helpers
+open TypeAliasParser
 open Entity
 
 let rec parseNode (section: string) (node: Reflection): Entity list =
@@ -26,12 +26,7 @@ let rec parseNode (section: string) (node: Reflection): Entity list =
     | ReflectionKind.Class -> [renderInterfaceAndClass section node false]
     | ReflectionKind.TypeAlias -> 
         match node.Type with
-        | Some _ -> 
-            let original = System.Console.ForegroundColor
-            System.Console.ForegroundColor <- System.ConsoleColor.Yellow
-            System.Console.Error.WriteLine ("Warning: type alias " + node.Name + " is not supported")
-            System.Console.ForegroundColor <- original
-            []
+        | Some _ -> parseTypeAlias section node
         | _ -> []
     | _ -> []
 

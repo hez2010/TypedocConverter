@@ -13,16 +13,18 @@ let rec toPascalCase (str: string) =
             |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
             |> Array.reduce (fun accu next -> accu + next)
 
+let escapeSymbols (text: string) = 
+    if isNull text then ""
+    else text
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;")
+
+let toCommentText (text: string) = 
+    if isNull text then ""
+    else text.Split "\n" |> Array.map (fun t -> "/// " + escapeSymbols t) |> Array.reduce(fun accu next -> accu + "\n" + next)
+
 let getXmlDocComment (comment: Comment) =
-    let escapeSymbols (text: string) = 
-        if isNull text then ""
-        else text
-                .Replace("&", "&amp;")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;")
-    let toCommentText (text: string) = 
-        if isNull text then ""
-        else text.Split "\n" |> Array.map (fun t -> "/// " + escapeSymbols t) |> Array.reduce(fun accu next -> accu + "\n" + next)
     let prefix = "/// <summary>\n"
     let suffix = "\n/// </summary>"
     let summary = 

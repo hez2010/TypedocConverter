@@ -45,11 +45,11 @@ let parseEnum (section: string) (node: Reflection): Entity =
                 | _ -> ""
             let mutable intValue = 0L
             match x.DefaultValue with
-            | Some value -> if Int64.TryParse(value, &intValue) then { Comment = comment; Name = toPascalCase x.Name; Value = Some intValue }
+            | Some value -> if Int64.TryParse(value, &intValue) then { Comment = comment; Name = toPascalCase x.Name; Value = Some intValue; }
                             else match getEnumReferencedValue values value x.Name with
-                                 | Some t -> { Comment = comment; Name = x.Name; Value = Some (int64 t) }
-                                 | _ -> { Comment = comment; Name = x.Name; Value = None }
-            | _ -> { Comment = comment; Name = x.Name; Value = None }
+                                 | Some t -> { Comment = comment; Name = x.Name; Value = Some (int64 t); }
+                                 | _ -> { Comment = comment; Name = x.Name; Value = None; }
+            | _ -> { Comment = comment; Name = x.Name; Value = None; }
         );
         TypeParameter = []
     }

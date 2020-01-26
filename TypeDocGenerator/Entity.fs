@@ -44,6 +44,7 @@ type EntityType =
 | Interface
 | Class
 | Enum
+| StringEnum
 
 type Entity = {
     Namespace: string

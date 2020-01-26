@@ -32,6 +32,44 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | [] -> pascalizeTypeName typeInfo.Type
         | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map arrangeType) + ">"
 
+let printConverter (entity: Entity) = 
+    printfn "    class %s%s" (toPascalCase entity.Name) "Converter : Newtonsoft.Json.JsonConverter"
+    printfn "    {"
+    printfn "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase entity.Name) (toPascalCase entity.Name)
+    printfn "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)"
+    printfn "            => reader.TokenType switch"
+    printfn "            {"
+    printfn "                Newtonsoft.Json.JsonToken.String =>"
+    printfn "                    serializer.Deserialize<string>(reader) switch"
+    printfn "                    {"
+    entity.Enums
+    |> List.iter
+        (
+            fun x ->
+                printfn "                        \"%s\" => %s.%s," x.Name (toPascalCase entity.Name) (toPascalCase x.Name)
+        )
+    printfn "                        _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
+    printfn "                    },"
+    printfn "                _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
+    printfn "            };"
+    printfn "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)"
+    printfn "        {"
+    printfn "            if (untypedValue is null) { serializer.Serialize(writer, null); return; }"
+    printfn "            var value = (%s)untypedValue;" (toPascalCase entity.Name)
+    printfn "            switch (value)"
+    printfn "            {"
+    entity.Enums
+    |> List.iter
+        (
+            fun x ->
+                printfn "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase entity.Name) (toPascalCase x.Name) x.Name
+        )
+    printfn "                default: break;"
+    printfn "            }"
+    printfn "            throw new System.Exception(\"Cannot marshal type %s\");" (toPascalCase entity.Name)
+    printfn "        }"
+    printfn "    }"
+
 let printEntity (references: string list) (entity: Entity) = 
     let thisNamespace = toPascalCase entity.Namespace
     printfn "namespace %s\n{" thisNamespace
@@ -39,6 +77,8 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.where(fun x -> x <> thisNamespace)
     |> List.iter(fun x -> printfn "    using %s;" (x))
     printf "\n"
+    
+    if entity.Type = EntityType.StringEnum then printfn "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase entity.Name) "Converter" else ()
 
     if (entity.Comment <> "") then printfn "%s" (arrangeComment entity.Comment 4) else ()
     printfn "    %s%s%s %s%s%s\n    {" 
@@ -52,7 +92,7 @@ let printEntity (references: string list) (entity: Entity) =
             match entity.Type with
             | EntityType.Class -> "class"
             | EntityType.Interface -> "interface"
-            | EntityType.Enum -> "enum"
+            | EntityType.Enum | EntityType.StringEnum -> "enum"
         )
         (toPascalCase entity.Name)
         (
@@ -70,7 +110,7 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.iteri
         (
             fun i x ->
-                if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
+                if x.Comment <> "" then printfn "%s" (arrangeComment x.Comment 8) else ()
                 printfn "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
                 printfn "        %s%s%s"
                     (toPascalCase x.Name)
@@ -172,7 +212,10 @@ let printEntity (references: string list) (entity: Entity) =
                     )
         )
 
-    printfn "    }\n}\n"
+    printfn "    }\n"
+    
+    if entity.Type = EntityType.StringEnum then printConverter entity else ()
+    printfn "}\n"
 
 let printEntities (entities: Entity list) = 
     let namespaces = 
