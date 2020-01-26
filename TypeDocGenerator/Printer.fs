@@ -164,7 +164,7 @@ let printEntity (references: string list) (entity: Entity) =
                         )
                     )
                     (
-                        if entity.Type = EntityType.Interface then ""
+                        if entity.Type = EntityType.Interface then ";"
                         else " => throw new NotImplementedException();"
                     )
         )
