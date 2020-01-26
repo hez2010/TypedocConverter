@@ -54,17 +54,21 @@ let rec getType (typeInfo: Type): EntityBodyType =
         | "reference" | "typeParameter" -> 
             match typeInfo.Name with
             | Some name -> 
-                { 
-                    Type =
-                        match name with
-                        | "Promise" -> "System.Threading.Tasks.Task"
-                        | "Set" -> "System.Collections.Generic.ISet"
-                        | "Map" -> "System.Collections.Generic.IDictionary"
-                        | "Array" -> "System.Array"
-                        | x -> x; 
-                    InnerTypes = []; 
-                    Name = None 
-                }
+                match name with
+                | "Promise" -> { Type = "System.Threading.Tasks.Task"; InnerTypes = []; Name = None }
+                | "Set" -> { Type = "System.Collections.Generic.ISet"; InnerTypes = []; Name = None }
+                | "Map" -> { Type = "System.Collections.Generic.IDictionary"; InnerTypes = []; Name = None }
+                | "Array" -> { Type = "System.Array"; InnerTypes = []; Name = None }
+                | "BigUint64Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "ulong"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Uint32Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "uint"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Uint16Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "ushort"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Uint8Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "byte"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "BigInt64Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "long"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Int32Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "int"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Int16Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "short"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "Int8Array" -> { Type = "System.Array"; InnerTypes = [{ Type = "char"; InnerTypes = [ ]; Name = None };]; Name = None };
+                | "RegExp" -> { Type = "string"; InnerTypes = []; Name = None };
+                | x -> { Type = x; InnerTypes = []; Name = None };
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "array" -> 
             match typeInfo.ElementType with

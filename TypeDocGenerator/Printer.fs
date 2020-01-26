@@ -17,7 +17,8 @@ let arrangeComment (comment: string) blankSpace =
 let rec arrangeType (typeInfo: EntityBodyType) =
     let pascalizeTypeName name =
         match name with
-        | "object" | "string" | "double" | "void" | "bool" -> name
+        | "object" | "string" | "double" | "void" | "bool" | "ulong"
+        | "uint" | "ushort" | "byte" | "long" | "int" | "short" | "char" -> name
         | _ -> toPascalCase name
     match typeInfo.Type with
     | "System.Array" -> 
