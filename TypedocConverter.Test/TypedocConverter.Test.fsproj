@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypeDocGenerator\TypeDocGenerator.fsproj" />
+    <ProjectReference Include="..\TypedocConverter\TypedocConverter.fsproj" />
   </ItemGroup>
 
 </Project>

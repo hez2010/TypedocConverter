@@ -1,4 +1,4 @@
-# Typedoc Generator
+# Typedoc Converter
 This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.  
 Currently it support TypeScript doc to C# binding.
 
@@ -28,16 +28,16 @@ Currently it support TypeScript doc to C# binding.
 
 ## Build
 ```
-cd TypeDocGenerator/TypeDocGenerator
+cd TypedocConverter/TypedocConverter
 dotnet publish -c Release -r win-x64 --no-self-contained /p:PublishSingleFile=true /p:PublishReadyToRun=true
 ```
 You can replace `win-x64` with other platform identifiers such as `linux-x64`, `linux-arm`, `osx-x64` and etc.  
 Then built dists will be placed in `bin/Release/netcoreapp3.1/[platform identifier]/publish`
 ## Run
 ```
-TypeDocGenerator --help
+TypedocConverter --help
 ```
 Sample:
 ```
-TypeDocGenerator --inputfile 1.json --splitfiles true --outputdir . --namespace ""
+TypedocConverter --inputfile 1.json --splitfiles true --outputdir . --namespace ""
 ```
