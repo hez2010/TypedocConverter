@@ -32,56 +32,56 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | [] -> pascalizeTypeName typeInfo.Type
         | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map arrangeType) + ">"
 
-let printConverter (entity: Entity) = 
-    printfn "    class %s%s" (toPascalCase entity.Name) "Converter : Newtonsoft.Json.JsonConverter"
-    printfn "    {"
-    printfn "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase entity.Name) (toPascalCase entity.Name)
-    printfn "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)"
-    printfn "            => reader.TokenType switch"
-    printfn "            {"
-    printfn "                Newtonsoft.Json.JsonToken.String =>"
-    printfn "                    serializer.Deserialize<string>(reader) switch"
-    printfn "                    {"
+let printConverter (writer: System.IO.TextWriter) (entity: Entity) = 
+    fprintfn writer "    class %s%s" (toPascalCase entity.Name) "Converter : Newtonsoft.Json.JsonConverter"
+    fprintfn writer "    {"
+    fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase entity.Name) (toPascalCase entity.Name)
+    fprintfn writer "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)"
+    fprintfn writer "            => reader.TokenType switch"
+    fprintfn writer "            {"
+    fprintfn writer "                Newtonsoft.Json.JsonToken.String =>"
+    fprintfn writer "                    serializer.Deserialize<string>(reader) switch"
+    fprintfn writer "                    {"
     entity.Enums
     |> List.iter
         (
             fun x ->
-                printfn "                        \"%s\" => %s.%s," x.Name (toPascalCase entity.Name) (toPascalCase x.Name)
+                fprintfn writer "                        \"%s\" => %s.%s," x.Name (toPascalCase entity.Name) (toPascalCase x.Name)
         )
-    printfn "                        _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
-    printfn "                    },"
-    printfn "                _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
-    printfn "            };"
-    printfn "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)"
-    printfn "        {"
-    printfn "            if (untypedValue is null) { serializer.Serialize(writer, null); return; }"
-    printfn "            var value = (%s)untypedValue;" (toPascalCase entity.Name)
-    printfn "            switch (value)"
-    printfn "            {"
+    fprintfn writer "                        _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
+    fprintfn writer "                    },"
+    fprintfn writer "                _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
+    fprintfn writer "            };"
+    fprintfn writer "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)"
+    fprintfn writer "        {"
+    fprintfn writer "            if (untypedValue is null) { serializer.Serialize(writer, null); return; }"
+    fprintfn writer "            var value = (%s)untypedValue;" (toPascalCase entity.Name)
+    fprintfn writer "            switch (value)"
+    fprintfn writer "            {"
     entity.Enums
     |> List.iter
         (
             fun x ->
-                printfn "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase entity.Name) (toPascalCase x.Name) x.Name
+                fprintf writer  "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase entity.Name) (toPascalCase x.Name) x.Name
         )
-    printfn "                default: break;"
-    printfn "            }"
-    printfn "            throw new System.Exception(\"Cannot marshal type %s\");" (toPascalCase entity.Name)
-    printfn "        }"
-    printfn "    }"
+    fprintfn writer "                default: break;"
+    fprintfn writer "            }"
+    fprintfn writer "            throw new System.Exception(\"Cannot marshal type %s\");" (toPascalCase entity.Name)
+    fprintfn writer "        }"
+    fprintfn writer "    }"
 
-let printEntity (references: string list) (entity: Entity) = 
+let printEntity (writer: System.IO.TextWriter) (references: string list) (entity: Entity) = 
     let thisNamespace = toPascalCase entity.Namespace
-    printfn "namespace %s\n{" thisNamespace
+    fprintfn writer "namespace %s\n{" thisNamespace
     references
     |> List.where(fun x -> x <> thisNamespace)
-    |> List.iter(fun x -> printfn "    using %s;" (x))
-    printf "\n"
+    |> List.iter(fun x -> fprintfn writer "    using %s;" (x))
+    fprintfn writer  ""
     
-    if entity.Type = EntityType.StringEnum then printfn "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase entity.Name) "Converter" else ()
+    if entity.Type = EntityType.StringEnum then fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase entity.Name) "Converter" else ()
 
-    if (entity.Comment <> "") then printfn "%s" (arrangeComment entity.Comment 4) else ()
-    printfn "    %s%s%s %s%s%s\n    {" 
+    if (entity.Comment <> "") then fprintfn writer "%s" (arrangeComment entity.Comment 4) else ()
+    fprintfn writer "    %s%s%s %s%s%s\n    {" 
         (
             match entity.Modifier with
             | [] -> ""
@@ -110,9 +110,9 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.iteri
         (
             fun i x ->
-                if x.Comment <> "" then printfn "%s" (arrangeComment x.Comment 8) else ()
-                printfn "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
-                printfn "        %s%s%s"
+                if x.Comment <> "" then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
+                fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
+                fprintfn writer "        %s%s%s"
                     (toPascalCase x.Name)
                     (
                         match x.Value with
@@ -127,9 +127,9 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.iter
         (
             fun x ->
-                if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
-                printfn "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
-                printfn "        %s%s%s %s { %s%s}%s"
+                if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
+                fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
+                fprintfn writer "        %s%s%s %s { %s%s}%s"
                     (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
                     (arrangeType x.Type)
                     (if x.IsOptional then "?" else "")
@@ -159,8 +159,8 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.iter
         (
             fun x ->
-                if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
-                printfn "        %sevent %s%s %s;"
+                if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
+                fprintfn writer "        %sevent %s%s %s;"
                     (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
                     (arrangeType x.DelegateType)
                     (if x.IsOptional then "?" else "")
@@ -171,8 +171,8 @@ let printEntity (references: string list) (entity: Entity) =
     |> List.iter
         (
             fun x ->
-                if (x.Comment <> "") then printfn "%s" (arrangeComment x.Comment 8) else ()
-                printfn "        %s%s %s%s(%s)%s;"
+                if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
+                fprintfn writer "        %s%s %s%s(%s)%s;"
                     (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
                     (arrangeType x.Type)
                     (toPascalCase x.Name)
@@ -212,15 +212,37 @@ let printEntity (references: string list) (entity: Entity) =
                     )
         )
 
-    printfn "    }\n"
+    fprintfn writer "    }\n"
     
-    if entity.Type = EntityType.StringEnum then printConverter entity else ()
-    printfn "}\n"
+    if entity.Type = EntityType.StringEnum then printConverter writer entity else ()
+    fprintfn writer "}\n"
 
-let printEntities (entities: Entity list) = 
+let printEntities (splitFile: bool) (output: string) (entities: Entity list) = 
     let namespaces = 
         entities 
         |> List.map(fun x -> x.Namespace) 
         |> List.distinct 
         |> List.map toPascalCase
-    entities |> List.iter (printEntity namespaces)
+    if (splitFile) then
+        entities 
+        |> List.iter
+            (
+                fun x ->
+                    let path = System.IO.Path.Combine([output]@((toPascalCase x.Namespace).Split(".") |> List.ofArray) |> Array.ofList)
+                    if not (System.IO.Directory.Exists path) 
+                    then System.IO.Directory.CreateDirectory path |> ignore
+                    else ()
+                    use file = new System.IO.FileStream(System.IO.Path.Combine(path, toPascalCase x.Name + ".cs"), System.IO.FileMode.Create)
+                    use textWriter = new System.IO.StreamWriter(file)
+                    printEntity textWriter namespaces x
+            )
+    else
+        let path = output
+        let dir = System.IO.Path.GetDirectoryName path
+        if not (System.IO.Directory.Exists dir) 
+        then System.IO.Directory.CreateDirectory dir |> ignore
+        else ()
+        use file = new System.IO.FileStream(path, System.IO.FileMode.Create)
+        use textWriter = new System.IO.StreamWriter(file)
+        entities 
+        |> List.iter(printEntity textWriter namespaces)

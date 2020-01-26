@@ -1,5 +1,14 @@
 module Definitions
 
+type Config = {
+    Namespace: string
+    SplitFiles: bool
+    OutputDir: string
+    OutputFile: string
+    InputFile: string
+    Help: bool
+}
+
 type ReflectionKind = 
 | Global = 0
 | ExternalModule = 1

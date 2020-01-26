@@ -2,7 +2,7 @@
   "profiles": {
     "TypeDocGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "$(ProjectDir)/1.json"
+      "commandLineArgs": "--inputfile \"$(ProjectDir)/1.json\"  --splitfiles true --outputdir Monaco --namespace \"\""
     }
   }
 }

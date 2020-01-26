@@ -28,19 +28,17 @@ Currently it support TypeScript doc to C# binding.
 
 ## Build
 ```
-dotnet build [-c Release|Debug]
+dotnet publish -c Release -r win-x64 --no-self-contained /p:PublishSingleFile=true /p:PublishReadyToRun=true
 ```
+You can replace `win-x64` with other platform identifiers such as `linux-x64`, `linux-arm`, `osx-x64` and etc.
 
 ## Run
 ```
-dotnet run [-c Release|Debug] inputfile [> outputfile]
+cd bin\Release\netcoreapp3.1\[platform identifier]\publish
+.\TypeDocGenerator --help
 ```
 Sample:
 ```
-dotnet run -c Release input.json > 1.cs
-```
-
-## Test
-```
-dotnet test
+cd bin\Release\netcoreapp3.1\win-x64\publish
+.\TypeDocGenerator --help
 ```
