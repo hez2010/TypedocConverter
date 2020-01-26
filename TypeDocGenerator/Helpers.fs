@@ -3,6 +3,18 @@
 open Definitions
 open Entity
 
+let printWarning (warn: string) = 
+    let backup = System.Console.ForegroundColor
+    System.Console.ForegroundColor <- System.ConsoleColor.Yellow
+    System.Console.Error.WriteLine ("[Warning] " + warn)
+    System.Console.ForegroundColor <- backup
+    
+let printError (err: string) = 
+    let backup = System.Console.ForegroundColor
+    System.Console.ForegroundColor <- System.ConsoleColor.Red
+    System.Console.Error.WriteLine ("[Error] " + err)
+    System.Console.ForegroundColor <- backup
+
 let rec toPascalCase (str: string) =
     if str.Length = 0
     then str
@@ -89,7 +101,9 @@ let rec getType (typeInfo: Type): EntityBodyType =
             | Some innerTypes -> 
                 match innerTypes with
                 | [] -> { Type = "object"; InnerTypes = []; Name = None }
-                | _ -> getType innerTypes.[0] // TODO: generate unions
+                | _ -> 
+                    printWarning ("Taking only the first type " + innerTypes.[0].Type + " for the entire union type.")
+                    getType innerTypes.[0] // TODO: generate unions
             | _ ->{ Type = "object"; InnerTypes = []; Name = None }
         | "intersection" -> { Type = "object"; InnerTypes = []; Name = None } // TODO: generate intersections
         | "reflection" -> 

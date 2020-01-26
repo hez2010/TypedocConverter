@@ -4,18 +4,12 @@ open Definitions
 open Entity
 open Helpers
 
-let notSupported (typeString: string) = 
-    let backup = System.Console.ForegroundColor
-    System.Console.ForegroundColor <- System.ConsoleColor.Yellow
-    System.Console.Error.WriteLine ("[Warning] Type alias " + typeString + " is not supported.")
-    System.Console.ForegroundColor <- backup
-
 let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list): Entity list =
     let notStringLiteral = nodes |> List.tryFind(fun x -> x.Type <> "stringLiteral")
     let enums = 
         match notStringLiteral with
         | Some _ -> 
-            notSupported node.Name
+            printWarning ("Type alias " + node.Name + " is not supported.")
             []
         | None ->
             nodes 
@@ -63,9 +57,9 @@ let parseTypeAlias (section: string) (node: Reflection): Entity list =
             match aliasType.Types with
             | Some types -> parseUnionTypeAlias section node types
             | _ -> 
-                notSupported node.Name
+                printWarning ("Type alias " + node.Name + " is not supported.")
                 []
         | _ ->
-            notSupported node.Name
+            printWarning ("Type alias " + node.Name + " is not supported.")
             []
     | _ -> []

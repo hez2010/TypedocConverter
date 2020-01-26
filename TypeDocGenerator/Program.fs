@@ -4,6 +4,7 @@ open System.IO
 open Newtonsoft.Json
 open Converters
 open Definitions
+open Helpers
 
 let rec parseArguments (state: string) (config: Config) (argv: string list) =
     match argv with
@@ -34,14 +35,6 @@ let printHelp () =
     printfn "--splitfiles [true|false]: whether split code to different files"
     printfn "--outputdir [path]: used for place code files when splitfiles is true"
     printfn "--outputfile [path]: used for place code file when splitfiles is false"
-
-
-let printError (err: string) = 
-    let backup = System.Console.ForegroundColor
-    System.Console.ForegroundColor <- System.ConsoleColor.Red
-    System.Console.Error.WriteLine ("[Error] " + err)
-    System.Console.ForegroundColor <- backup
-
 
 [<EntryPoint>]
 let main argv =
