@@ -78,9 +78,9 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
     |> List.iter(fun x -> fprintfn writer "    using %s;" (x))
     fprintfn writer  ""
     
+    if (entity.Comment <> "") then fprintfn writer "%s" (arrangeComment entity.Comment 4) else ()
     if entity.Type = EntityType.StringEnum then fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase entity.Name) "Converter" else ()
 
-    if (entity.Comment <> "") then fprintfn writer "%s" (arrangeComment entity.Comment 4) else ()
     fprintfn writer "    %s%s%s %s%s%s\n    {" 
         (
             match entity.Modifier with
