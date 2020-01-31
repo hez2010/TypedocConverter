@@ -14,18 +14,15 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
         | None ->
             nodes 
             |> List.collect
-                (
-                    fun x ->
-                        match x.Value with
-                        | Some value -> 
-                            [
-                                {
-                                    Name = toPascalCase value
-                                    Comment = "///<summary>\n" + toCommentText value + "\n///</summary>"
-                                    Value = None
-                                }
-                            ]
-                        | _ -> []
+                (fun x ->
+                    match x.Value with
+                    | Some value -> 
+                        [{
+                            Name = toPascalCase value
+                            Comment = "///<summary>\n" + toCommentText value + "\n///</summary>"
+                            Value = None
+                        }]
+                    | _ -> []
                 )
     if enums = [] then []
     else 
