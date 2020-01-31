@@ -22,8 +22,8 @@ let rec parseNode (section: string) (node: Reflection): Entity list =
         | Some children -> parseNodes section children
         | _ -> []
     | ReflectionKind.Enum -> [parseEnum section node]
-    | ReflectionKind.Interface -> [renderInterfaceAndClass section node true]
-    | ReflectionKind.Class -> [renderInterfaceAndClass section node false]
+    | ReflectionKind.Interface -> [parseInterfaceAndClass section node true]
+    | ReflectionKind.Class -> [parseInterfaceAndClass section node false]
     | ReflectionKind.TypeAlias -> 
         match node.Type with
         | Some _ -> parseTypeAlias section node

@@ -4,7 +4,7 @@ open Definitions
 open Helpers
 open Entity
 
-let renderInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool): Entity =
+let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool): Entity =
     let comment = 
         match node.Comment with
         | Some comment -> getXmlDocComment comment
@@ -28,7 +28,7 @@ let renderInterfaceAndClass (section: string) (node: Reflection) (isInterface: b
                 children 
                 |> List.where(fun x -> x.Kind = ReflectionKind.Property)
                 |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited properties
-                |> List.where(fun x -> x.Overwrites = None) // exclude overrites methods
+                |> List.where(fun x -> x.Overwrites = None) // exclude overrites properties
             else children |> List.where(fun x -> x.Kind = ReflectionKind.Property)
         | _ -> []
     let events = 
@@ -37,8 +37,8 @@ let renderInterfaceAndClass (section: string) (node: Reflection) (isInterface: b
             if isInterface then
                 children 
                 |> List.where(fun x -> x.Kind = ReflectionKind.Event)
-                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited properties
-                |> List.where(fun x -> x.Overwrites = None) // exclude overrites methods
+                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited events
+                |> List.where(fun x -> x.Overwrites = None) // exclude overrites events
             else children |> List.where(fun x -> x.Kind = ReflectionKind.Event)
         | _ -> []
     let methods = 
@@ -47,7 +47,7 @@ let renderInterfaceAndClass (section: string) (node: Reflection) (isInterface: b
             if isInterface then
                 children 
                 |> List.where(fun x -> x.Kind = ReflectionKind.Method)
-                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited properties
+                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited methods
                 |> List.where(fun x -> x.Overwrites = None) // exclude overrites methods
             else children |> List.where(fun x -> x.Kind = ReflectionKind.Method)
         | _ -> []
