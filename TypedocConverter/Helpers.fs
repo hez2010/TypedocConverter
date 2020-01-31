@@ -52,6 +52,27 @@ let getXmlDocComment (comment: Comment) =
         | _ -> ""
     summary + returns
 
+let getCommentFromSignature (node: Reflection) =
+    let signature = 
+        match node.Signatures with
+        | Some signatures -> 
+            signatures 
+            |> List.collect(
+                fun x -> 
+                    match x.Comment with
+                    | Some comment -> [getXmlDocComment comment]
+                    | _ -> []
+                )
+        | _ -> []
+    match signature with
+    | [] -> ""
+    | _ -> signature |> List.reduce(fun accu next -> accu + "\n" + next)
+
+let getComment (node: Reflection) =
+    match node.Comment with
+    | Some comment -> getXmlDocComment comment
+    | _ -> ""
+
 let rec getType (typeInfo: Type): EntityBodyType = 
     let genericType =
         match typeInfo.Type with

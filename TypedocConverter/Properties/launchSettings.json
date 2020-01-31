@@ -1,8 +1,7 @@
 {
   "profiles": {
     "TypedocConverter": {
-      "commandName": "Project",
-      "commandLineArgs": "--inputfile \"$(ProjectDir)/1.json\""
+      "commandName": "Project"
     }
   }
 }

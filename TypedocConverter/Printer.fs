@@ -62,7 +62,7 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
     |> List.iter
         (
             fun x ->
-                fprintf writer  "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase entity.Name) (toPascalCase x.Name) x.Name
+                fprintfn writer  "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase entity.Name) (toPascalCase x.Name) x.Name
         )
     fprintfn writer "                default: break;"
     fprintfn writer "            }"

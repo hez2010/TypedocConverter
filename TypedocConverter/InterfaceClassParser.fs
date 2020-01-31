@@ -5,10 +5,7 @@ open Helpers
 open Entity
 
 let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool): Entity =
-    let comment = 
-        match node.Comment with
-        | Some comment -> getXmlDocComment comment
-        | _ -> ""
+    let comment = getComment node
     let exts = 
         (match node.ExtendedTypes with
         | Some types -> types |> List.map(fun x -> getType x)
@@ -104,10 +101,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                 |> List.reduce(fun accu next -> accu @ next)
                             | _ -> [])
                     {
-                        Comment = 
-                            match x.Comment with
-                            | Some comment -> getXmlDocComment comment
-                            | _ -> ""
+                        Comment = getCommentFromSignature x
                         Modifier = if isInterface then [] else getModifier x.Flags;
                         Type = retType
                         Name = x.Name
@@ -148,10 +142,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                 | Some typeInfo -> getType typeInfo
                                 | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
                             ;
-                        Comment = 
-                            match x.Comment with
-                            | Some comment -> getXmlDocComment comment
-                            | _ -> ""
+                        Comment = getCommentFromSignature x
                             ;
                         Modifier = if isInterface then [] else getModifier x.Flags;
                     }
@@ -161,10 +152,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
             |> List.map (
                 fun x -> 
                     {
-                        Comment = 
-                            match x.Comment with
-                            | Some comment -> getXmlDocComment comment
-                            | _ -> ""
+                        Comment = getComment x
                         Modifier = if isInterface then [] else getModifier x.Flags;
                         Name = x.Name
                         Type = 
