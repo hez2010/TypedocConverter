@@ -1,0 +1,153 @@
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// The declaration of an enum
+    /// </summary>
+    enum MyEnum
+    {
+        [Newtonsoft.Json.JsonProperty("A", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        A = 0,
+        [Newtonsoft.Json.JsonProperty("B", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        B = 1,
+        [Newtonsoft.Json.JsonProperty("C", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        C = 2,
+        [Newtonsoft.Json.JsonProperty("D", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        D = 2
+    }
+}
+
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// The declaration of a class
+    /// </summary>
+    class MyClass1<T> : MyInterface1
+    {
+        /// <summary>
+        /// An property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        string TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        event System.Action<MyInterface1> OnTest;
+        string TestMethod(string arg, System.Action callback) => throw new System.NotImplementedException();
+        static UnionStr StaticMethod(string value, bool isOption) => throw new System.NotImplementedException();
+    }
+}
+
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// Another declaration of a class
+    /// </summary>
+    class MyClass2<T> : MyInterface2<T>
+    {
+        /// <summary>
+        /// An property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        T TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        event System.Action<MyInterface2<T>> OnTest;
+        T TestMethod(T arg, System.Action callback) => throw new System.NotImplementedException();
+        static UnionStr StaticMethod(string value, bool isOption) => throw new System.NotImplementedException();
+    }
+}
+
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// The declaration of an interface
+    /// </summary>
+    interface MyInterface1
+    {
+        /// <summary>
+        /// An property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        string TestProp { get; set; }
+        event System.Action<MyInterface1> OnTest;
+        string TestMethod(string arg, System.Action callback);
+    }
+}
+
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// Another declaration of an interface
+    /// </summary>
+    interface MyInterface2<T>
+    {
+        /// <summary>
+        /// An property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        T TestProp { get; set; }
+        event System.Action<MyInterface2<T>> OnTest;
+        T TestMethod(T arg, System.Action callback);
+    }
+}
+
+namespace TypedocConverter.Test
+{
+
+    /// <summary>
+    /// The declaration of a type alias
+    /// </summary>
+    [Newtonsoft.Json.JsonConverter(typeof(UnionStrConverter))]
+    enum UnionStr
+    {
+        ///<summary>
+        /// A
+        ///</summary>
+        [Newtonsoft.Json.JsonProperty("A", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        A,
+        ///<summary>
+        /// B
+        ///</summary>
+        [Newtonsoft.Json.JsonProperty("B", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        B,
+        ///<summary>
+        /// C
+        ///</summary>
+        [Newtonsoft.Json.JsonProperty("C", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        C,
+        ///<summary>
+        /// other
+        ///</summary>
+        [Newtonsoft.Json.JsonProperty("Other", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        Other
+    }
+    class UnionStrConverter : Newtonsoft.Json.JsonConverter
+    {
+        public override bool CanConvert(System.Type t) => t == typeof(UnionStr) || t == typeof(UnionStr?);
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)
+            => reader.TokenType switch
+            {
+                Newtonsoft.Json.JsonToken.String =>
+                    serializer.Deserialize<string>(reader) switch
+                    {
+                        "A" => UnionStr.A,
+                        "B" => UnionStr.B,
+                        "C" => UnionStr.C,
+                        "Other" => UnionStr.Other,
+                        _ => throw new System.Exception("Cannot unmarshal type UnionStr")
+                    },
+                _ => throw new System.Exception("Cannot unmarshal type UnionStr")
+            };
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            if (untypedValue is null) { serializer.Serialize(writer, null); return; }
+            var value = (UnionStr)untypedValue;
+            switch (value)
+            {
+                case UnionStr.A: serializer.Serialize(writer, "A"); return;                case UnionStr.B: serializer.Serialize(writer, "B"); return;                case UnionStr.C: serializer.Serialize(writer, "C"); return;                case UnionStr.Other: serializer.Serialize(writer, "Other"); return;                default: break;
+            }
+            throw new System.Exception("Cannot marshal type UnionStr");
+        }
+    }
+}
+
