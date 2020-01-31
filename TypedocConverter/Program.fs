@@ -40,7 +40,7 @@ let printHelp () =
 let main argv =
     let jsonSettings = JsonSerializerSettings()
     jsonSettings.Converters.Add(OptionConverter())
-    let config = parseArguments "" { Help = false; InputFile = null; Namespace = "TypeDocGenerator"; SplitFiles = false; OutputDir = "."; OutputFile = "TypeDocGenerator.cs" } (argv |> List.ofArray)
+    let config = parseArguments "" { Help = false; InputFile = null; Namespace = "TypedocConverter"; SplitFiles = false; OutputDir = "."; OutputFile = "TypedocConverter.cs" } (argv |> List.ofArray)
     if config.Help 
     then 
         printHelp ()
