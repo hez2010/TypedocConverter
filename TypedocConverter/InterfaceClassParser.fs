@@ -10,9 +10,12 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
         | Some comment -> getXmlDocComment comment
         | _ -> ""
     let exts = 
-        match node.ExtendedTypes with
+        (match node.ExtendedTypes with
         | Some types -> types |> List.map(fun x -> getType x)
-        | _ -> []
+        | _ -> []) @
+        (match node.ImplementedTypes with
+        | Some types -> types |> List.map(fun x -> getType x)
+        | _ -> [])
     let genericType =
         let types = 
               match node.TypeParameter with
