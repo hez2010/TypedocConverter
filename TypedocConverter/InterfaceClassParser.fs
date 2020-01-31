@@ -53,7 +53,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
         | _ -> []
     {
         Type = if isInterface then EntityType.Interface else EntityType.Class;
-        Namespace = if section = "" then "TypeDocGenerator" else section;
+        Namespace = if section = "" then "TypedocConverter" else section;
         Name = node.Name;
         Comment = comment;
         Modifier = getModifier node.Flags;

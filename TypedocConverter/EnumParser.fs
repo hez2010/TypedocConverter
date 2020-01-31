@@ -30,7 +30,7 @@ let parseEnum (section: string) (node: Reflection): Entity =
                  | None -> []
     { 
         Type = EntityType.Enum;
-        Namespace = if section = "" then "TypeDocGenerator" else section;
+        Namespace = if section = "" then "TypedocConverter" else section;
         Modifier = getModifier node.Flags;
         Name = node.Name
         Comment = 
