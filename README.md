@@ -1,6 +1,8 @@
 # Typedoc Converter
 This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.  
-Currently it support TypeScript doc to C# binding.
+Currently it only support typedoc JSON Schema to C# type bindings.
+
+Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows/.NET%20Core/badge.svg)
 
 ## Languages support
 - [x] C#
@@ -41,3 +43,10 @@ Sample:
 ```
 TypedocConverter --inputfile 1.json --splitfiles true --outputdir . --namespace ""
 ```
+## Prebuilt binaries
+We have prepared some prebuilt binaries for Windows x64, Linux x64 and macOS x64.  
+You can download these prebuilt binaries directly from [GitHub Actions](https://github.com/hez2010/TypedocConverter/actions)
+
+Just select the latest successful action and then you can download coresponding artifacts.
+
+Prerequisites: [.NET Core Runtime 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1)
