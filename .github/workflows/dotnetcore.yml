@@ -17,3 +17,24 @@ jobs:
       run: dotnet build
     - name: Test with dotnet
       run: dotnet test
+    - name: Publish Windows x64 Release
+      run: dotnet publish TypedocConverter -c Release -o WindowsBuild -r win-x64 --no-self-contained /p:PublishSingleFile=true
+    - name: Publish Linux x64 Release
+      run: dotnet publish TypedocConverter -c Release -o LinuxBuild -r linux-x64 --no-self-contained /p:PublishSingleFile=true
+    - name: Publish macOS x64 Release
+      run: dotnet publish TypedocConverter -c Release -o macOSBuild -r osx-x64 --no-self-contained /p:PublishSingleFile=true
+    - name: Upload Windows x64 artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Windows x64
+        path: WindowsBuild
+    - name: Upload Linux x64 artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Linux x64
+        path: LinuxBuild
+    - name: Upload macOS x64 artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: macOS x64
+        path: macOSBuild
