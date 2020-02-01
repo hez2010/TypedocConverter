@@ -44,8 +44,8 @@ Sample:
 TypedocConverter --inputfile 1.json --splitfiles true --outputdir . --namespace ""
 ```
 ## Prebuilt binaries
-We have prepared some prebuilt binaries for Windows x64, Linux x64 and macOS x64.  
-You can download these prebuilt binaries directly from [GitHub Actions](https://github.com/hez2010/TypedocConverter/actions)
+We have prepared some prebuilt binaries for Windows, Linux and macOS.  
+You can download them directly from [GitHub Actions](https://github.com/hez2010/TypedocConverter/actions)
 
 Just select the latest successful action and then you can download coresponding artifacts.
 
