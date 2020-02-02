@@ -6,13 +6,9 @@ namespace TypedocConverter.Test
     /// </summary>
     enum MyEnum
     {
-        [Newtonsoft.Json.JsonProperty("A", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         A = 0,
-        [Newtonsoft.Json.JsonProperty("B", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         B = 1,
-        [Newtonsoft.Json.JsonProperty("C", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         C = 2,
-        [Newtonsoft.Json.JsonProperty("D", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         D = 2
     }
 }
@@ -127,22 +123,18 @@ namespace TypedocConverter.Test
         ///<summary>
         /// A
         ///</summary>
-        [Newtonsoft.Json.JsonProperty("A", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         A,
         ///<summary>
         /// B
         ///</summary>
-        [Newtonsoft.Json.JsonProperty("B", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         B,
         ///<summary>
         /// C
         ///</summary>
-        [Newtonsoft.Json.JsonProperty("C", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         C,
         ///<summary>
         /// other
         ///</summary>
-        [Newtonsoft.Json.JsonProperty("Other", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         Other
     }
     class UnionStrConverter : Newtonsoft.Json.JsonConverter
