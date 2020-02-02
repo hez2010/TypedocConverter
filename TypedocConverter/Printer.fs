@@ -111,7 +111,6 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
         (
             fun i x ->
                 if x.Comment <> "" then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
-                fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
                 fprintfn writer "        %s%s%s"
                     (toPascalCase x.Name)
                     (
