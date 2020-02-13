@@ -198,7 +198,7 @@ and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate consta
         |> List.map (fun x -> x.Name)
     types |> List.map (fun x -> {| Type = x; Constraint = "" |})
 and typeSorter typeA typeB = 
-    let typesOrder = ["array"; "tuple"; "reference"; "intrinsic"]
+    let typesOrder = ["array"; "tuple"; "reference"; "reflection"; "stringLiteral"; "intrinsic"]
     let indexA = typesOrder |> List.tryFindIndex (fun x -> x = typeA.Type)
     let indexB = typesOrder |> List.tryFindIndex (fun x -> x = typeB.Type)
     match (indexA, indexB) with

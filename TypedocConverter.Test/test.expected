@@ -149,7 +149,7 @@ namespace TypedocConverter.Test
                         "A" => UnionStr.A,
                         "B" => UnionStr.B,
                         "C" => UnionStr.C,
-                        "Other" => UnionStr.Other,
+                        "other" => UnionStr.Other,
                         _ => throw new System.Exception("Cannot unmarshal type UnionStr")
                     },
                 _ => throw new System.Exception("Cannot unmarshal type UnionStr")
@@ -163,7 +163,7 @@ namespace TypedocConverter.Test
                 case UnionStr.A: serializer.Serialize(writer, "A"); return;
                 case UnionStr.B: serializer.Serialize(writer, "B"); return;
                 case UnionStr.C: serializer.Serialize(writer, "C"); return;
-                case UnionStr.Other: serializer.Serialize(writer, "Other"); return;
+                case UnionStr.Other: serializer.Serialize(writer, "other"); return;
                 default: break;
             }
             throw new System.Exception("Cannot marshal type UnionStr");

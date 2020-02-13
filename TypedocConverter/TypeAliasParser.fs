@@ -18,7 +18,7 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
                     match x.Value with
                     | Some value -> 
                         [{
-                            Name = toPascalCase value
+                            Name = value
                             Comment = "///<summary>\n" + toCommentText value + "\n///</summary>"
                             Value = None
                         }]
