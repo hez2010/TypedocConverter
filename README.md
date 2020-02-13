@@ -45,8 +45,6 @@ TypedocConverter --inputfile 1.json --splitfiles true --outputdir . --namespace 
 ```
 ## Prebuilt binaries
 We have prepared some prebuilt binaries for Windows, Linux and macOS.  
-You can download them directly from [GitHub Actions](https://github.com/hez2010/TypedocConverter/actions)
-
-Just select the latest successful action and then you can download coresponding artifacts.
+You can download them directly from [Releases](https://github.com/hez2010/TypedocConverter/releases)
 
 Prerequisites: [.NET Core Runtime 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1)
