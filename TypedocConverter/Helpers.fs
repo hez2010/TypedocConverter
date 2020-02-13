@@ -123,8 +123,14 @@ let rec getType (typeInfo: Type): EntityBodyType =
                 match innerTypes with
                 | [] -> { Type = "object"; InnerTypes = []; Name = None }
                 | _ -> 
-                    printWarning ("Taking only the first type " + innerTypes.[0].Type + " for the entire union type.")
-                    getType innerTypes.[0] // TODO: generate unions
+                    let takenType = 
+                        innerTypes 
+                        |> List.sortWith typeSorter
+                        |> List.head
+                    match takenType.Name with
+                    | Some name -> printWarning ("Taking type " + name + " for the entire union type.")
+                    | _ -> printWarning ("Taking type " + takenType.Type + " for the entire union type.")
+                    getType takenType // TODO: generate unions
             | _ ->{ Type = "object"; InnerTypes = []; Name = None }
         | "intersection" -> { Type = "object"; InnerTypes = []; Name = None } // TODO: generate intersections
         | "reflection" -> 
@@ -191,7 +197,15 @@ and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate consta
         |> List.where(fun x -> x.Kind = ReflectionKind.TypeParameter)
         |> List.map (fun x -> x.Name)
     types |> List.map (fun x -> {| Type = x; Constraint = "" |})
-
+and typeSorter typeA typeB = 
+    let typesOrder = ["array"; "tuple"; "reference"; "intrinsic"]
+    let indexA = typesOrder |> List.tryFindIndex (fun x -> x = typeA.Type)
+    let indexB = typesOrder |> List.tryFindIndex (fun x -> x = typeB.Type)
+    match (indexA, indexB) with
+    | (None, None) -> 0
+    | (Some _, None) -> -1
+    | (None, Some _) -> 1
+    | (Some a, Some b) -> a.CompareTo b
 let getMethodParameters (parameters: Reflection list) = 
     parameters
     |> List.where(fun x -> x.Kind = ReflectionKind.Parameter)
