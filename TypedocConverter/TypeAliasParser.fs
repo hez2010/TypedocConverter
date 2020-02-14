@@ -9,8 +9,20 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
     let enums = 
         match notStringLiteral with
         | Some _ -> 
-            printWarning ("Type alias " + node.Name + " is not supported.")
-            []
+            printWarning ("Type alias " + node.Name + " is not fully supported.")
+            nodes 
+            |> List.where (fun x -> x.Type = "stringLiteral")
+            |> List.collect
+                (fun x ->
+                    match x.Value with
+                    | Some value -> 
+                        [{
+                            Name = value
+                            Comment = "///<summary>\n" + toCommentText value + "\n///</summary>"
+                            Value = None
+                        }]
+                    | _ -> []
+                )
         | None ->
             nodes 
             |> List.collect

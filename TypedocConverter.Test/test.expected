@@ -25,16 +25,20 @@ namespace TypedocConverter.Test
         /// An property
         /// </summary>
         [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        string TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public string TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
         /// <summary>
         /// An event
         /// </summary>
-        event System.Action<MyInterface1> OnTest;
+        public event System.Action<MyInterface1> OnTest;
+
         /// <summary>
         /// A method
         /// </summary>
-        string TestMethod(string arg, System.Action callback) => throw new System.NotImplementedException();
+        public string TestMethod(string arg, System.Action callback) => throw new System.NotImplementedException();
+
         static UnionStr StaticMethod(string value, bool isOption) => throw new System.NotImplementedException();
+
     }
 }
 
@@ -50,16 +54,20 @@ namespace TypedocConverter.Test
         /// An property
         /// </summary>
         [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        T TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public T TestProp { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
         /// <summary>
         /// An event
         /// </summary>
-        event System.Action<MyInterface2<T>> OnTest;
+        public event System.Action<MyInterface2<T>> OnTest;
+
         /// <summary>
         /// A method
         /// </summary>
-        T TestMethod(T arg, System.Action callback) => throw new System.NotImplementedException();
+        public T TestMethod(T arg, System.Action callback) => throw new System.NotImplementedException();
+
         static UnionStr StaticMethod(string value, bool isOption) => throw new System.NotImplementedException();
+
     }
 }
 
@@ -76,14 +84,17 @@ namespace TypedocConverter.Test
         /// </summary>
         [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         string TestProp { get; set; }
+
         /// <summary>
         /// An event
         /// </summary>
         event System.Action<MyInterface1> OnTest;
+
         /// <summary>
         /// A method
         /// </summary>
         string TestMethod(string arg, System.Action callback);
+
     }
 }
 
@@ -100,14 +111,17 @@ namespace TypedocConverter.Test
         /// </summary>
         [Newtonsoft.Json.JsonProperty("testProp", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         T TestProp { get; set; }
+
         /// <summary>
         /// An event
         /// </summary>
         event System.Action<MyInterface2<T>> OnTest;
+
         /// <summary>
         /// A method
         /// </summary>
         T TestMethod(T arg, System.Action callback);
+
     }
 }
 
@@ -137,9 +151,11 @@ namespace TypedocConverter.Test
         ///</summary>
         Other
     }
+
     class UnionStrConverter : Newtonsoft.Json.JsonConverter
     {
         public override bool CanConvert(System.Type t) => t == typeof(UnionStr) || t == typeof(UnionStr?);
+
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)
             => reader.TokenType switch
             {
@@ -154,6 +170,7 @@ namespace TypedocConverter.Test
                     },
                 _ => throw new System.Exception("Cannot unmarshal type UnionStr")
             };
+
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             if (untypedValue is null) { serializer.Serialize(writer, null); return; }

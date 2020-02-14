@@ -36,6 +36,7 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
     fprintfn writer "    class %s%s" (toPascalCase entity.Name) "Converter : Newtonsoft.Json.JsonConverter"
     fprintfn writer "    {"
     fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase entity.Name) (toPascalCase entity.Name)
+    fprintfn writer ""
     fprintfn writer "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)"
     fprintfn writer "            => reader.TokenType switch"
     fprintfn writer "            {"
@@ -52,6 +53,7 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
     fprintfn writer "                    },"
     fprintfn writer "                _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase entity.Name)
     fprintfn writer "            };"
+    fprintfn writer ""
     fprintfn writer "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)"
     fprintfn writer "        {"
     fprintfn writer "            if (untypedValue is null) { serializer.Serialize(writer, null); return; }"
@@ -129,7 +131,11 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                 if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
                 fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" x.Name
                 fprintfn writer "        %s%s%s %s { %s%s}%s"
-                    (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
+                    (
+                        if x.Modifier = [] then 
+                            if entity.Type = EntityType.Class then "public " else "" 
+                        else System.String.Join(" ", x.Modifier) + " "
+                    )
                     (arrangeType x.Type)
                     (if x.IsOptional then "?" else "")
                     (toPascalCase x.Name)
@@ -152,6 +158,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                         | None -> ""
                         | Some value -> " = " + string value + ";"
                     )
+                fprintfn writer ""
         )
 
     entity.Events
@@ -160,10 +167,15 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
             fun x ->
                 if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
                 fprintfn writer "        %sevent %s%s %s;"
-                    (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
+                    (
+                        if x.Modifier = [] then 
+                            if entity.Type = EntityType.Class then "public " else "" 
+                        else System.String.Join(" ", x.Modifier) + " "
+                    )
                     (arrangeType x.DelegateType)
                     (if x.IsOptional then "?" else "")
                     (toPascalCase x.Name)
+                fprintfn writer ""
         )
 
     entity.Methods
@@ -172,7 +184,11 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
             fun x ->
                 if (x.Comment <> "") then fprintfn writer "%s" (arrangeComment x.Comment 8) else ()
                 fprintfn writer "        %s%s %s%s(%s)%s;"
-                    (if x.Modifier = [] then "" else System.String.Join(" ", x.Modifier) + " ")
+                    (
+                        if x.Modifier = [] then 
+                            if entity.Type = EntityType.Class then "public " else "" 
+                        else System.String.Join(" ", x.Modifier) + " "
+                    )
                     (arrangeType x.Type)
                     (toPascalCase x.Name)
                     (
@@ -209,13 +225,14 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                         if entity.Type = EntityType.Interface then ""
                         else " => throw new System.NotImplementedException()"
                     )
+                fprintfn writer ""
         )
 
     fprintfn writer "    }"
     
     if entity.Type = EntityType.StringEnum 
     then 
-        fprintf writer ""
+        fprintfn writer ""
         printConverter writer entity 
     else ()
     fprintfn writer "}\n"
