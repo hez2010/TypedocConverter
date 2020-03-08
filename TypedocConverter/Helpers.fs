@@ -73,17 +73,18 @@ let getComment (node: Reflection) =
     | Some comment -> getXmlDocComment comment
     | _ -> ""
 
-let rec getType (typeInfo: Type): EntityBodyType = 
-    let genericType =
+let rec getType (config: Config) (typeInfo: Type): EntityBodyType = 
+    let mutable genericType =
         match typeInfo.Type with
         | "intrinsic" -> 
             match typeInfo.Name with
             | Some name -> 
                 match name with
-                | "number" -> { Type = "double"; InnerTypes = []; Name = None }
+                | "number" -> { Type = config.NumberType; InnerTypes = []; Name = None }
                 | "boolean" -> { Type = "bool"; InnerTypes = []; Name = None }
                 | "string" -> { Type = "string"; InnerTypes = []; Name = None }
                 | "void" -> { Type = "void"; InnerTypes = []; Name = None }
+                | "any" -> { Type = config.AnyType; InnerTypes = []; Name = None }
                 | _ -> { Type = "object"; InnerTypes = []; Name = None }
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "reference" | "typeParameter" -> 
@@ -107,7 +108,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "array" -> 
             match typeInfo.ElementType with
-            | Some elementType -> { Type = "System.Array"; InnerTypes = [getType elementType]; Name = None }
+            | Some elementType -> { Type = "System.Array"; InnerTypes = [getType config elementType]; Name = None }
             | _ -> { Type = "System.Array"; InnerTypes = [{ Type = "object"; InnerTypes = []; Name = None }]; Name = None }
         | "stringLiteral" -> { Type = "string"; InnerTypes = []; Name = None }
         | "tuple" ->
@@ -115,7 +116,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
             | Some innerTypes -> 
                 match innerTypes with
                 | [] -> { Type = "object"; InnerTypes = []; Name = None }
-                | _ -> { Type = "System.ValueTuple"; InnerTypes = innerTypes |> List.map getType; Name = None }
+                | _ -> { Type = "System.ValueTuple"; InnerTypes = innerTypes |> List.map (getType config); Name = None }
             | _ -> { Type = "object"; InnerTypes = []; Name = None }
         | "union" -> 
             match typeInfo.Types with
@@ -130,7 +131,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
                     match takenType.Name with
                     | Some name -> printWarning ("Taking type " + name + " for the entire union type.")
                     | _ -> printWarning ("Taking type " + takenType.Type + " for the entire union type.")
-                    getType takenType // TODO: generate unions
+                    getType config takenType // TODO: generate unions
             | _ ->{ Type = "object"; InnerTypes = []; Name = None }
         | "intersection" -> { Type = "object"; InnerTypes = []; Name = None } // TODO: generate intersections
         | "reflection" -> 
@@ -145,7 +146,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
                             |> List.map
                                 (fun pi -> 
                                     match pi.Type with 
-                                    | Some pt -> Some (getType pt)
+                                    | Some pt -> Some (getType config pt)
                                     | _ -> None
                                 )
                             |> List.collect
@@ -162,7 +163,7 @@ let rec getType (typeInfo: Type): EntityBodyType =
                         | _ -> []
                     let returnsType = 
                         match signature.Type with
-                        | Some t -> getType t
+                        | Some t -> getType config t
                         | _ -> { Type = "void"; InnerTypes = []; Name = None }
                     let typeParas = getDelegateParas paras
                     match typeParas with
@@ -176,12 +177,22 @@ let rec getType (typeInfo: Type): EntityBodyType =
         | _ -> { Type = "object"; InnerTypes = []; Name = None }
     let mutable innerTypes = 
         match typeInfo.TypeArguments with
-        | Some args -> getGenericTypeArguments args
+        | Some args -> getGenericTypeArguments config args
         | _ -> []
     if genericType.Type = "System.Threading.Tasks.Task"
     then 
         match innerTypes with
-        | (front::_) -> if front.Type = "void" then innerTypes <- [] else ()
+        | (front::_) -> 
+            if front.Type = "void" 
+            then 
+                innerTypes <- []
+                if config.UseWinRTPromise
+                then genericType <- { genericType with Type = "Windows.Foundation.IAsyncAction" }
+                else ()
+            else 
+                if config.UseWinRTPromise
+                then genericType <- { genericType with Type = "Windows.Foundation.IAsyncOperation" }
+                else ()
         | _ -> ()
     else ()
     { 
@@ -189,8 +200,8 @@ let rec getType (typeInfo: Type): EntityBodyType =
         Name = None; 
         InnerTypes = if innerTypes = [] then genericType.InnerTypes else innerTypes; 
     }
-and getGenericTypeArguments (typeInfos: Type list): EntityBodyType list = 
-    typeInfos |> List.map getType
+and getGenericTypeArguments (config: Config) (typeInfos: Type list): EntityBodyType list = 
+    typeInfos |> List.map (getType config)
 and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate constaints
     let types = 
         nodes 
@@ -206,14 +217,14 @@ and typeSorter typeA typeB =
     | (Some _, None) -> -1
     | (None, Some _) -> 1
     | (Some a, Some b) -> a.CompareTo b
-let getMethodParameters (parameters: Reflection list) = 
+let getMethodParameters (config: Config) (parameters: Reflection list) = 
     parameters
     |> List.where(fun x -> x.Kind = ReflectionKind.Parameter)
     |> List.map(fun x ->
         let name = if isNull x.Name then "" else x.Name
         match x.Type with
         | Some typeInfo -> 
-            let typeMeta = getType typeInfo;
+            let typeMeta = getType config typeInfo;
             { Type = typeMeta.Type; InnerTypes = typeMeta.InnerTypes; Name = Some name }
         | _ -> { Type = "object"; InnerTypes = []; Name = Some name }
     )

@@ -4,14 +4,14 @@ open Definitions
 open Helpers
 open Entity
 
-let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool): Entity =
+let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool) (config: Config): Entity =
     let comment = getComment node
     let exts = 
         (match node.ExtendedTypes with
-        | Some types -> types |> List.map(fun x -> getType x)
+        | Some types -> types |> List.map(fun x -> getType config x)
         | _ -> []) @
         (match node.ImplementedTypes with
-        | Some types -> types |> List.map(fun x -> getType x)
+        | Some types -> types |> List.map(fun x -> getType config x)
         | _ -> [])
     let genericType =
         let types = 
@@ -72,7 +72,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             | [] -> { Type = "object"; InnerTypes = []; Name = None }
                             | (front::_) ->
                                 match front.Type with
-                                | Some typeInfo -> getType typeInfo
+                                | Some typeInfo -> getType config typeInfo
                                 | _ -> { Type = "object"; InnerTypes = []; Name = None }
                     let typeParameter = 
                         match x.Signatures with
@@ -88,6 +88,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                         |> List.map (fun x -> x.Type)
                     let parameters = 
                         getMethodParameters 
+                            config
                             (match x.Signatures with
                             | Some signatures -> 
                                 signatures 
@@ -135,11 +136,11 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             match paras with
                             | (front::_) -> 
                                 match front.Type with
-                                | Some typeInfo -> getType typeInfo
+                                | Some typeInfo -> getType config typeInfo
                                 | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
                             | _ -> 
                                 match x.Type with
-                                | Some typeInfo -> getType typeInfo
+                                | Some typeInfo -> getType config typeInfo
                                 | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
                             ;
                         Comment = getCommentFromSignature x
@@ -157,7 +158,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                         Name = x.Name
                         Type = 
                             match x.Type with
-                            | Some typeInfo -> getType typeInfo
+                            | Some typeInfo -> getType config typeInfo
                             | _ -> { Type = "object"; Name = None; InnerTypes = [] }
                         WithGet = true;
                         WithSet = true;

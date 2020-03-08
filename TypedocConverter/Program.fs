@@ -19,6 +19,9 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
             | "outputfile" -> parseArguments "" { config with OutputFile = front } tails
             | "inputfile" -> parseArguments "" { config with InputFile = front } tails
             | "help" -> parseArguments "" { config with Help = true } tails
+            | "number-type" -> parseArguments "" { config with NumberType = front } tails
+            | "promise-type" -> parseArguments "" { config with UseWinRTPromise = (front.ToLowerInvariant() = "winrt") } tails
+            | "any-type" -> parseArguments "" { config with AnyType = front } tails
             | _ -> 
                 printfn "Not supported argument: --%s %s" state front
                 parseArguments "" config tails
@@ -35,12 +38,24 @@ let printHelp () =
     printfn "--splitfiles [true|false]: whether split code to different files"
     printfn "--outputdir [path]: used for place code files when splitfiles is true"
     printfn "--outputfile [path]: used for place code file when splitfiles is false"
+    printfn "--number-type [int/decimal/double...]: config for number type mapping"
+    printfn "--promise-type [CLR/WinRT]: config for promise type mapping"
+    printfn "--any-type [object/dynamic...]: config for any type mapping"
 
 [<EntryPoint>]
 let main argv =
     let jsonSettings = JsonSerializerSettings()
     jsonSettings.Converters.Add(OptionConverter())
-    let config = parseArguments "" { Help = false; InputFile = null; Namespace = "TypedocConverter"; SplitFiles = false; OutputDir = "."; OutputFile = "TypedocConverter.cs" } (argv |> List.ofArray)
+    let config = parseArguments "" { Help = false;
+                                     InputFile = null; 
+                                     Namespace = "TypedocConverter"; 
+                                     SplitFiles = false; 
+                                     OutputDir = "."; 
+                                     OutputFile = "TypedocConverter.cs" 
+                                     NumberType = "double"
+                                     UseWinRTPromise = false
+                                     AnyType = "object"
+                                   } (argv |> List.ofArray)
     if config.Help 
     then 
         printHelp ()
@@ -54,7 +69,7 @@ let main argv =
         else
             let json = File.ReadAllText config.InputFile
             let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
-            let entities = Parser.parseNode config.Namespace root
+            let entities = Parser.parseNode config.Namespace root config
             if config.SplitFiles 
             then Printer.printEntities true config.OutputDir entities
             else Printer.printEntities false config.OutputFile entities

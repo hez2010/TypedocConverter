@@ -7,6 +7,9 @@ type Config = {
     OutputFile: string
     InputFile: string
     Help: bool
+    NumberType: string
+    UseWinRTPromise: bool
+    AnyType: string
 }
 
 type ReflectionKind = 
