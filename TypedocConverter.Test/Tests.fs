@@ -34,12 +34,22 @@ type ParserTest () =
     [<TestMethod>]
     member this.TestParser () =
         let expected = File.ReadAllText "test.expected"
-        let config = { Help = false; InputFile = "test.input"; Namespace = "TypedocConverter"; SplitFiles = false; OutputDir = "."; OutputFile = "test.output" }
+        let config = { 
+            Help = false; 
+            InputFile = "test.input";
+            Namespace = "TypedocConverter";
+            SplitFiles = false; 
+            OutputDir = ".";
+            OutputFile = "test.output";
+            AnyType = "object"; 
+            NumberType = "double";
+            UseWinRTPromise = false 
+        }
         let json = File.ReadAllText config.InputFile
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.Converters.Add(Converters.OptionConverter())
         let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
-        let entities = Parser.parseNode config.Namespace root
+        let entities = Parser.parseNode config.Namespace root config
         Printer.printEntities false config.OutputFile entities
         let output = File.ReadAllText "test.output"
         Assert.AreEqual(output, expected)
