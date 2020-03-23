@@ -35,6 +35,13 @@ dotnet publish -c Release -r win-x64 --no-self-contained /p:PublishSingleFile=tr
 ```
 You can replace `win-x64` with other platform identifiers such as `linux-x64`, `linux-arm`, `osx-x64` and etc.  
 Then built dists will be placed in `bin/Release/netcoreapp3.1/[platform identifier]/publish`
+
+## Native Build:
+```
+cd TypedocConverter/TypedocConverter
+dotnet publish -c Release -r win-x64 /p:NativeBuild=true
+```
+
 ## Run
 ```
 TypedocConverter --help
