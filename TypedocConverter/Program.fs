@@ -48,7 +48,7 @@ let main argv =
     jsonSettings.Converters.Add(OptionConverter())
     let config = parseArguments "" { Help = false;
                                      InputFile = null; 
-                                     Namespace = "TypedocConverter"; 
+                                     Namespace = ""; 
                                      SplitFiles = false; 
                                      OutputDir = "."; 
                                      OutputFile = "TypedocConverter.cs" 
