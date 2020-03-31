@@ -30,8 +30,8 @@ let rec arrangeType (config: Config) (typeInfo: EntityBodyType) =
             | _ -> "object") + "[]"
         | _ ->
             match typeInfo.InnerTypes with
-                | [] -> pascalizeTypeName typeInfo.Type
-                | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
+                | [] -> config.ArrayType
+                | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
     | "System.ValueTuple" ->
         "(" + System.String.Join(", ", typeInfo.InnerTypes |> List.map (arrangeType config)) + ")"
     | _ -> 
