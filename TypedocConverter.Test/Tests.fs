@@ -45,6 +45,8 @@ type ParserTest () =
             NumberType = "double";
             UseWinRTPromise = false 
         }
+        let asciilize str =
+            str |> String.filter(fun c -> int c >= 33 && int c <= 126)
         let json = File.ReadAllText config.InputFile
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.Converters.Add(Converters.OptionConverter())
@@ -52,4 +54,4 @@ type ParserTest () =
         let entities = Parser.parseNode config.Namespace root config
         Printer.printEntities false config.OutputFile entities
         let output = File.ReadAllText "test.output"
-        Assert.AreEqual(output, expected)
+        Assert.AreEqual(asciilize output,asciilize expected)

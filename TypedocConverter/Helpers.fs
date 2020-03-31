@@ -54,15 +54,8 @@ let getXmlDocComment (comment: Comment) =
 
 let getCommentFromSignature (node: Reflection) =
     let signature = 
-        match node.Signatures with
-        | Some signatures -> 
-            signatures 
-            |> List.collect(
-                fun x -> 
-                    match x.Comment with
-                    | Some comment -> [getXmlDocComment comment]
-                    | _ -> []
-                )
+        match node.Comment with
+        | Some comment -> [getXmlDocComment comment]
         | _ -> []
     match signature with
     | [] -> ""

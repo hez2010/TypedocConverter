@@ -60,93 +60,76 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
         InheritedFrom = exts;
         Methods = 
             methods 
-            |> List.map (
+            |> List.collect (
                 fun x -> 
-                    let retType = 
-                        match (
-                                match x.Signatures with
-                                | Some signatures -> 
-                                    signatures |> List.where(fun x -> x.Kind = ReflectionKind.CallSignature)
-                                | _ -> []) 
-                            with
-                            | [] -> { Type = "object"; InnerTypes = []; Name = None }
-                            | (front::_) ->
-                                match front.Type with
-                                | Some typeInfo -> getType config typeInfo
-                                | _ -> { Type = "object"; InnerTypes = []; Name = None }
-                    let typeParameter = 
-                        match x.Signatures with
-                        | Some (sigs::_) -> 
-                            let types = 
-                                  match sigs.TypeParameter with
-                                  | Some tp -> Some (getGenericTypeParameters tp)
-                                  | _ -> None
-                            match types with
-                            | Some result -> result
-                            | _ -> []
-                        | _ -> []
-                        |> List.map (fun x -> x.Type)
-                    let parameters = 
-                        getMethodParameters 
-                            config
-                            (match x.Signatures with
-                            | Some signatures -> 
-                                signatures 
-                                |> List.where(fun x -> x.Kind = ReflectionKind.CallSignature) 
-                                |> List.map(
-                                    fun x -> 
-                                        match x.Parameters with
+                    match x.Signatures with
+                    | Some signatures -> 
+                        signatures 
+                        |> List.where(fun s -> s.Kind = ReflectionKind.CallSignature)
+                        |> List.map (
+                            fun s -> 
+                                let retType = 
+                                    match s.Type with
+                                    | Some t -> getType config t
+                                    | _ -> { Type = "object"; InnerTypes = []; Name = None }
+                                let typeParameter = 
+                                    let types = 
+                                        match s.TypeParameter with
+                                        | Some tp -> Some (getGenericTypeParameters tp)
+                                        | _ -> None
+                                    match types with
+                                    | Some result -> result
+                                    | _ -> []
+                                    |> List.map (fun t -> t.Type)
+                                let parameters = 
+                                    getMethodParameters 
+                                        config
+                                        (match s.Parameters with
                                         | Some parameters -> parameters |> List.where(fun p -> p.Kind = ReflectionKind.Parameter)
-                                        | _ -> []
-                                    )
-                                |> List.reduce(fun accu next -> accu @ next)
-                            | _ -> [])
-                    {
-                        Comment = getCommentFromSignature x
-                        Modifier = if isInterface then [] else getModifier x.Flags;
-                        Type = retType
-                        Name = x.Name
-                        TypeParameter = typeParameter
-                        Parameter = parameters
-                    }
+                                        | _ -> [])
+                                {
+                                    Comment = getCommentFromSignature s
+                                    Modifier = if isInterface then [] else getModifier x.Flags;
+                                    Type = retType
+                                    Name = s.Name
+                                    TypeParameter = typeParameter
+                                    Parameter = parameters
+                                }
+                        )
+                    | _ -> []
+                    
             );
         Events = 
             events
-            |> List.map (
+            |> List.collect (
                 fun x -> 
-                    let paras = 
-                        match x.Signatures with
-                        | Some sigs -> 
-                            sigs 
-                            |> List.where (fun x -> x.Kind = ReflectionKind.Event)
-                            |> List.map(fun x -> x.Parameters)
-                            |> List.collect (fun x ->
-                                match x with
-                                | Some paras -> paras
-                                | _ -> [])
-                        | _ -> []
-                    { 
-                        Name = x.Name; 
-                        IsOptional = 
-                            match x.Flags.IsOptional with
-                            | Some optional -> optional
-                            | _ -> false
-                            ;
-                        DelegateType = 
-                            match paras with
-                            | (front::_) -> 
-                                match front.Type with
-                                | Some typeInfo -> getType config typeInfo
-                                | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
-                            | _ -> 
-                                match x.Type with
-                                | Some typeInfo -> getType config typeInfo
-                                | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
-                            ;
-                        Comment = getCommentFromSignature x
-                            ;
-                        Modifier = if isInterface then [] else getModifier x.Flags;
-                    }
+                    match x.Signatures with
+                    | Some signature -> 
+                        signature 
+                        |> List.where (fun s -> s.Kind = ReflectionKind.Event)
+                        |> List.map(
+                            fun s -> 
+                                { 
+                                    Name = x.Name; 
+                                    IsOptional = 
+                                        match x.Flags.IsOptional with
+                                        | Some optional -> optional
+                                        | _ -> false
+                                        ;
+                                    DelegateType = 
+                                        match s.Parameters with
+                                        | Some (front::_) -> 
+                                            match front.Type with
+                                            | Some pType -> getType config pType
+                                            | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
+                                        | _ -> { Type = "System.Delegate"; Name = None; InnerTypes = [] }
+                                        ;
+                                    Comment = getCommentFromSignature s
+                                        ;
+                                    Modifier = if isInterface then [] else getModifier x.Flags;
+                                }
+                            )
+                    | _ -> []
             );
         Properties = 
             properties 
