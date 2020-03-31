@@ -2,6 +2,7 @@
 
 open Entity
 open Helpers
+open Definitions
 
 let append spliter accu next = accu + spliter + next
 
@@ -14,7 +15,7 @@ let arrangeComment (comment: string) blankSpace =
     |> Array.map(fun x -> blanks + x)
     |> Array.reduce (append "\n")
 
-let rec arrangeType (typeInfo: EntityBodyType) =
+let rec arrangeType (config: Config) (typeInfo: EntityBodyType) =
     let pascalizeTypeName name =
         match name with
         | "object" | "string" | "double" | "void" | "bool" | "ulong"
@@ -22,17 +23,23 @@ let rec arrangeType (typeInfo: EntityBodyType) =
         | _ -> toPascalCase name
     match typeInfo.Type with
     | "System.Array" -> 
-        (match typeInfo.InnerTypes with
-        | [x] -> arrangeType x
-        | _ -> "object") + "[]"
+        match config.ArrayType with
+        | "Array" -> 
+            (match typeInfo.InnerTypes with
+            | [x] -> arrangeType config x
+            | _ -> "object") + "[]"
+        | _ ->
+            match typeInfo.InnerTypes with
+                | [] -> pascalizeTypeName typeInfo.Type
+                | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
     | "System.ValueTuple" ->
-        "(" + System.String.Join(", ", typeInfo.InnerTypes |> List.map arrangeType) + ")"
+        "(" + System.String.Join(", ", typeInfo.InnerTypes |> List.map (arrangeType config)) + ")"
     | _ -> 
         match typeInfo.InnerTypes with
         | [] -> pascalizeTypeName typeInfo.Type
-        | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map arrangeType) + ">"
+        | types -> pascalizeTypeName typeInfo.Type + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
 
-let printConverter (writer: System.IO.TextWriter) (entity: Entity) = 
+let printConverter (writer: System.IO.TextWriter) (config: Config) (entity: Entity) = 
     fprintfn writer "    class %s%s" (toPascalCase entity.Name) "Converter : Newtonsoft.Json.JsonConverter"
     fprintfn writer "    {"
     fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase entity.Name) (toPascalCase entity.Name)
@@ -72,7 +79,7 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
     fprintfn writer "        }"
     fprintfn writer "    }"
 
-let printEntity (writer: System.IO.TextWriter) (references: string list) (entity: Entity) = 
+let printEntity (writer: System.IO.TextWriter) (config: Config) (references: string list) (entity: Entity) = 
     let thisNamespace = toPascalCase entity.Namespace
     fprintfn writer "namespace %s\n{" thisNamespace
     references
@@ -105,7 +112,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
         (
             match entity.InheritedFrom with
             | [] -> ""
-            | paras -> " : " + System.String.Join(", ", paras |> List.map arrangeType)
+            | paras -> " : " + System.String.Join(", ", paras |> List.map (arrangeType config))
         )
 
     entity.Enums
@@ -136,7 +143,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                             if entity.Type = EntityType.Class then "public " else "" 
                         else System.String.Join(" ", x.Modifier) + " "
                     )
-                    (arrangeType x.Type)
+                    (arrangeType config x.Type)
                     (if x.IsOptional then "?" else "")
                     (toPascalCase x.Name)
                     (
@@ -172,7 +179,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                             if entity.Type = EntityType.Class then "public " else "" 
                         else System.String.Join(" ", x.Modifier) + " "
                     )
-                    (arrangeType x.DelegateType)
+                    (arrangeType config x.DelegateType)
                     (if x.IsOptional then "?" else "")
                     (toPascalCase x.Name)
                 fprintfn writer ""
@@ -189,7 +196,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                             if entity.Type = EntityType.Class then "public " else "" 
                         else System.String.Join(" ", x.Modifier) + " "
                     )
-                    (arrangeType x.Type)
+                    (arrangeType config x.Type)
                     (toPascalCase x.Name)
                     (
                         match x.TypeParameter with
@@ -212,7 +219,7 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
                             ", ", 
                             x.Parameter |> List.map 
                                 (fun i -> 
-                                    (arrangeType i) + " " + 
+                                    (arrangeType config i) + " " + 
                                         (
                                             match i.Name with
                                             | Some name -> getArg name 0
@@ -233,11 +240,11 @@ let printEntity (writer: System.IO.TextWriter) (references: string list) (entity
     if entity.Type = EntityType.StringEnum 
     then 
         fprintfn writer ""
-        printConverter writer entity 
+        printConverter writer config entity 
     else ()
     fprintfn writer "}\n"
 
-let printEntities (splitFile: bool) (output: string) (entities: Entity list) = 
+let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) = 
     let namespaces = 
         entities 
         |> List.map(fun x -> x.Namespace) 
@@ -254,7 +261,7 @@ let printEntities (splitFile: bool) (output: string) (entities: Entity list) =
                     else ()
                     use file = new System.IO.FileStream(System.IO.Path.Combine(path, toPascalCase x.Name + ".cs"), System.IO.FileMode.Create)
                     use textWriter = new System.IO.StreamWriter(file)
-                    printEntity textWriter namespaces x
+                    printEntity textWriter config namespaces x
             )
     else
         let path = output
@@ -265,4 +272,4 @@ let printEntities (splitFile: bool) (output: string) (entities: Entity list) =
         use file = new System.IO.FileStream(path, System.IO.FileMode.Create)
         use textWriter = new System.IO.StreamWriter(file)
         entities 
-        |> List.iter(printEntity textWriter namespaces)
+        |> List.iter(printEntity textWriter config namespaces)

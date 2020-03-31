@@ -22,6 +22,7 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
             | "number-type" -> parseArguments "" { config with NumberType = front } tails
             | "promise-type" -> parseArguments "" { config with UseWinRTPromise = (front.ToLowerInvariant() = "winrt") } tails
             | "any-type" -> parseArguments "" { config with AnyType = front } tails
+            | "array-type" -> parseArguments "" { config with ArrayType = front } tails
             | _ -> 
                 printfn "Not supported argument: --%s %s" state front
                 parseArguments "" config tails
@@ -41,6 +42,7 @@ let printHelp () =
     printfn "--number-type [int/decimal/double...]: config for number type mapping"
     printfn "--promise-type [CLR/WinRT]: config for promise type mapping"
     printfn "--any-type [object/dynamic...]: config for any type mapping"
+    printfn "--array-type [Array/IEnumerable/List...]: config for array type mapping"
 
 [<EntryPoint>]
 let main argv =
@@ -55,6 +57,7 @@ let main argv =
                                      NumberType = "double"
                                      UseWinRTPromise = false
                                      AnyType = "object"
+                                     ArrayType = "Array"
                                    } (argv |> List.ofArray)
     if config.Help 
     then 
@@ -71,7 +74,7 @@ let main argv =
             let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
             let entities = Parser.parseNode config.Namespace root config
             if config.SplitFiles 
-            then Printer.printEntities true config.OutputDir entities
-            else Printer.printEntities false config.OutputFile entities
+            then Printer.printEntities true config.OutputDir config entities
+            else Printer.printEntities false config.OutputFile config entities
             printfn "Completed"
             0

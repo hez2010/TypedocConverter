@@ -10,6 +10,7 @@ type Config = {
     NumberType: string
     UseWinRTPromise: bool
     AnyType: string
+    ArrayType: string
 }
 
 type ReflectionKind = 
