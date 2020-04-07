@@ -12,7 +12,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.101
+        dotnet-version: 3.1.201
     - name: Build with dotnet
       run: dotnet build
     - name: Test with dotnet
@@ -36,40 +36,40 @@ jobs:
     - name: Upload Windows x86 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Windows x86
+        name: Windows_x86
         path: WindowsBuildx86
     - name: Upload Windows x64 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Windows x64
+        name: Windows_x64
         path: WindowsBuildx64
     - name: Upload Windows ARM artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Windows ARM
+        name: Windows_ARM
         path: WindowsBuildARM
     - name: Upload Windows ARM64 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Windows ARM64
+        name: Windows_ARM64
         path: WindowsBuildARM64
     - name: Upload Linux x64 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Linux x64
+        name: Linux_x64
         path: LinuxBuildx64
     - name: Upload Linux ARM artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Linux ARM
+        name: Linux_ARM
         path: LinuxBuildARM
     - name: Upload Linux ARM64 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Linux ARM64
+        name: Linux_ARM64
         path: LinuxBuildARM64
     - name: Upload macOS x64 artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: macOS x64
+        name: macOS_x64
         path: macOSBuildx64
