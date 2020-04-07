@@ -1,8 +1,7 @@
 {
   "profiles": {
     "TypedocConverter": {
-      "commandName": "Project",
-      "commandLineArgs": "--inputfile \"C:\\Users\\hez20\\source\\repos\\TypedocConverter\\TypedocConverter\\bin\\Release\\netcoreapp3.1\\win-x64\\native\\0.20.0.json\""
+      "commandName": "Project"
     }
   }
 }
