@@ -5,7 +5,9 @@ open Newtonsoft.Json
 open Converters
 open Definitions
 open Helpers
+open System.Diagnostics.CodeAnalysis
 
+[<ExcludeFromCodeCoverage>]
 let rec parseArguments (state: string) (config: Config) (argv: string list) =
     match argv with
     | (front::tails) ->
@@ -31,6 +33,7 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
         then { config with Help = true }
         else config
 
+[<ExcludeFromCodeCoverage>]
 let printHelp () = 
     printfn "TypeDoc Generator Arguments:"
     printfn ""
@@ -45,6 +48,7 @@ let printHelp () =
     printfn "--array-type [Array/IEnumerable/List...]: config for array type mapping"
 
 [<EntryPoint>]
+[<ExcludeFromCodeCoverage>]
 let main argv =
     let jsonSettings = JsonSerializerSettings()
     jsonSettings.Converters.Add(OptionConverter())

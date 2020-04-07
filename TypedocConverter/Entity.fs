@@ -1,61 +1,64 @@
 ﻿module Entity
 
-type EntityBodyType = {
-    Type: string
-    Name: string option
-    InnerTypes: EntityBodyType list
-}
-
-type EntityMethod = {
-    Comment: string
-    Modifier: string list
-    Type: EntityBodyType
-    Name: string
-    TypeParameter: string list
-    Parameter: EntityBodyType list
-}
-
-type EntityProperty = {
-    Comment: string
-    Modifier: string list
-    Name: string
-    Type: EntityBodyType
-    WithGet: bool
-    WithSet: bool
-    IsOptional: bool
+type Entity =
+| TypeEntity of
+    Name: string *
+    InnerTypes: Entity list
+| TypeParameterEntity of
+    Name: string // TODO: Add contraints support
+| ParameterEntity of
+    Name: string *
+    Type: Entity
+| PropertyEntity of
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    Type: Entity *
+    WithGet: bool *
+    WithSet: bool *
+    IsOptional: bool *
     InitialValue: string option
-}
-
-type EntityEvent = {
-    Comment: string
-    Modifier: string list
-    DelegateType: EntityBodyType
-    Name: string
-    IsOptional: bool
-}
-
-type EntityEnum = {
-    Comment: string
-    Name: string
-    Value: int64 option
-}
-
-type EntityType = 
-| Interface
-| Class
-| Enum
-| StringEnum
-
-type Entity = {
-    Namespace: string
-    Name: string
-    Comment: string
-    Methods: EntityMethod list
-    Properties: EntityProperty list
-    Events: EntityEvent list
-    Enums: EntityEnum list
-    InheritedFrom: EntityBodyType list
-    Type: EntityType
-    TypeParameter: string list
-    Modifier: string list
-}
+| EventEntity of
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    IsOptional: bool *
+    Type: Entity
+| EnumMemberEntity of
+    Name: string *
+    Comment: string *
+    Value: string option
+| MethodEntity of
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    TypeParameter: Entity list *
+    Parameter: Entity list *
+    ReturnType: Entity
+| EnumEntity of 
+    Namespace: string *
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    Members: Entity list
+| ClassInterfaceEntity of
+    Namespace: string *
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    Methods: Entity list *
+    Properties: Entity list *
+    Events: Entity list *
+    InheritedFrom: Entity list *
+    TypeParameter: Entity list *
+    IsInterface: bool
+| StringUnionEntity of
+    Namespace: string *
+    Name: string *
+    Comment: string *
+    Modifier: string list *
+    Members: Entity list
+| TypealiasEntity of // not used
+    AliasedType: Entity
+| UnionTypeEntity of // not used
+    Types: Entity list

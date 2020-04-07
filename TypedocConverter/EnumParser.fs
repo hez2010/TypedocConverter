@@ -23,33 +23,30 @@ let rec getEnumReferencedValue (nodes: Reflection list) value name =
     | _ -> None
     
 let parseEnum (section: string) (node: Reflection): Entity =
-    let values = match node.Children with
-                 | Some children ->
-                     children
-                     |> List.where (fun x -> x.Kind = ReflectionKind.EnumMember)
-                 | None -> []
-    { 
-        Type = EntityType.Enum;
-        Namespace = if section = "" then "TypedocConverter" else section;
-        Modifier = getModifier node.Flags;
-        Name = node.Name
-        Comment = 
-            match node.Comment with
-            | Some comment -> getXmlDocComment comment
-            | _ -> ""
-        Methods = []; Properties = []; Events = []; InheritedFrom = [];
-        Enums = values |> List.map (fun x ->
+    let values = 
+        (match node.Children with
+        | Some children ->
+            children
+            |> List.where (fun x -> x.Kind = ReflectionKind.EnumMember)
+        | None -> [])
+    let members =
+        values |> List.map (fun x ->
             let comment = 
                 match x.Comment with
                 | Some comment -> getXmlDocComment comment
                 | _ -> ""
             let mutable intValue = 0L
             match x.DefaultValue with
-            | Some value -> if Int64.TryParse(value, &intValue) then { Comment = comment; Name = x.Name; Value = Some intValue; }
+            | Some value -> if Int64.TryParse(value, &intValue) then EnumMemberEntity(x.Name, comment, Some (intValue.ToString()))
                             else match getEnumReferencedValue values value x.Name with
-                                 | Some t -> { Comment = comment; Name = x.Name; Value = Some (int64 t); }
-                                 | _ -> { Comment = comment; Name = x.Name; Value = None; }
-            | _ -> { Comment = comment; Name = x.Name; Value = None; }
-        );
-        TypeParameter = []
-    }
+                                 | Some t -> EnumMemberEntity(x.Name, comment, Some t)
+                                 | _ -> EnumMemberEntity(x.Name, comment, None)
+            | _ -> EnumMemberEntity(x.Name, comment, None)
+        )
+    EnumEntity((if section = "" then "TypedocConverter" else section), node.Name, 
+        (
+            match node.Comment with
+            | Some comment -> getXmlDocComment comment
+            | _ -> ""
+        ), 
+        getModifier node.Flags, members)
