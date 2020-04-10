@@ -22,8 +22,16 @@ let rec parseNode (section: string) (node: Reflection) (config: Config): Entity 
         | Some children -> parseNodes section children config
         | _ -> []
     | ReflectionKind.Enum -> [parseEnum section node]
-    | ReflectionKind.Interface -> [parseInterfaceAndClass section node true config]
-    | ReflectionKind.Class -> [parseInterfaceAndClass section node false config]
+    | ReflectionKind.Interface -> 
+        match node.Children with
+        | Some children ->
+            [parseInterfaceAndClass section node true config] @ parseNodes (if section = "" then node.Name else section + "." + node.Name) children config
+        | _ -> [parseInterfaceAndClass section node true config]
+    | ReflectionKind.Class -> 
+        match node.Children with
+        | Some children ->
+            [parseInterfaceAndClass section node false config] @ parseNodes (if section = "" then node.Name else section + "." + node.Name) children config
+        | _ -> [parseInterfaceAndClass section node false config]
     | ReflectionKind.TypeAlias -> 
         match node.Type with
         | Some _ -> parseTypeAlias section node
