@@ -48,8 +48,8 @@ let printHelp () =
     printfn "--promise-type [CLR/WinRT]: config for promise type mapping, CLR for Task and WinRT for IAsyncAction/IAsyncOperation"
     printfn "--any-type [object/dynamic...]: config for any type mapping"
     printfn "--array-type [Array/IEnumerable/List...]: config for array type mapping"
-    printfn "--nrt-disabled [true|false]: whether to use Nullable Reference Types"
-    printfn "--use-system-json: whether to use System.Text.Json instead of Newtonsoft.Json"
+    printfn "--nrt-disabled [true|false]: whether to disable Nullable Reference Types"
+    printfn "--use-system-json [true|false]: whether to use System.Text.Json instead of Newtonsoft.Json"
 
 [<EntryPoint>]
 [<ExcludeFromCodeCoverage>]
