@@ -40,14 +40,14 @@ let rec arrangeType (config: Config) (typeInfo: Entity) =
         | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
     | _ -> "object"
 
-let printConverter (writer: System.IO.TextWriter) (entity: Entity) = 
+let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
     match entity with
     | StringUnionEntity(_, name, _, _, members) ->
         fprintfn writer "    class %s%s" (toPascalCase name) "Converter : Newtonsoft.Json.JsonConverter"
         fprintfn writer "    {"
         fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase name) (toPascalCase name)
         fprintfn writer ""
-        fprintfn writer "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)"
+        fprintfn writer "        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object%s existingValue, Newtonsoft.Json.JsonSerializer serializer)" (if config.NrtDisabled then "" else "?")
         fprintfn writer "            => reader.TokenType switch"
         fprintfn writer "            {"
         fprintfn writer "                Newtonsoft.Json.JsonToken.String =>"
@@ -62,12 +62,12 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
                         fprintfn writer "                        \"%s\" => %s.%s," eName (toPascalCase name) (toPascalCase eName)
                     | _ -> ()
             )
-        fprintfn writer "                        _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase name)
+        fprintfn writer "                        _ => throw new System.NotSupportedException(\"Cannot unmarshal type %s\")" (toPascalCase name)
         fprintfn writer "                    },"
-        fprintfn writer "                _ => throw new System.Exception(\"Cannot unmarshal type %s\")" (toPascalCase name)
+        fprintfn writer "                _ => throw new System.NotSupportedException(\"Cannot unmarshal type %s\")" (toPascalCase name)
         fprintfn writer "            };"
         fprintfn writer ""
-        fprintfn writer "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)"
+        fprintfn writer "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object%s untypedValue, Newtonsoft.Json.JsonSerializer serializer)" (if config.NrtDisabled then "" else "?")
         fprintfn writer "        {"
         fprintfn writer "            if (untypedValue is null) { serializer.Serialize(writer, null); return; }"
         fprintfn writer "            var value = (%s)untypedValue;" (toPascalCase name)
@@ -84,7 +84,52 @@ let printConverter (writer: System.IO.TextWriter) (entity: Entity) =
             )
         fprintfn writer "                default: break;"
         fprintfn writer "            }"
-        fprintfn writer "            throw new System.Exception(\"Cannot marshal type %s\");" (toPascalCase name)
+        fprintfn writer "            throw new System.NotSupportedException(\"Cannot marshal type %s\");" (toPascalCase name)
+        fprintfn writer "        }"
+        fprintfn writer "    }"
+    | _ -> ()
+
+let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
+    match entity with
+    | StringUnionEntity(_, name, _, _, members) ->
+        fprintfn writer "    class %s%s<%s>" (toPascalCase name) "Converter : System.Text.Json.Serialization.JsonConverter" (toPascalCase name)
+        fprintfn writer "    {"
+        fprintfn writer "        public override %s Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)" (toPascalCase name)
+        fprintfn writer "            => reader.TokenType switch"
+        fprintfn writer "            {"
+        fprintfn writer "                System.Text.Json.JsonTokenType.String =>"
+        fprintfn writer "                    System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options) switch"
+        fprintfn writer "                    {"
+        members
+        |> List.iter
+            (
+                fun x ->
+                    match x with
+                    | EnumMemberEntity(eName, _, _) ->
+                        fprintfn writer "                        \"%s\" => %s.%s," eName (toPascalCase name) (toPascalCase eName)
+                    | _ -> ()
+            )
+        fprintfn writer "                        _ => throw new System.NotSupportedException(\"Cannot unmarshal type %s\")" (toPascalCase name)
+        fprintfn writer "                    },"
+        fprintfn writer "                _ => throw new System.NotSupportedException(\"Cannot unmarshal type %s\")" (toPascalCase name)
+        fprintfn writer "            };"
+        fprintfn writer ""
+        fprintfn writer "        public override void Write(System.Text.Json.Utf8JsonWriter writer, %s%s value, System.Text.Json.JsonSerializerOptions options)" (if config.NrtDisabled then "" else "[System.Diagnostics.CodeAnalysis.DisallowNull] ") (toPascalCase name)
+        fprintfn writer "        {"
+        fprintfn writer "            switch (value)"
+        fprintfn writer "            {"
+        members
+        |> List.iter
+            (
+                fun x ->
+                    match x with
+                    | EnumMemberEntity(eName, _, _) ->
+                        fprintfn writer  "                case %s.%s: System.Text.Json.JsonSerializer.Serialize<string>(writer, \"%s\", options); return;" (toPascalCase name) (toPascalCase eName) eName
+                    | _ -> ()
+            )
+        fprintfn writer "                default: break;"
+        fprintfn writer "            }"
+        fprintfn writer "            throw new System.NotSupportedException(\"Cannot marshal type %s\");" (toPascalCase name)
         fprintfn writer "        }"
         fprintfn writer "    }"
     | _ -> ()
@@ -138,9 +183,16 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
             )
             (if isLastOne then "" else ",")
 
-    let printProperty name comment modifier eType withGet withSet isOptional initValue isInInterface =
+    let isValueType (typeInfo: Entity) =
+        let valueTypes = ["double"; "bool"; "ulong"; "uint"; "ushort"; "byte"; "long"; "int"; "short"; "char"; "System.DateTime"; "System.ValueTuple"]
+        match typeInfo with
+        | TypeEntity(name, _) -> valueTypes |> List.contains name
+        | _ -> false
+
+    let printProperty name comment modifier eType withGet withSet isOptional initValue isInInterface config =
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
-        fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
+        if config.UseSystemJson then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
+        else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
         fprintfn writer "        %s%s%s %s { %s%s}%s"
             (
                 if modifier = [] then 
@@ -148,7 +200,14 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 else System.String.Join(" ", modifier) + " "
             )
             (arrangeType config eType)
-            (if isOptional then "?" else "")
+            (
+                if isOptional then
+                    if config.NrtDisabled then 
+                        if isValueType eType then "?"
+                        else ""
+                    else "?"
+                else ""
+            )
             (toPascalCase name)
             (
                 if isInInterface
@@ -255,7 +314,8 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "}\n"
     | StringUnionEntity(ns, name, comment, modifier, members) ->
         printHeader ns comment
-        fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
+        if config.UseSystemJson then fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
+        else fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
         printName "enum" modifier name [] []
         members |> List.iteri
             (
@@ -266,7 +326,8 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
             )
         fprintfn writer "    }"
         fprintfn writer ""
-        printConverter writer entity
+        if config.UseSystemJson then printSystemJsonConverter writer entity config
+        else printNewtonsoftJsonConverter writer entity config
         fprintfn writer "}\n"
     | ClassInterfaceEntity(ns, name, comment, modifier, methods, properties, events, exts, tps, isInterface) ->
         printHeader ns comment
@@ -278,7 +339,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 fun x ->
                     match x with
                     | PropertyEntity(pName, pComment, pModifier, pType, withGet, withSet, isOptional, initValue) ->
-                        printProperty pName pComment pModifier pType withGet withSet isOptional initValue isInterface
+                        printProperty pName pComment pModifier pType withGet withSet isOptional initValue isInterface config
                     | _ -> ()
             )
         events

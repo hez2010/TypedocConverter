@@ -25,6 +25,8 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
             | "promise-type" -> parseArguments "" { config with UseWinRTPromise = (front.ToLowerInvariant() = "winrt") } tails
             | "any-type" -> parseArguments "" { config with AnyType = front } tails
             | "array-type" -> parseArguments "" { config with ArrayType = front } tails
+            | "nrt-disabled" -> parseArguments "" { config with NrtDisabled = front = "true" } tails
+            | "use-system-json" -> parseArguments "" { config with UseSystemJson = front = "true" } tails
             | _ -> 
                 printfn "Not supported argument: --%s %s" state front
                 parseArguments "" config tails
@@ -39,13 +41,15 @@ let printHelp () =
     printfn ""
     printfn "--inputfile [file]: input file"
     printfn "--namespace [namespace]: specify namespace for generated code"
-    printfn "--splitfiles [true|false]: whether split code to different files"
+    printfn "--splitfiles [true|false]: whether to split code to different files"
     printfn "--outputdir [path]: used for place code files when splitfiles is true"
     printfn "--outputfile [path]: used for place code file when splitfiles is false"
     printfn "--number-type [int/decimal/double...]: config for number type mapping"
-    printfn "--promise-type [CLR/WinRT]: config for promise type mapping"
+    printfn "--promise-type [CLR/WinRT]: config for promise type mapping, CLR for Task and WinRT for IAsyncAction/IAsyncOperation"
     printfn "--any-type [object/dynamic...]: config for any type mapping"
     printfn "--array-type [Array/IEnumerable/List...]: config for array type mapping"
+    printfn "--nrt-disabled [true|false]: whether to use Nullable Reference Types"
+    printfn "--use-system-json: whether to use System.Text.Json instead of Newtonsoft.Json"
 
 [<EntryPoint>]
 [<ExcludeFromCodeCoverage>]
@@ -62,6 +66,8 @@ let main argv =
                                      UseWinRTPromise = false
                                      AnyType = "object"
                                      ArrayType = "Array"
+                                     NrtDisabled = false
+                                     UseSystemJson = false
                                    } (argv |> List.ofArray)
     if config.Help 
     then 

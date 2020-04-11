@@ -88,6 +88,7 @@ let rec getType (config: Config) (typeInfo: Type): Entity =
                 | "Set" -> TypeEntity("System.Collections.Generic.ISet", [])
                 | "Map" -> TypeEntity("System.Collections.Generic.IDictionary", [])
                 | "Array" -> TypeEntity("System.Array", [])
+                | "Date" -> TypeEntity("System.DateTime", [])
                 | "BigUint64Array" -> TypeEntity("System.Array", [TypeEntity("ulong", [])])
                 | "Uint32Array" -> TypeEntity("System.Array", [TypeEntity("uint", [])])
                 | "Uint16Array" -> TypeEntity("System.Array", [TypeEntity("ushort", [])])

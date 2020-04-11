@@ -11,6 +11,8 @@ type Config = {
     UseWinRTPromise: bool
     AnyType: string
     ArrayType: string
+    NrtDisabled: bool
+    UseSystemJson: bool
 }
 
 type ReflectionKind = 

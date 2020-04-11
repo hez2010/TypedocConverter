@@ -5999,9 +5999,9 @@ namespace TypedocConverter.Monaco.Editor
                         "vs" => BuiltinTheme.Vs,
                         "vs-dark" => BuiltinTheme.VsDark,
                         "hc-black" => BuiltinTheme.HcBlack,
-                        _ => throw new System.Exception("Cannot unmarshal type BuiltinTheme")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type BuiltinTheme")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type BuiltinTheme")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type BuiltinTheme")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6015,7 +6015,7 @@ namespace TypedocConverter.Monaco.Editor
                 case BuiltinTheme.HcBlack: serializer.Serialize(writer, "hc-black"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type BuiltinTheme");
+            throw new System.NotSupportedException("Cannot marshal type BuiltinTheme");
         }
     }
 }
@@ -6063,9 +6063,9 @@ namespace TypedocConverter.Monaco.Editor
                         "always" => EditorAutoClosingOvertypeStrategy.Always,
                         "auto" => EditorAutoClosingOvertypeStrategy.Auto,
                         "never" => EditorAutoClosingOvertypeStrategy.Never,
-                        _ => throw new System.Exception("Cannot unmarshal type EditorAutoClosingOvertypeStrategy")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoClosingOvertypeStrategy")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type EditorAutoClosingOvertypeStrategy")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoClosingOvertypeStrategy")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6079,7 +6079,7 @@ namespace TypedocConverter.Monaco.Editor
                 case EditorAutoClosingOvertypeStrategy.Never: serializer.Serialize(writer, "never"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type EditorAutoClosingOvertypeStrategy");
+            throw new System.NotSupportedException("Cannot marshal type EditorAutoClosingOvertypeStrategy");
         }
     }
 }
@@ -6132,9 +6132,9 @@ namespace TypedocConverter.Monaco.Editor
                         "languageDefined" => EditorAutoClosingStrategy.LanguageDefined,
                         "beforeWhitespace" => EditorAutoClosingStrategy.BeforeWhitespace,
                         "never" => EditorAutoClosingStrategy.Never,
-                        _ => throw new System.Exception("Cannot unmarshal type EditorAutoClosingStrategy")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoClosingStrategy")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type EditorAutoClosingStrategy")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoClosingStrategy")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6149,7 +6149,7 @@ namespace TypedocConverter.Monaco.Editor
                 case EditorAutoClosingStrategy.Never: serializer.Serialize(writer, "never"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type EditorAutoClosingStrategy");
+            throw new System.NotSupportedException("Cannot marshal type EditorAutoClosingStrategy");
         }
     }
 }
@@ -6202,9 +6202,9 @@ namespace TypedocConverter.Monaco.Editor
                         "quotes" => EditorAutoSurroundStrategy.Quotes,
                         "brackets" => EditorAutoSurroundStrategy.Brackets,
                         "never" => EditorAutoSurroundStrategy.Never,
-                        _ => throw new System.Exception("Cannot unmarshal type EditorAutoSurroundStrategy")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoSurroundStrategy")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type EditorAutoSurroundStrategy")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type EditorAutoSurroundStrategy")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6219,7 +6219,7 @@ namespace TypedocConverter.Monaco.Editor
                 case EditorAutoSurroundStrategy.Never: serializer.Serialize(writer, "never"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type EditorAutoSurroundStrategy");
+            throw new System.NotSupportedException("Cannot marshal type EditorAutoSurroundStrategy");
         }
     }
 }
@@ -6264,9 +6264,9 @@ namespace TypedocConverter.Monaco.Editor
                         "peek" => GoToLocationValues.Peek,
                         "gotoAndPeek" => GoToLocationValues.GotoAndPeek,
                         "goto" => GoToLocationValues.Goto,
-                        _ => throw new System.Exception("Cannot unmarshal type GoToLocationValues")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type GoToLocationValues")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type GoToLocationValues")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type GoToLocationValues")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6280,7 +6280,7 @@ namespace TypedocConverter.Monaco.Editor
                 case GoToLocationValues.Goto: serializer.Serialize(writer, "goto"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type GoToLocationValues");
+            throw new System.NotSupportedException("Cannot marshal type GoToLocationValues");
         }
     }
 }
@@ -6330,9 +6330,9 @@ namespace TypedocConverter.Monaco.Editor
                         "off" => LineNumbersType.Off,
                         "relative" => LineNumbersType.Relative,
                         "interval" => LineNumbersType.Interval,
-                        _ => throw new System.Exception("Cannot unmarshal type LineNumbersType")
+                        _ => throw new System.NotSupportedException("Cannot unmarshal type LineNumbersType")
                     },
-                _ => throw new System.Exception("Cannot unmarshal type LineNumbersType")
+                _ => throw new System.NotSupportedException("Cannot unmarshal type LineNumbersType")
             };
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -6347,7 +6347,7 @@ namespace TypedocConverter.Monaco.Editor
                 case LineNumbersType.Interval: serializer.Serialize(writer, "interval"); return;
                 default: break;
             }
-            throw new System.Exception("Cannot marshal type LineNumbersType");
+            throw new System.NotSupportedException("Cannot marshal type LineNumbersType");
         }
     }
 }

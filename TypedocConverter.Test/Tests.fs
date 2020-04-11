@@ -44,7 +44,9 @@ type ParserTest () =
             AnyType = "object"; 
             NumberType = "double";
             UseWinRTPromise = false;
-            ArrayType = "Array"
+            ArrayType = "Array";
+            UseSystemJson = false;
+            NrtDisabled = false;
         }
         let asciilize str =
             str |> String.filter(fun c -> int c >= 33 && int c <= 126)
