@@ -1,31 +1,34 @@
 # Typedoc Converter
-This is a [typedoc](https://github.com/TypeStrong/typedoc) json to language type bindings converter.  
-Currently it only support typedoc JSON Schema to C# type bindings.
+This is a [typedoc](https://github.com/TypeStrong/typedoc) json to C# bindings converter.  
 
 Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows/.NET%20Core/badge.svg)
 
 ## Languages support
-- [x] C#
-  - [x] Enums
-    - [x] Direct value
-    - [x] Referenced value
-  - [x] Interfaces
-    - [x] Inherits
-    - [x] Generics
-    - [ ] Generics Constaints
-    - [x] Properties
-    - [x] Methods
-    - [x] Events
-  - [x] Classes
-    - [x] Inherits
-    - [x] Generics
-    - [ ] Generics Constaints
-    - [x] Properties
-    - [x] Methods
-    - [x] Events
-  - [x] Split entities to different files
-  - [x] Auto rename conflict parameter names
-  - [ ] ...
+- [x] Enums
+  - [x] Direct value
+  - [x] Referenced value
+- [x] Interfaces
+  - [x] Inherits
+  - [x] Generics
+  - [ ] Generics Constaints
+  - [x] Properties
+  - [x] Methods
+  - [x] Events
+- [x] Classes
+  - [x] Constructors
+  - [x] Inherits
+  - [x] Generics
+  - [ ] Generics Constaints
+  - [x] Properties
+  - [x] Methods
+  - [x] Events
+- [ ] Types
+  - [x] String literals
+  - [ ] Union types
+  - [ ] Intersection types
+  - [ ] Anonymous interfaces
+- [x] Split entities to different files
+- [x] Auto rename conflict parameter names
 - [ ] ...
 
 ## Build
