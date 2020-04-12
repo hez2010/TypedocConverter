@@ -16,7 +16,7 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
                 (fun x ->
                     match x.Value with
                     | Some value -> 
-                        [EnumMemberEntity(value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
+                        [EnumMemberEntity(x.Id, value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
                     | _ -> []
                 )
         | None ->
@@ -25,12 +25,12 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
                 (fun x ->
                     match x.Value with
                     | Some value -> 
-                        [EnumMemberEntity(value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
+                        [EnumMemberEntity(x.Id, value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
                     | _ -> []
                 )
     if members = [] then []
     else 
-        [StringUnionEntity(section, node.Name, 
+        [StringUnionEntity(node.Id, section, node.Name, 
             (
                 match node.Comment with
                 | Some comment -> getXmlDocComment comment

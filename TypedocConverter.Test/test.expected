@@ -5099,18 +5099,6 @@ namespace TypedocConverter.Monaco.Editor
     interface ITextModel
     {
         /// <summary>
-        /// A unique identifier associated with this model.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("id", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        string Id { get; set; }
-
-        /// <summary>
-        /// Gets the resource associated with this editor model.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("uri", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        Uri Uri { get; set; }
-
-        /// <summary>
         /// An event emitted when the contents of the model have changed.
         /// </summary>
         event System.Action<IModelContentChangedEvent> OnDidChangeContent;
@@ -5139,6 +5127,18 @@ namespace TypedocConverter.Monaco.Editor
         /// An event emitted right before disposing the model.
         /// </summary>
         event System.Action OnWillDispose;
+
+        /// <summary>
+        /// A unique identifier associated with this model.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("id", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        string Id { get; set; }
+
+        /// <summary>
+        /// Gets the resource associated with this editor model.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("uri", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        Uri Uri { get; set; }
 
         /// <summary>
         /// Edit the model without adding the edits to the undo stack.
@@ -7923,6 +7923,11 @@ namespace TypedocConverter.Monaco.Languages
 
     class FoldingRangeKind
     {
+        /// <summary>
+        /// Creates a new [FoldingRangeKind](#FoldingRangeKind).
+        /// </summary>
+        public FoldingRangeKind(string value) => throw new System.NotImplementedException();
+
         [Newtonsoft.Json.JsonProperty("value", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Value { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -10843,6 +10848,8 @@ namespace TypedocConverter.Monaco
 
     class CancellationTokenSource
     {
+        public CancellationTokenSource(CancellationToken parent) => throw new System.NotImplementedException();
+
         public void Cancel() => throw new System.NotImplementedException();
 
         public void Dispose(bool cancel) => throw new System.NotImplementedException();
@@ -10865,6 +10872,8 @@ namespace TypedocConverter.Monaco
     /// </summary>
     class Emitter<T>
     {
+        public Emitter() => throw new System.NotImplementedException();
+
         [Newtonsoft.Json.JsonProperty("event", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public IEvent<T> Event { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -10919,6 +10928,8 @@ namespace TypedocConverter.Monaco
     /// </summary>
     class Position
     {
+        public Position(double lineNumber, double column) => throw new System.NotImplementedException();
+
         /// <summary>
         /// column (the first character in a line is between column 1 and column 2)
         /// </summary>
@@ -11018,6 +11029,8 @@ namespace TypedocConverter.Monaco
     /// </summary>
     class Range
     {
+        public Range(double startLineNumber, double startColumn, double endLineNumber, double endColumn) => throw new System.NotImplementedException();
+
         /// <summary>
         /// Column on which the range ends in line `endLineNumber`.
         /// </summary>
@@ -11209,6 +11222,8 @@ namespace TypedocConverter.Monaco
     /// </summary>
     class Selection : Range
     {
+        public Selection(double selectionStartLineNumber, double selectionStartColumn, double positionLineNumber, double positionColumn) => throw new System.NotImplementedException();
+
         /// <summary>
         /// Column on which the range ends in line `endLineNumber`.
         /// </summary>
@@ -11463,6 +11478,8 @@ namespace TypedocConverter.Monaco
 
     class Token
     {
+        public Token(double offset, string type, string language) => throw new System.NotImplementedException();
+
         [Newtonsoft.Json.JsonProperty("_tokenBrand", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public void TokenBrand { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 

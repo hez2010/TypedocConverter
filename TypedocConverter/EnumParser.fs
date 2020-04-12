@@ -37,13 +37,13 @@ let parseEnum (section: string) (node: Reflection): Entity =
                 | _ -> ""
             let mutable intValue = 0L
             match x.DefaultValue with
-            | Some value -> if Int64.TryParse(value, &intValue) then EnumMemberEntity(x.Name, comment, Some (intValue.ToString()))
+            | Some value -> if Int64.TryParse(value, &intValue) then EnumMemberEntity(x.Id, x.Name, comment, Some (intValue.ToString()))
                             else match getEnumReferencedValue values value x.Name with
-                                 | Some t -> EnumMemberEntity(x.Name, comment, Some t)
-                                 | _ -> EnumMemberEntity(x.Name, comment, None)
-            | _ -> EnumMemberEntity(x.Name, comment, None)
+                                 | Some t -> EnumMemberEntity(x.Id, x.Name, comment, Some t)
+                                 | _ -> EnumMemberEntity(x.Id, x.Name, comment, None)
+            | _ -> EnumMemberEntity(x.Id, x.Name, comment, None)
         )
-    EnumEntity((if section = "" then "TypedocConverter" else section), node.Name, 
+    EnumEntity(node.Id, (if section = "" then "TypedocConverter" else section), node.Name, 
         (
             match node.Comment with
             | Some comment -> getXmlDocComment comment

@@ -106,7 +106,7 @@ and DeclarationHierarchy = {
 }
 and Type = {
     Type: string
-    Id: int option
+    Id: int
     Name: string option
     ElementType: Type option
     Value: string option

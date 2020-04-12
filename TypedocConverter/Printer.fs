@@ -22,7 +22,7 @@ let rec arrangeType (config: Config) (typeInfo: Entity) =
         | "uint" | "ushort" | "byte" | "long" | "int" | "short" | "char" -> name
         | _ -> toPascalCase name
     match typeInfo with
-    | TypeEntity("System.Array", innerTypes) ->
+    | TypeEntity(_, "System.Array", innerTypes) ->
         match config.ArrayType with
         | "Array" -> 
             (match innerTypes with
@@ -32,17 +32,51 @@ let rec arrangeType (config: Config) (typeInfo: Entity) =
             match innerTypes with
                 | [] -> config.ArrayType
                 | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
-    | TypeEntity("System.ValueTuple", innerTypes) ->
+    | TypeEntity(_, "System.ValueTuple", innerTypes) ->
         "(" + System.String.Join(", ", innerTypes |> List.map (arrangeType config)) + ")"
-    | TypeEntity(name, innerTypes) ->
+    | TypeEntity(_, name, innerTypes) ->
         match innerTypes with
         | [] -> pascalizeTypeName name
         | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
     | _ -> "object"
 
+let arrangeParameterList config paras = 
+    let mutable args = []
+    let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte";
+        "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; 
+        "decimal"; "default"; "delegate"; "do"; "double"; "else"; "enum"; 
+        "event"; "explicit"; "extern"; "false"; "finally"; "fixed"; "float";
+        "for"; "foreach"; "goto"; "if"; "implicit"; "in"; "int"; "interface"; 
+        "internal"; "is"; "lock"; "long"; "namespace"; "new"; "null"; "object";
+        "operator"; "out"; "override"; "params"; "private"; "protected"; "public";
+        "readonly"; "ref"; "return"; "sbyte"; "sealed"; "short"; "sizeof"; 
+        "stackalloc"; "static"; "string"; "struct"; "switch"; "this"; "throw"; 
+        "true"; "try"; "typeof"; "uint"; "ulong"; "unchecked"; "unsafe"; 
+        "ushort"; "using"; "virtual"; "void"; "volatile"; "while";]
+
+    let rec getArg arg cnt = 
+        let outArg = 
+            if args |> List.contains (if cnt = 0 then arg else arg + string cnt)
+            then getArg arg (cnt + 1)
+            else 
+                let newArg = if cnt = 0 then arg else arg + string cnt
+                args <- args @ [newArg]
+                newArg
+        if conflictNames |> List.contains outArg then "@" + outArg else outArg
+    System.String.Join(
+        ", ", 
+        paras |> List.collect 
+            (fun i -> 
+                match i with
+                | ParameterEntity(_, pName, pType) ->
+                    [(arrangeType config pType) + " " + getArg pName 0]
+                | _ -> []
+            )
+    )
+
 let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
     match entity with
-    | StringUnionEntity(_, name, _, _, members) ->
+    | StringUnionEntity(_, _, name, _, _, members) ->
         fprintfn writer "    class %s%s" (toPascalCase name) "Converter : Newtonsoft.Json.JsonConverter"
         fprintfn writer "    {"
         fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase name) (toPascalCase name)
@@ -58,7 +92,7 @@ let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity)
             (
                 fun x ->
                     match x with
-                    | EnumMemberEntity(eName, _, _) ->
+                    | EnumMemberEntity(_, eName, _, _) ->
                         fprintfn writer "                        \"%s\" => %s.%s," eName (toPascalCase name) (toPascalCase eName)
                     | _ -> ()
             )
@@ -78,7 +112,7 @@ let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity)
             (
                 fun x ->
                     match x with
-                    | EnumMemberEntity(eName, _, _) ->
+                    | EnumMemberEntity(_, eName, _, _) ->
                         fprintfn writer  "                case %s.%s: serializer.Serialize(writer, \"%s\"); return;" (toPascalCase name) (toPascalCase eName) eName
                     | _ -> ()
             )
@@ -91,7 +125,7 @@ let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity)
 
 let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
     match entity with
-    | StringUnionEntity(_, name, _, _, members) ->
+    | StringUnionEntity(_, _, name, _, _, members) ->
         fprintfn writer "    class %s%s<%s>" (toPascalCase name) "Converter : System.Text.Json.Serialization.JsonConverter" (toPascalCase name)
         fprintfn writer "    {"
         fprintfn writer "        public override %s Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)" (toPascalCase name)
@@ -105,7 +139,7 @@ let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (co
             (
                 fun x ->
                     match x with
-                    | EnumMemberEntity(eName, _, _) ->
+                    | EnumMemberEntity(_, eName, _, _) ->
                         fprintfn writer "                        \"%s\" => %s.%s," eName (toPascalCase name) (toPascalCase eName)
                     | _ -> ()
             )
@@ -123,7 +157,7 @@ let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (co
             (
                 fun x ->
                     match x with
-                    | EnumMemberEntity(eName, _, _) ->
+                    | EnumMemberEntity(_, eName, _, _) ->
                         fprintfn writer  "                case %s.%s: System.Text.Json.JsonSerializer.Serialize<string>(writer, \"%s\", options); return;" (toPascalCase name) (toPascalCase eName) eName
                     | _ -> ()
             )
@@ -136,8 +170,8 @@ let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (co
 
 let getNamespaceAndName entity =
     match entity with
-    | ClassInterfaceEntity(ns, name, _, _, _, _, _, _, _, _) -> Some (ns, name)
-    | EnumEntity(ns, name, _, _, _) -> Some (ns, name)
+    | ClassInterfaceEntity(_, ns, name, _, _, _, _, _, _) -> Some (ns, name)
+    | EnumEntity(_, ns, name, _, _, _) -> Some (ns, name)
     | _ -> None
 
 let printEntity (writer: System.IO.TextWriter) (config: Config) (references: string list) (entity: Entity) = 
@@ -149,21 +183,21 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer  ""
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 4) else ()
 
-    let printName eType modifier name exts tps = 
+    let printName eType modifiers name exts tps = 
         fprintfn writer "    %s%s%s %s%s%s\n    {"
             (
-                match modifier with
+                match modifiers with
                 | [] -> ""
-                | _ -> modifier |> List.reduce (fun a b -> a + b + " ")
+                | _ -> modifiers |> List.reduce (fun a b -> a + b + " ")
             )
-            (if modifier = [] then "" else " ")
+            (if modifiers = [] then "" else " ")
             eType (toPascalCase name)
             (
                 match tps with
                 | [] -> ""
                 | paras -> 
                     "<" + System.String.Join(", ", paras |> List.collect(fun x -> 
-                        match x with | TypeParameterEntity(tpName) -> [toPascalCase tpName] | _ -> [])
+                        match x with | TypeParameterEntity(_, tpName) -> [toPascalCase tpName] | _ -> [])
                     ) + ">"
             )
             (
@@ -186,18 +220,29 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
     let isValueType (typeInfo: Entity) =
         let valueTypes = ["double"; "bool"; "ulong"; "uint"; "ushort"; "byte"; "long"; "int"; "short"; "char"; "System.DateTime"; "System.ValueTuple"]
         match typeInfo with
-        | TypeEntity(name, _) -> valueTypes |> List.contains name
+        | TypeEntity(_, name, _) -> valueTypes |> List.contains name
         | _ -> false
 
-    let printProperty name comment modifier eType withGet withSet isOptional initValue isInInterface config =
+    let printConstructor name comment modifiers paras config =
+        if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
+        fprintfn writer "        %s%s(%s) => throw new System.NotImplementedException();"
+            (
+                if modifiers = [] then "public "
+                else System.String.Join(" ", modifiers) + " "
+            )
+            (toPascalCase name)
+            (arrangeParameterList config paras)
+        fprintfn writer ""
+
+    let printProperty name comment modifiers eType withGet withSet isOptional initValue isInInterface config =
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         if config.UseSystemJson then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
         else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
         fprintfn writer "        %s%s%s %s { %s%s}%s"
             (
-                if modifier = [] then 
+                if modifiers = [] then 
                     if isInInterface then "" else "public "
-                else System.String.Join(" ", modifier) + " "
+                else System.String.Join(" ", modifiers) + " "
             )
             (arrangeType config eType)
             (
@@ -230,26 +275,26 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
             )
         fprintfn writer ""
 
-    let printEvent name comment modifier isOptional eType isInInterface = 
+    let printEvent name comment modifiers isOptional eType isInInterface = 
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         fprintfn writer "        %sevent %s%s %s;"
             (
-                if modifier = [] then 
+                if modifiers = [] then 
                     if isInInterface then "" else "public "
-                else System.String.Join(" ", modifier) + " "
+                else System.String.Join(" ", modifiers) + " "
             )
             (arrangeType config eType)
             (if isOptional then "?" else "")
             (toPascalCase name)
         fprintfn writer ""
 
-    let printMethod name comment modifier tps paras mType isInInterface = 
+    let printMethod name comment modifiers tps paras mType isInInterface = 
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         fprintfn writer "        %s%s %s%s(%s)%s;"
             (
-                if modifier = [] then 
+                if modifiers = [] then 
                     if isInInterface then "" else "public "
-                else System.String.Join(" ", modifier) + " "
+                else System.String.Join(" ", modifiers) + " "
             )
             (arrangeType config mType)
             (toPascalCase name)
@@ -257,42 +302,9 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 match tps with
                 | [] -> ""
                 | tps -> "<" + System.String.Join(", ", tps |> List.collect (fun x -> 
-                    match x with | TypeParameterEntity(tpName) -> [toPascalCase tpName] | _ -> [])) + ">"
+                    match x with | TypeParameterEntity(_, tpName) -> [toPascalCase tpName] | _ -> [])) + ">"
             )
-            (
-                let mutable args = []
-                let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte";
-                    "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; 
-                    "decimal"; "default"; "delegate"; "do"; "double"; "else"; "enum"; 
-                    "event"; "explicit"; "extern"; "false"; "finally"; "fixed"; "float";
-                    "for"; "foreach"; "goto"; "if"; "implicit"; "in"; "int"; "interface"; 
-                    "internal"; "is"; "lock"; "long"; "namespace"; "new"; "null"; "object";
-                    "operator"; "out"; "override"; "params"; "private"; "protected"; "public";
-                    "readonly"; "ref"; "return"; "sbyte"; "sealed"; "short"; "sizeof"; 
-                    "stackalloc"; "static"; "string"; "struct"; "switch"; "this"; "throw"; 
-                    "true"; "try"; "typeof"; "uint"; "ulong"; "unchecked"; "unsafe"; 
-                    "ushort"; "using"; "virtual"; "void"; "volatile"; "while";]
-
-                let rec getArg arg cnt = 
-                    let outArg = 
-                        if args |> List.contains (if cnt = 0 then arg else arg + string cnt)
-                        then getArg arg (cnt + 1)
-                        else 
-                            let newArg = if cnt = 0 then arg else arg + string cnt
-                            args <- args @ [newArg]
-                            newArg
-                    if conflictNames |> List.contains outArg then "@" + outArg else outArg
-                System.String.Join(
-                    ", ", 
-                    paras |> List.collect 
-                        (fun i -> 
-                            match i with
-                            | ParameterEntity(pName, pType) ->
-                                [(arrangeType config pType) + " " + getArg pName 0]
-                            | _ -> []
-                        )
-                )
-            )
+            (arrangeParameterList config paras)
             (
                 if isInInterface then ""
                 else " => throw new System.NotImplementedException()"
@@ -300,28 +312,28 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer ""
 
     match entity with
-    | EnumEntity(ns, name, comment, modifier, members) ->
+    | EnumEntity(_, ns, name, comment, modifiers, members) ->
         printHeader ns comment
-        printName "enum" modifier name [] []
+        printName "enum" modifiers name [] []
         members |> List.iteri
             (
                 fun i x ->
                     match x with
-                    | EnumMemberEntity(eName, eComment, eValue) -> printEnumMember eName eComment eValue (i = members.Length - 1)
+                    | EnumMemberEntity(_, eName, eComment, eValue) -> printEnumMember eName eComment eValue (i = members.Length - 1)
                     | _ -> ()
             )
         fprintfn writer "    }"
         fprintfn writer "}\n"
-    | StringUnionEntity(ns, name, comment, modifier, members) ->
+    | StringUnionEntity(_, ns, name, comment, modifiers, members) ->
         printHeader ns comment
         if config.UseSystemJson then fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
         else fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
-        printName "enum" modifier name [] []
+        printName "enum" modifiers name [] []
         members |> List.iteri
             (
                 fun i x ->
                     match x with
-                    | EnumMemberEntity(eName, eComment, eValue) -> printEnumMember eName eComment eValue (i = members.Length - 1)
+                    | EnumMemberEntity(_, eName, eComment, eValue) -> printEnumMember eName eComment eValue (i = members.Length - 1)
                     | _ -> ()
             )
         fprintfn writer "    }"
@@ -329,35 +341,23 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         if config.UseSystemJson then printSystemJsonConverter writer entity config
         else printNewtonsoftJsonConverter writer entity config
         fprintfn writer "}\n"
-    | ClassInterfaceEntity(ns, name, comment, modifier, methods, properties, events, exts, tps, isInterface) ->
+    | ClassInterfaceEntity(_, ns, name, comment, modifiers, members, exts, tps, isInterface) ->
         printHeader ns comment
-        if isInterface then printName "interface" modifier name exts tps
-        else printName "class" modifier name exts tps
-        properties
+        if isInterface then printName "interface" modifiers name exts tps
+        else printName "class" modifiers name exts tps
+        members
         |> List.iter
             (
                 fun x ->
                     match x with
-                    | PropertyEntity(pName, pComment, pModifier, pType, withGet, withSet, isOptional, initValue) ->
+                    | ConstructorEntity(_, cName, cComment, cModifier, cParas) ->
+                        printConstructor cName cComment cModifier cParas config
+                    | PropertyEntity(_, pName, pComment, pModifier, pType, withGet, withSet, isOptional, initValue) ->
                         printProperty pName pComment pModifier pType withGet withSet isOptional initValue isInterface config
-                    | _ -> ()
-            )
-        events
-        |> List.iter
-            (
-                fun x ->
-                    match x with
-                    | EventEntity(eName, eComment, eModifier, isOptional, eType) ->
+                    | EventEntity(_, eName, eComment, eModifier, isOptional, eType) ->
                         printEvent eName eComment eModifier isOptional eType isInterface
-                    | _ -> ()
-            )
-        methods
-        |> List.iter
-            (
-                fun x ->
-                    match x with
-                    | MethodEntity(mName, mComment, mModifier, mTps, paras, mType) ->
-                        printMethod mName mComment mModifier mTps paras mType isInterface
+                    | MethodEntity(_, mName, mComment, mModifier, mTps, mParas, mType) ->
+                        printMethod mName mComment mModifier mTps mParas mType isInterface
                     | _ -> ()
             )
         fprintfn writer "    }"

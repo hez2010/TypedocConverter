@@ -21,58 +21,61 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
         match types with
         | Some result -> result
         | _ -> []
-    let properties = 
-        (match node.Children with
-        | Some children -> 
-            if isInterface then
-                children 
-                |> List.where(fun x -> x.Kind = ReflectionKind.Property)
-                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited properties
-                |> List.where(fun x -> x.Overwrites = None) // exclude overrites properties
-            else children |> List.where(fun x -> x.Kind = ReflectionKind.Property)
-        | _ -> [])
-        |> List.map (
-            fun x -> 
-                PropertyEntity(x.Name, getComment x, 
-                    (if isInterface then [] else getModifier x.Flags),
-                    (
-                        match x.Type with
-                        | Some typeInfo -> getType config typeInfo
-                        | _ -> TypeEntity("object", [])
-                    ),
-                    true,
-                    true,
-                    (
-                        match x.Flags.IsOptional with
-                        | Some optional -> optional
-                        | _ -> false
-                    ),
-                    (
-                        match x.DefaultValue with
-                        | Some value -> Some value
-                        | _ -> None
-                    )
-                )
-        )
-    let events = 
-        (match node.Children with
-        | Some children -> 
-            if isInterface then
-                children 
-                |> List.where(fun x -> x.Kind = ReflectionKind.Event)
-                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited events
-                |> List.where(fun x -> x.Overwrites = None) // exclude overrites events
-            else children |> List.where(fun x -> x.Kind = ReflectionKind.Event)
-        | _ -> [])
-        |> List.collect (
-            fun x -> 
-                match x.Signatures with
-                | Some signature -> 
-                    signature 
-                    |> List.where (fun s -> s.Kind = ReflectionKind.Event)
-                    |> List.map(
-                        fun s -> 
-                            EventEntity(x.Name, getCommentFromSignature s, 
+    let members = 
+        match node.Children with
+        | Some children ->
+            children 
+            |> List.where (fun x -> 
+                if isInterface then x.InheritedFrom = None && x.Overwrites = None
+                else true
+            )
+            |> List.collect (fun x ->
+                match x.Kind with
+                | ReflectionKind.Constructor ->
+                    match x.Signatures with
+                    | Some signature -> 
+                        signature 
+                        |> List.where (fun s -> s.Kind = ReflectionKind.ConstructorSignature)
+                        |> List.map(fun s ->
+                            let parameters = 
+                                getMethodParameters 
+                                    config
+                                    (match s.Parameters with
+                                    | Some parameters -> parameters |> List.where(fun p -> p.Kind = ReflectionKind.Parameter)
+                                    | _ -> [])
+                            ConstructorEntity(s.Id, node.Name, getComment x, [], parameters)
+                        )
+                    | _ -> []
+                | ReflectionKind.Property -> 
+                    [
+                        PropertyEntity(x.Id, x.Name, getComment x, 
+                            (if isInterface then [] else getModifier x.Flags),
+                            (
+                                match x.Type with
+                                | Some typeInfo -> getType config typeInfo
+                                | _ -> TypeEntity(0, "object", [])
+                            ),
+                            true,
+                            true,
+                            (
+                                match x.Flags.IsOptional with
+                                | Some optional -> optional
+                                | _ -> false
+                            ),
+                            (
+                                match x.DefaultValue with
+                                | Some value -> Some value
+                                | _ -> None
+                            )
+                        )
+                    ]
+                | ReflectionKind.Event ->
+                    match x.Signatures with
+                    | Some signature -> 
+                        signature 
+                        |> List.where (fun s -> s.Kind = ReflectionKind.Event)
+                        |> List.map(fun s -> 
+                            EventEntity(s.Id, x.Name, getCommentFromSignature s, 
                                 (if isInterface then [] else getModifier x.Flags), 
                                 (
                                     match x.Flags.IsOptional with
@@ -84,35 +87,22 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                     | Some [front] | Some (front::_) -> 
                                         match front.Type with
                                         | Some pType -> getType config pType
-                                        | _ -> TypeEntity("System.Delegate", [])
-                                    | _ -> TypeEntity("System.Delegate", [])
+                                        | _ -> TypeEntity(0, "System.Delegate", [])
+                                    | _ -> TypeEntity(0, "System.Delegate", [])
                                 )
                             )
                         )
-                | _ -> []
-        )
-    let methods = 
-        (match node.Children with
-        | Some children -> 
-            if isInterface then
-                children 
-                |> List.where(fun x -> x.Kind = ReflectionKind.Method)
-                |> List.where(fun x -> x.InheritedFrom = None) // exclude inhreited methods
-                |> List.where(fun x -> x.Overwrites = None) // exclude overrites methods
-            else children |> List.where(fun x -> x.Kind = ReflectionKind.Method)
-        | _ -> [])
-        |> List.collect (
-            fun x -> 
-                match x.Signatures with
-                | Some signatures -> 
-                    signatures 
-                    |> List.where(fun s -> s.Kind = ReflectionKind.CallSignature)
-                    |> List.map (
-                        fun s -> 
+                    | _ -> []
+                | ReflectionKind.Method ->
+                    match x.Signatures with
+                    | Some signatures -> 
+                        signatures 
+                        |> List.where(fun s -> s.Kind = ReflectionKind.CallSignature)
+                        |> List.map (fun s -> 
                             let retType = 
                                 match s.Type with
                                 | Some t -> getType config t
-                                | _ -> TypeEntity("object", [])
+                                | _ -> TypeEntity(0, "object", [])
                             let typeParameter = 
                                 let types = 
                                     match s.TypeParameter with
@@ -127,12 +117,15 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                     (match s.Parameters with
                                     | Some parameters -> parameters |> List.where(fun p -> p.Kind = ReflectionKind.Parameter)
                                     | _ -> [])
-                            MethodEntity(s.Name, getCommentFromSignature s, 
+                            MethodEntity(s.Id, s.Name, getCommentFromSignature s, 
                                 (if isInterface then [] else getModifier x.Flags), typeParameter, parameters, retType)
-                    )
+                        )
+                    | _ -> []
                 | _ -> []
-        )
+            )
+        | _ -> []
+
     ClassInterfaceEntity(
-        (if section = "" then "TypedocConverter" else section), node.Name, comment, getModifier node.Flags,
-        methods, properties, events, exts, genericType, isInterface
+        node.Id, (if section = "" then "TypedocConverter" else section), node.Name, comment, getModifier node.Flags,
+        members, exts, genericType, isInterface
     )
