@@ -24,6 +24,7 @@ Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows
   - [x] Events
 - [ ] Types
   - [x] String literals
+  - [ ] Type alias
   - [ ] Union types
   - [ ] Intersection types
   - [ ] Anonymous interfaces
