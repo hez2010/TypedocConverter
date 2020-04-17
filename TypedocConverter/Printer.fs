@@ -15,32 +15,65 @@ let arrangeComment (comment: string) blankSpace =
     |> Array.map(fun x -> blanks + x)
     |> Array.reduce (append "\n")
 
-let rec arrangeType (config: Config) (typeInfo: Entity) =
+let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: Entity) =
     let pascalizeTypeName name =
         match name with
         | "object" | "string" | "double" | "void" | "bool" | "ulong"
         | "uint" | "ushort" | "byte" | "long" | "int" | "short" | "char" -> name
         | _ -> toPascalCase name
     match typeInfo with
-    | TypeEntity(_, "System.Array", innerTypes) ->
+    | TypeEntity(_, "System.Array", _, innerTypes) ->
         match config.ArrayType with
         | "Array" -> 
             (match innerTypes with
-            | [x] -> arrangeType config x
+            | [x] -> arrangeType config writer x
             | _ -> "object") + "[]"
         | _ ->
             match innerTypes with
                 | [] -> config.ArrayType
-                | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
-    | TypeEntity(_, "System.ValueTuple", innerTypes) ->
-        "(" + System.String.Join(", ", innerTypes |> List.map (arrangeType config)) + ")"
-    | TypeEntity(_, name, innerTypes) ->
+                | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
+    | TypeEntity(_, "System.ValueTuple", _, innerTypes) ->
+        "(" + System.String.Join(", ", innerTypes |> List.map (arrangeType config writer)) + ")"
+    | TypeEntity(_, name, _, innerTypes) ->
         match innerTypes with
         | [] -> pascalizeTypeName name
-        | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config)) + ">"
+        | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
+    | UnionTypeEntity _ -> arrangeUnionType config writer typeInfo
     | _ -> "object"
+and arrangeUnionType (config: Config) (writer: System.IO.TextWriter) (typeInfo: Entity) = 
+    let printUnionType (name: string) (types: string list) =
+        printWarning ("Taking " + name + " for union type "+ System.String.Join(" | ", types) + ".")
+    match typeInfo with
+    | UnionTypeEntity(_, _, inner) ->
+        let types = inner |> List.map (arrangeType config writer) |> List.distinct
+        let objRemoved = types |> List.where(fun x -> x <> "object")
+        match objRemoved with
+        | [] -> "object"
+        | [x] -> x
+        | (_::_) ->
+            let takenType = inner |> List.sortWith typeSorter |> List.head
+            let name = arrangeType config writer takenType
+            printUnionType name types
+            name
+    | _ -> "object"
+and typeSorter typeA typeB = 
+    let typesOrder = ["array"; "tuple"; "reference"; "reflection"; "stringLiteral"; "intrinsic"]
+    let compare typeIdA typeIdB = 
+        let indexA = typesOrder |> List.tryFindIndex (fun x -> x = typeIdA)
+        let indexB = typesOrder |> List.tryFindIndex (fun x -> x = typeIdB)
+        match (indexA, indexB) with
+        | (None, None) -> 0
+        | (Some _, None) -> -1
+        | (None, Some _) -> 1
+        | (Some a, Some b) -> a.CompareTo b
+    match (typeA, typeB) with
+    | (TypeEntity(_, _, typeIdA, _), TypeEntity(_, _, typeIdB, _)) -> compare typeIdA typeIdB
+    | (TypeEntity(_, _, typeIdA, _), UnionTypeEntity(_, typeIdB, _)) -> compare typeIdA typeIdB
+    | (UnionTypeEntity(_, typeIdA, _), TypeEntity(_, _, typeIdB, _)) -> compare typeIdA typeIdB
+    | (UnionTypeEntity(_, typeIdA, _), UnionTypeEntity(_, typeIdB, _)) -> compare typeIdA typeIdB
+    | _ -> 0
 
-let arrangeParameterList config paras = 
+let arrangeParameterList config (writer: System.IO.TextWriter) paras = 
     let mutable args = []
     let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte";
         "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; 
@@ -69,7 +102,7 @@ let arrangeParameterList config paras =
             (fun i -> 
                 match i with
                 | ParameterEntity(_, pName, pType) ->
-                    [(arrangeType config pType) + " " + getArg pName 0]
+                    [(arrangeType config writer pType) + " " + getArg pName 0]
                 | _ -> []
             )
     )
@@ -203,7 +236,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
             (
                 match exts with
                 | [] -> ""
-                | paras -> " : " + System.String.Join(", ", paras |> List.map (arrangeType config))
+                | paras -> " : " + System.String.Join(", ", paras |> List.map (arrangeType config writer))
             )
 
     let printEnumMember name comment value isLastOne = 
@@ -220,7 +253,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
     let isValueType (typeInfo: Entity) =
         let valueTypes = ["double"; "bool"; "ulong"; "uint"; "ushort"; "byte"; "long"; "int"; "short"; "char"; "System.DateTime"; "System.ValueTuple"]
         match typeInfo with
-        | TypeEntity(_, name, _) -> valueTypes |> List.contains name
+        | TypeEntity(_, name, _, _) -> valueTypes |> List.contains name
         | _ -> false
 
     let printConstructor name comment modifiers paras config =
@@ -231,7 +264,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 else System.String.Join(" ", modifiers) + " "
             )
             (toPascalCase name)
-            (arrangeParameterList config paras)
+            (arrangeParameterList config writer paras)
         fprintfn writer ""
 
     let printProperty name comment modifiers eType withGet withSet isOptional initValue isInInterface config =
@@ -244,7 +277,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )
-            (arrangeType config eType)
+            (arrangeType config writer eType)
             (
                 if isOptional then
                     if config.NrtDisabled then 
@@ -283,7 +316,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )
-            (arrangeType config eType)
+            (arrangeType config writer eType)
             (if isOptional then "?" else "")
             (toPascalCase name)
         fprintfn writer ""
@@ -296,7 +329,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )
-            (arrangeType config mType)
+            (arrangeType config writer mType)
             (toPascalCase name)
             (
                 match tps with
@@ -304,7 +337,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 | tps -> "<" + System.String.Join(", ", tps |> List.collect (fun x -> 
                     match x with | TypeParameterEntity(_, tpName) -> [toPascalCase tpName] | _ -> [])) + ">"
             )
-            (arrangeParameterList config paras)
+            (arrangeParameterList config writer paras)
             (
                 if isInInterface then ""
                 else " => throw new System.NotImplementedException()"

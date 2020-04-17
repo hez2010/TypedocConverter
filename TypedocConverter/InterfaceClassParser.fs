@@ -53,7 +53,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             (
                                 match x.Type with
                                 | Some typeInfo -> getType config typeInfo
-                                | _ -> TypeEntity(0, "object", [])
+                                | _ -> TypeEntity(0, "object", "intrinsic", [])
                             ),
                             true,
                             true,
@@ -87,8 +87,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                     | Some [front] | Some (front::_) -> 
                                         match front.Type with
                                         | Some pType -> getType config pType
-                                        | _ -> TypeEntity(0, "System.Delegate", [])
-                                    | _ -> TypeEntity(0, "System.Delegate", [])
+                                        | _ -> TypeEntity(0, "System.Delegate", "reflection", [])
+                                    | _ -> TypeEntity(0, "System.Delegate", "reflection", [])
                                 )
                             )
                         )
@@ -102,7 +102,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             let retType = 
                                 match s.Type with
                                 | Some t -> getType config t
-                                | _ -> TypeEntity(0, "object", [])
+                                | _ -> TypeEntity(0, "object", "intrinsic", [])
                             let typeParameter = 
                                 let types = 
                                     match s.TypeParameter with

@@ -4,6 +4,7 @@ type Entity =
 | TypeEntity of
     Id: int *
     Name: string *
+    TypeId: string *
     InnerTypes: Entity list
 | TypeParameterEntity of
     Id: int *
@@ -77,4 +78,5 @@ type Entity =
     AliasedType: Entity
 | UnionTypeEntity of // not used
     Id: int *
+    TypeId: string *
     Types: Entity list

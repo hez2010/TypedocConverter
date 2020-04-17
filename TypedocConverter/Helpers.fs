@@ -67,69 +67,74 @@ let getComment (node: Reflection) =
     | _ -> ""
 
 let rec getType (config: Config) (typeInfo: Type): Entity = 
-    let mutable containerType =
+    let containerType =
         match typeInfo.Type with
         | "intrinsic" -> 
             match typeInfo.Name with
             | Some name -> 
                 match name with
-                | "number" -> TypeEntity(typeInfo.Id, config.NumberType, [])
-                | "boolean" -> TypeEntity(typeInfo.Id, "bool", [])
-                | "string" -> TypeEntity(typeInfo.Id, "string", [])
-                | "void" -> TypeEntity(typeInfo.Id, "void", [])
-                | "any" -> TypeEntity(typeInfo.Id, config.AnyType, [])
-                | _ -> TypeEntity(typeInfo.Id, "object", [])
-            | _ -> TypeEntity(typeInfo.Id, "object", [])
+                | "number" -> TypeEntity(typeInfo.Id, config.NumberType, typeInfo.Type, [])
+                | "boolean" -> TypeEntity(typeInfo.Id, "bool", typeInfo.Type, [])
+                | "string" -> TypeEntity(typeInfo.Id, "string", typeInfo.Type, [])
+                | "void" -> TypeEntity(typeInfo.Id, "void", typeInfo.Type, [])
+                | "any" -> TypeEntity(typeInfo.Id, config.AnyType, typeInfo.Type, [])
+                | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+            | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
         | "reference" | "typeParameter" -> 
             match typeInfo.Name with
             | Some name -> 
                 match name with
-                | "Promise" -> TypeEntity(typeInfo.Id, "System.Threading.Tasks.Task", [])
-                | "Set" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.ISet", [])
-                | "Map" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.IDictionary", [])
-                | "Array" -> TypeEntity(typeInfo.Id, "System.Array", [])
-                | "Date" -> TypeEntity(typeInfo.Id, "System.DateTime", [])
-                | "BigUint64Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "ulong", [])])
-                | "Uint32Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "uint", [])])
-                | "Uint16Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "ushort", [])])
-                | "Uint8Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "byte", [])])
-                | "BigInt64Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "long", [])])
-                | "Int32Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "int", [])])
-                | "Int16Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "short", [])])
-                | "Int8Array" -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "char", [])])
-                | "RegExp" -> TypeEntity(typeInfo.Id, "string", []);
-                | x -> TypeEntity(typeInfo.Id, x, []);
-            | _ -> TypeEntity(typeInfo.Id, "object", [])
+                | "Promise" -> TypeEntity(typeInfo.Id, "System.Threading.Tasks.Task", typeInfo.Type, [])
+                | "Set" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.ISet", typeInfo.Type, [])
+                | "Map" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.IDictionary", typeInfo.Type, [])
+                | "Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [])
+                | "Date" -> TypeEntity(typeInfo.Id, "System.DateTime", typeInfo.Type, [])
+                | "BigUint64Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "ulong", "intrinsic", [])])
+                | "Uint32Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "uint", "intrinsic", [])])
+                | "Uint16Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "ushort", "intrinsic", [])])
+                | "Uint8Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "byte", "intrinsic", [])])
+                | "BigInt64Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "long", "intrinsic", [])])
+                | "Int32Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "int", "intrinsic", [])])
+                | "Int16Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "short", "intrinsic", [])])
+                | "Int8Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "char", "intrinsic", [])])
+                | "RegExp" -> TypeEntity(typeInfo.Id, "string", typeInfo.Type, []);
+                | x -> TypeEntity(typeInfo.Id, x, typeInfo.Type, []);
+            | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
         | "array" -> 
             match typeInfo.ElementType with
-            | Some elementType -> TypeEntity(typeInfo.Id, "System.Array", [getType config elementType])
-            | _ -> TypeEntity(typeInfo.Id, "System.Array", [TypeEntity(0, "object", [])])
-        | "stringLiteral" -> TypeEntity(typeInfo.Id, "string", [])
+            | Some elementType -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [getType config elementType])
+            | _ -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "object", "intrinsic", [])])
+        | "stringLiteral" -> TypeEntity(typeInfo.Id, "string", typeInfo.Type, [])
         | "tuple" ->
             match typeInfo.Types with
             | Some innerTypes -> 
                 match innerTypes with
-                | [] -> TypeEntity(typeInfo.Id, "object", [])
-                | _ -> TypeEntity(typeInfo.Id, "System.ValueTuple", innerTypes |> List.map (getType config))
-            | _ -> TypeEntity(typeInfo.Id, "object", [])
+                | [] -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+                | _ -> TypeEntity(typeInfo.Id, "System.ValueTuple", typeInfo.Type, innerTypes |> List.map (getType config))
+            | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
         | "union" -> 
             match typeInfo.Types with
             | Some innerTypes -> 
                 match innerTypes with
-                | [] -> TypeEntity(typeInfo.Id, "object", [])
-                | _ -> 
-                    let takenType = 
-                        innerTypes 
-                        |> List.sortWith typeSorter
-                        |> List.head
-                    match takenType.Name with
-                    | Some name -> printWarning ("Taking type " + name + " for the entire union type.")
-                    | _ -> printWarning ("Taking type " + takenType.Type + " for the entire union type.")
-                    getType config takenType
-            | _ -> TypeEntity(typeInfo.Id, "object", [])
+                | [] -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+                | _ -> UnionTypeEntity(typeInfo.Id, typeInfo.Type, innerTypes |> List.map (getType config))
+            | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
         | "intersection" -> 
-            printWarning ("Intersection type is not supported.")
-            TypeEntity(typeInfo.Id, "object", []) // TODO: generate intersections
+            let types = 
+                match typeInfo.Types with
+                | Some innerTypes -> 
+                    innerTypes 
+                    |> List.map (getType config) 
+                    |> List.map (fun x ->
+                        match x with 
+                        | TypeEntity(_, name, _, _) -> name 
+                        | UnionTypeEntity _ -> "union"
+                        | _ -> "object"
+                    )
+                | _ -> []
+
+            printWarning ("Intersection type " + System.String.Join(" & ", types) + " is not supported.")
+            TypeEntity(typeInfo.Id, "object", typeInfo.Type, []) // TODO: generate intersections
         | "reflection" -> 
             match typeInfo.Declaration with
             | Some dec -> 
@@ -160,45 +165,51 @@ let rec getType (config: Config) (typeInfo: Type): Entity =
                     let returnsType = 
                         match signature.Type with
                         | Some t -> getType config t
-                        | _ -> TypeEntity(0, "void", [])
+                        | _ -> TypeEntity(0, "void", "intrinsic", [])
                     let typeParas = getDelegateParas paras
                     match typeParas with
-                    | [] -> TypeEntity(typeInfo.Id, "System.Action", [])
+                    | [] -> TypeEntity(typeInfo.Id, "System.Action", typeInfo.Type, [])
                     | _ -> 
                         match returnsType with
-                        | TypeEntity(_, "void", _) -> TypeEntity(typeInfo.Id, "System.Action", typeParas) 
-                        | _ -> TypeEntity(typeInfo.Id, "System.Func", typeParas @ [returnsType])
-                | _ -> TypeEntity(typeInfo.Id, "object", [])
-            | _ -> TypeEntity(typeInfo.Id, "object", [])
-        | _ -> TypeEntity(typeInfo.Id, "object", [])
+                        | TypeEntity(_, "void", _, _) -> TypeEntity(typeInfo.Id, "System.Action", typeInfo.Type, typeParas) 
+                        | _ -> TypeEntity(typeInfo.Id, "System.Func", typeInfo.Type, typeParas @ [returnsType])
+                | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+            | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+        | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+    handlePromiseType containerType typeInfo config
+and handlePromiseType (containerType: Entity) (typeInfo: Type) (config: Config): Entity =
+    let mutable container = containerType
     let mutable innerTypes = 
         match typeInfo.TypeArguments with
         | Some args -> getGenericTypeArguments config args
         | _ -> []
-    match containerType with
-    | TypeEntity(id, "System.Threading.Tasks.Task", _) ->
+    match container with
+    | TypeEntity(id, "System.Threading.Tasks.Task", typeId, _) ->
         match innerTypes with
         | [front] | (front::_) -> 
             match front with
-            | TypeEntity(_, "void", _) ->
+            | TypeEntity(_, "void", _, _) ->
                 innerTypes <- []
                 if config.UseWinRTPromise
                 then 
-                    containerType <- TypeEntity(id, "Windows.Foundation.IAsyncAction", [])
+                    container <- TypeEntity(id, "Windows.Foundation.IAsyncAction", typeId, [])
                 else 
-                    containerType <- TypeEntity(id, "System.Threading.Tasks.Task", [])
-            | TypeEntity(_, _, inner) ->
+                    container <- TypeEntity(id, "System.Threading.Tasks.Task", typeId, [])
+            | TypeEntity(_, _, _, inner) ->
                 if config.UseWinRTPromise
                 then 
-                    containerType <- TypeEntity(id, "Windows.Foundation.IAsyncOperation", inner)
+                    container <- TypeEntity(id, "Windows.Foundation.IAsyncOperation", typeId, inner)
                 else 
-                    containerType <- TypeEntity(id, "System.Threading.Tasks.Task", inner)
+                    container <- TypeEntity(id, "System.Threading.Tasks.Task", typeId, inner)
             | _ -> ()
         | _ -> ()
+    | UnionTypeEntity(id, typeId, inner) -> 
+        container <- UnionTypeEntity(id, typeId, inner |> List.map(fun x -> handlePromiseType x typeInfo config))
     | _ -> ()
-    match containerType with
-    | TypeEntity(id, name, inner) -> TypeEntity(id, name, if innerTypes = [] then inner else innerTypes)
-    | _ -> TypeEntity(typeInfo.Id, "object", [])
+    match container with
+    | TypeEntity(id, name, typeId, inner) -> TypeEntity(id, name, typeId, if innerTypes = [] then inner else innerTypes)
+    | UnionTypeEntity(id, typeId, inner) -> UnionTypeEntity(id, typeId, inner)
+    | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
 and getGenericTypeArguments (config: Config) (typeInfos: Type list): Entity list = 
     typeInfos |> List.map (getType config)
 and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate constaints
@@ -206,15 +217,6 @@ and getGenericTypeParameters (nodes: Reflection list) = // TODO: generate consta
         nodes 
         |> List.where(fun x -> x.Kind = ReflectionKind.TypeParameter)
     types |> List.map (fun x -> TypeParameterEntity(x.Id, x.Name))
-and typeSorter typeA typeB = 
-    let typesOrder = ["array"; "tuple"; "reference"; "reflection"; "stringLiteral"; "intrinsic"]
-    let indexA = typesOrder |> List.tryFindIndex (fun x -> x = typeA.Type)
-    let indexB = typesOrder |> List.tryFindIndex (fun x -> x = typeB.Type)
-    match (indexA, indexB) with
-    | (None, None) -> 0
-    | (Some _, None) -> -1
-    | (None, Some _) -> 1
-    | (Some a, Some b) -> a.CompareTo b
 
 let getMethodParameters (config: Config) (parameters: Reflection list) = 
     parameters
@@ -225,7 +227,7 @@ let getMethodParameters (config: Config) (parameters: Reflection list) =
         | Some typeInfo -> 
             let typeMeta = getType config typeInfo
             ParameterEntity(x.Id, name, typeMeta)
-        | _ -> ParameterEntity(x.Id, name, TypeEntity(0, "object", []))
+        | _ -> ParameterEntity(x.Id, name, TypeEntity(0, "object", "intrinsic", []))
     )
 
 let getModifier (flags: ReflectionFlags) = 

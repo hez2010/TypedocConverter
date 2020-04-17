@@ -1776,7 +1776,7 @@ namespace TypedocConverter.Monaco.Editor
 
     interface IContextKey<T>
     {
-        object Get();
+        T Get();
 
         void Reset();
 
@@ -3923,7 +3923,7 @@ namespace TypedocConverter.Monaco.Editor
     interface IMarker
     {
         [Newtonsoft.Json.JsonProperty("code", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        object? Code { get; set; }
+        string? Code { get; set; }
 
         [Newtonsoft.Json.JsonProperty("endColumn", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         double EndColumn { get; set; }
@@ -3977,7 +3977,7 @@ namespace TypedocConverter.Monaco.Editor
     interface IMarkerData
     {
         [Newtonsoft.Json.JsonProperty("code", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        object? Code { get; set; }
+        string? Code { get; set; }
 
         [Newtonsoft.Json.JsonProperty("endColumn", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         double EndColumn { get; set; }
@@ -9964,7 +9964,7 @@ namespace TypedocConverter.Monaco.Languages
         /// the UI.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("label", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        object Label { get; set; }
+        string Label { get; set; }
 
     }
 }
