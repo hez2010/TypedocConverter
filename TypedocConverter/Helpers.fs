@@ -173,7 +173,12 @@ let rec getType (config: Config) (typeInfo: Type): Entity =
                         match returnsType with
                         | TypeEntity(_, "void", _, _) -> TypeEntity(typeInfo.Id, "System.Action", typeInfo.Type, typeParas) 
                         | _ -> TypeEntity(typeInfo.Id, "System.Func", typeInfo.Type, typeParas @ [returnsType])
-                | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+                | _ -> 
+                    match dec.Children with
+                    | None | Some [] -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
+                    | Some children -> 
+                        printWarning ("Type literal { " + System.String.Join(", ", children |> List.map(fun c -> c.Name)) + " } is not supported.")
+                        TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
             | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
         | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [])
     handlePromiseType containerType typeInfo config
