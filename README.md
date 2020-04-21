@@ -30,9 +30,12 @@ Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows
   - [ ] Anonymous interfaces
 - [x] Split entities to different files
 - [x] Auto rename conflict parameter names
+- [x] WinRT/CLR async types support (`IAsyncAction`/`IAsyncOperation<T>` or `Task`/`Task<T>`)
+- [x] Newtonsoft.Json and System.Text.Json for JSON serialization
+- [x] Nullable Reference Types
 - [ ] ...
 
-## Sample
+## Quick start
 TypeScript code `input.ts`:
 ```typescript
 declare namespace test {
