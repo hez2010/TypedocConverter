@@ -24,10 +24,10 @@ Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows
   - [x] Events
 - [ ] Types
   - [x] String literals
+  - [ ] Type literals
   - [ ] Type alias
   - [ ] Union types
   - [ ] Intersection types
-  - [ ] Anonymous interfaces
 - [x] Split entities to different files
 - [x] Auto rename conflict parameter names
 - [x] WinRT/CLR async types support (`IAsyncAction`/`IAsyncOperation<T>` or `Task`/`Task<T>`)
