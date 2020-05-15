@@ -348,13 +348,27 @@ cd TypedocConverter/TypedocConverter
 dotnet publish -c Release -r win-x64 /p:NativeBuild=true
 ```
 
-## Run
+## Run & Usage
 ```bash
 TypedocConverter --help
 ```
 Sample:
 ```bash
-TypedocConverter --inputfile 1.json --splitfiles true --outputdir . --namespace ""
+TypedocConverter --inputfile 1.json --splitfiles true --outputdir .
+```
+Arguments:
+```
+--inputfile [file]: input file
+--namespace [namespace]: specify namespace for generated code
+--splitfiles [true|false]: whether to split code to different files
+--outputdir [path]: used for place code files when splitfiles is true
+--outputfile [path]: used for place code file when splitfiles is false
+--number-type [int/decimal/double...]: config for number type mapping
+--promise-type [CLR/WinRT]: config for promise type mapping, CLR for Task and WinRT for IAsyncAction/IAsyncOperation
+--any-type [object/dynamic...]: config for any type mapping
+--array-type [Array/IEnumerable/List...]: config for array type mapping
+--nrt-disabled [true|false]: whether to disable Nullable Reference Types
+--use-system-json [true|false]: whether to use System.Text.Json instead of Newtonsoft.Json
 ```
 
 ## Prebuilt binaries
