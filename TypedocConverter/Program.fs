@@ -37,7 +37,7 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
 
 [<ExcludeFromCodeCoverage>]
 let printHelp () = 
-    printfn "TypeDoc Generator Arguments:"
+    printfn "Typedoc Converter Arguments:"
     printfn ""
     printfn "--inputfile [file]: input file"
     printfn "--namespace [namespace]: specify namespace for generated code"
