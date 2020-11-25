@@ -3,6 +3,7 @@ namespace TypeDocGenerator.Test
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open Helpers
 open Definitions
+open Entity
 open System.IO
 open Newtonsoft.Json
 
@@ -33,6 +34,7 @@ type ParserTest () =
 
     [<TestMethod>]
     member this.TestParser () =
+        File.Delete "test.output"
         let expected = File.ReadAllText "test.expected"
         let config = { 
             Help = false; 
@@ -55,6 +57,24 @@ type ParserTest () =
         jsonSettings.Converters.Add(Converters.OptionConverter())
         let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
         let entities = Parser.parseNode config.Namespace root config
-        Printer.printEntities false config.OutputFile config entities
+        
+        let mutable generatedEntites : Entity Set = Set.empty
+        let mutable generated : Entity list = List.empty
+        let mutable finished = false
+        generatedEntites <- 
+            if config.SplitFiles 
+            then Printer.printEntities true config.OutputDir config entities
+            else Printer.printEntities false config.OutputFile config entities
+        finished <- generatedEntites.IsEmpty
+        while not finished do
+            let newGenerated = generatedEntites |> Set.toList
+            generated <- newGenerated |> List.filter (fun x -> not (generated |> List.contains x))
+            finished <- generated.IsEmpty
+            if finished then () else
+                generatedEntites <- 
+                    if config.SplitFiles 
+                    then Printer.printEntities true config.OutputDir config generated
+                    else Printer.printEntities false config.OutputFile config generated
+        
         let output = File.ReadAllText "test.output"
         Assert.AreEqual(asciilize output,asciilize expected)

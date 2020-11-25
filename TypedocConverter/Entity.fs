@@ -1,11 +1,16 @@
 ﻿module Entity
 
+type TypeType = 
+| Plain
+| Literal
+
 type Entity =
 | TypeEntity of
     Id: int *
     Name: string *
     TypeId: string *
-    InnerTypes: Entity list
+    InnerTypes: Entity list *
+    Type: TypeType
 | TypeParameterEntity of
     Id: int *
     Name: string // TODO: Add contraints support
@@ -73,6 +78,10 @@ type Entity =
     Comment: string *
     Modifiers: string list *
     Members: Entity list
+| TypeLiteralElementEntity of
+    Id: int *
+    Identifier: string *
+    Type: Entity
 | TypealiasEntity of // not used
     Id: int *
     AliasedType: Entity

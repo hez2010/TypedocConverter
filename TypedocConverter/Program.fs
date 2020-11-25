@@ -4,6 +4,7 @@ open System.IO
 open Newtonsoft.Json
 open Converters
 open Definitions
+open Entity
 open Helpers
 open System.Diagnostics.CodeAnalysis
 
@@ -83,8 +84,24 @@ let main argv =
             let json = File.ReadAllText config.InputFile
             let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
             let entities = Parser.parseNode config.Namespace root config
-            if config.SplitFiles 
-            then Printer.printEntities true config.OutputDir config entities
-            else Printer.printEntities false config.OutputFile config entities
+            let mutable generatedEntites : Entity Set = Set.empty
+            let mutable generated : Entity list = List.empty
+            let mutable finished = false
+
+            generatedEntites <- 
+                if config.SplitFiles 
+                then Printer.printEntities true config.OutputDir config entities
+                else Printer.printEntities false config.OutputFile config entities
+            finished <- generatedEntites.IsEmpty
+            while not finished do
+                let newGenerated = generatedEntites |> Set.toList
+                generated <- newGenerated |> List.filter (fun x -> not (generated |> List.contains x))
+                finished <- generated.IsEmpty
+                if finished then () else
+                    generatedEntites <- 
+                        if config.SplitFiles 
+                        then Printer.printEntities true config.OutputDir config generated
+                        else Printer.printEntities false config.OutputFile config generated
+
             printfn "Completed"
             0
