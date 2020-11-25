@@ -340,7 +340,7 @@ cd TypedocConverter/TypedocConverter
 dotnet publish -c Release -r win-x64 --no-self-contained /p:PublishSingleFile=true /p:PublishReadyToRun=true
 ```
 You can replace `win-x64` with other platform identifiers such as `linux-x64`, `linux-arm`, `osx-x64` and etc.  
-Then built dists will be placed in `bin/Release/netcoreapp3.1/[platform identifier]/publish`
+Then built dists will be placed in `bin/Release/net5.0/[platform identifier]/publish`
 
 ## Native Build
 ```bash
@@ -375,4 +375,4 @@ Arguments:
 We have prepared some prebuilt binaries for Windows, Linux and macOS.  
 You can download them directly from [Releases](https://github.com/hez2010/TypedocConverter/releases)
 
-Prerequisites: [.NET Core Runtime 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1)
+Prerequisites: [.NET Runtime 5.0](https://dotnet.microsoft.com/download/dotnet-core/5.0)
