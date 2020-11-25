@@ -11621,6 +11621,11 @@ namespace TypedocConverter.Monaco
 
     interface CancellationToken
     {
+        /// <summary>
+        /// An event emitted when cancellation is requested
+        /// </summary>
+        event IEvent<object> OnCancellationRequested;
+
         [Newtonsoft.Json.JsonProperty("isCancellationRequested", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         bool IsCancellationRequested { get; set; }
 

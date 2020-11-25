@@ -92,7 +92,19 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                 )
                             )
                         )
-                    | _ -> []
+                    | _ -> 
+                        match x.Type with
+                        | Some eType -> 
+                            [EventEntity(x.Id, x.Name, getComment x, 
+                                (if isInterface then [] else getModifier x.Flags),
+                                (
+                                    match x.Flags.IsOptional with
+                                    | Some optional -> optional
+                                    | _ -> false
+                                ),
+                                getType config eType
+                            )]
+                        | _ -> []
                 | ReflectionKind.Method ->
                     match x.Signatures with
                     | Some signatures -> 
