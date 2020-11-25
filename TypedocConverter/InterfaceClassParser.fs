@@ -5,6 +5,7 @@ open Helpers
 open Entity
 
 let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bool) (config: Config): Entity =
+    let mutable accessorMap : Map<string, bool * bool> = Map.empty
     let comment = getComment node
     let exts = 
         (match node.ExtendedTypes with
@@ -47,6 +48,9 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                         )
                     | _ -> []
                 | ReflectionKind.Property -> 
+                    let mutable access = if Map.containsKey x.Name accessorMap then accessorMap.[x.Name] else (false, false)
+                    access <- (true, true)
+                    accessorMap <- Map.add x.Name access accessorMap
                     [
                         PropertyEntity(x.Id, x.Name, getComment x, 
                             (if isInterface then [] else getModifier x.Flags),
@@ -69,6 +73,59 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             )
                         )
                     ]
+                | ReflectionKind.Accessor -> 
+                    match x.GetSignature with
+                    | Some [signature] -> 
+                        let mutable access = if Map.containsKey x.Name accessorMap then accessorMap.[x.Name] else (false, false)
+                        access <- (true, snd access)
+                        accessorMap <- Map.add x.Name access accessorMap
+                        [PropertyEntity(x.Id, x.Name, getComment x, 
+                            (if isInterface then [] else getModifier x.Flags),
+                            (
+                                match signature.Type with
+                                | Some typeInfo -> getType config typeInfo
+                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                            ),
+                            true,
+                            false,
+                            (
+                                match x.Flags.IsOptional with
+                                | Some optional -> optional
+                                | _ -> false
+                            ),
+                            (
+                                match x.DefaultValue with
+                                | Some value -> Some value
+                                | _ -> None
+                            )
+                        )]
+                    | _ -> 
+                        match x.SetSignature with
+                        | Some [signature] -> 
+                            let mutable access = if Map.containsKey x.Name accessorMap then accessorMap.[x.Name] else (false, false)
+                            access <- (fst access, true)
+                            accessorMap <- Map.add x.Name access accessorMap
+                            [PropertyEntity(x.Id, x.Name, getComment x, 
+                                (if isInterface then [] else getModifier x.Flags),
+                                (
+                                    match signature.Type with
+                                    | Some typeInfo -> getType config typeInfo
+                                    | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                                ),
+                                false,
+                                true,
+                                (
+                                    match x.Flags.IsOptional with
+                                    | Some optional -> optional
+                                    | _ -> false
+                                ),
+                                (
+                                    match x.DefaultValue with
+                                    | Some value -> Some value
+                                    | _ -> None
+                                )
+                            )]
+                        | _ -> []
                 | ReflectionKind.Event ->
                     match x.Signatures with
                     | Some signature -> 
@@ -137,6 +194,19 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
             )
         | _ -> []
 
+    let mutable processedProperties : string Set = Set.empty
+    let mergedMembers = 
+        members |> List.collect(
+            fun x ->
+                match x with 
+                | PropertyEntity(id, name, comment, modifiers, pType, withGet, withSet, isOptional, defaultValue) -> 
+                    if Set.contains name processedProperties then []
+                    else 
+                        processedProperties <- Set.add name processedProperties
+                        let mutable access = if Map.containsKey name accessorMap then accessorMap.[name] else (false, false)
+                        [PropertyEntity(id, name, comment, modifiers, pType, fst access || withGet, snd access || withSet, isOptional, defaultValue)]
+                | _ -> [x]
+        )
     ClassInterfaceEntity(
         node.Id, (if section = "" then "TypedocConverter" else section), node.Name, comment, getModifier node.Flags,
         members, exts, genericType, isInterface

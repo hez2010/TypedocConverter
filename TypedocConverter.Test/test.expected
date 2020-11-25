@@ -10850,6 +10850,9 @@ namespace TypedocConverter.Monaco
     {
         public CancellationTokenSource(CancellationToken parent) => throw new System.NotImplementedException();
 
+        [Newtonsoft.Json.JsonProperty("token", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public CancellationToken Token { get => throw new System.NotImplementedException(); }
+
         public void Cancel() => throw new System.NotImplementedException();
 
         public void Dispose(bool cancel) => throw new System.NotImplementedException();
@@ -11553,6 +11556,32 @@ namespace TypedocConverter.Monaco
         /// </summary>
         [Newtonsoft.Json.JsonProperty("scheme", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Scheme { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+        /// <summary>
+        /// Returns a string representing the corresponding file system path of this Uri.
+        /// Will handle UNC paths, normalizes windows drive letters to lower-case, and uses the
+        /// platform specific path separator./// * Will *not* validate the path for invalid characters and semantics.
+        /// * Will *not* look at the scheme of this Uri.
+        /// * The result shall *not* be used for display purposes but for accessing a file on disk.
+        /// 
+        /// 
+        /// The *difference* to `Uri#path` is the use of the platform specific separator and the handling
+        /// of UNC paths. See the below sample of a file-uri with an authority (UNC path).
+        /// 
+        /// ```ts
+        /// const u = Uri.parse('file://server/c$/folder/file.txt')
+        /// u.authority === 'server'
+        /// u.path === '/shares/c$/file.txt'
+        /// u.fsPath === '\\server\c$\folder\file.txt'
+        /// ```
+        /// 
+        /// Using `Uri#path` to read a file (using fs-apis) would not be enough because parts of the path,
+        /// namely the server name, would be missing. Therefore `Uri#fsPath` exists - it's sugar to ease working
+        /// with URIs that represent files on disk (`file` scheme).
+        /// 
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("fsPath", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FsPath { get => throw new System.NotImplementedException(); }
 
         public UriComponents ToJSON() => throw new System.NotImplementedException();
 
