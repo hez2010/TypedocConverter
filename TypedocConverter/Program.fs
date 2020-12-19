@@ -84,24 +84,30 @@ let main argv =
             let json = File.ReadAllText config.InputFile
             let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
             let entities = Parser.parseNode config.Namespace root config
-            let mutable generatedEntites : Entity Set = Set.empty
-            let mutable generated : Entity list = List.empty
+            let mutable printedEntities : Entity Set = Set.empty
+            let mutable generatedEntites : Entity list = List.empty
             let mutable finished = false
 
             generatedEntites <- 
-                if config.SplitFiles 
-                then Printer.printEntities true config.OutputDir config entities
-                else Printer.printEntities false config.OutputFile config entities
+                (
+                    if config.SplitFiles 
+                    then Printer.printEntities true config.OutputDir config entities
+                    else Printer.printEntities false config.OutputFile config entities
+                ) |> Set.toList
             finished <- generatedEntites.IsEmpty
             while not finished do
-                let newGenerated = generatedEntites |> Set.toList
-                generated <- newGenerated |> List.filter (fun x -> not (generated |> List.contains x))
+                let newGenerated = generatedEntites
+                let generated = newGenerated |> List.filter (fun x -> not (printedEntities |> Set.contains x))
+                for i in generated do 
+                    printedEntities <- printedEntities |> Set.add i
                 finished <- generated.IsEmpty
                 if finished then () else
-                    generatedEntites <- 
-                        if config.SplitFiles 
-                        then Printer.printEntities true config.OutputDir config generated
-                        else Printer.printEntities false config.OutputFile config generated
+                    generatedEntites <-
+                        (
+                            if config.SplitFiles 
+                            then Printer.printEntities true config.OutputDir config generated
+                            else Printer.printEntities false config.OutputFile config generated
+                        ) |> Set.toList
 
             printfn "Completed"
             0

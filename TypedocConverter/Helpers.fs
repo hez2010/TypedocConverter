@@ -177,12 +177,24 @@ let rec getType (config: Config) (typeInfo: Type): Entity =
                     match dec.Children with
                     | None | Some [] -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [], Plain)
                     | Some children -> 
-                        let typeName = "Literal" + System.String.Join("", children |> List.map(fun c -> toPascalCase c.Name))
+                        let typeName = "Literal" + System.String.Join("", children |> List.map(fun c -> getQualifiedName config c))
                         // printWarning ("Type literal { " + System.String.Join(", ", children |> List.map(fun c -> c.Name)) + " } is not supported.")
                         TypeEntity(typeInfo.Id, typeName, typeInfo.Type, children |> List.collect(fun c -> match c.Type with | Some t -> [TypeLiteralElementEntity (typeInfo.Id, c.Name, getType config t)] | _ -> []), Literal)
             | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [], Plain)
         | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [], Plain)
     handlePromiseType containerType typeInfo config
+and getQualifiedName (config: Config) (node: Reflection) = 
+    let rec expandTypeName (entity: Entity) = 
+        match entity with
+        | TypeEntity(_, name, _, _, _) -> toPascalCase name |> String.collect (fun c -> if c = '.' then "" else c.ToString())
+        | UnionTypeEntity(_, _, types) -> "Union" + System.String.Join("", types |> List.map expandTypeName)
+        | _ -> ""
+    let tName = 
+        match node.Type with
+        | Some nType -> expandTypeName (getType config nType)
+        | _ -> ""
+    let nName = node.Name
+    toPascalCase tName + toPascalCase nName
 and handlePromiseType (containerType: Entity) (typeInfo: Type) (config: Config): Entity =
     let mutable container = containerType
     let mutable innerTypes = 

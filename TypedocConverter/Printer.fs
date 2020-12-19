@@ -417,6 +417,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
     | _ -> ()
 
 let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) = 
+    deferredEntities <- Set.empty
     let namespaces = 
         entities 
         |> List.map getNamespaceAndName
