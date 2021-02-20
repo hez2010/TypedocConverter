@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup Condition="'$(NativeBuild)'=='true'">
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(NativeBuild)'=='true'">
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+    <RdXmlFile Include="rd.xml" />
+  </ItemGroup>
+</Project>
