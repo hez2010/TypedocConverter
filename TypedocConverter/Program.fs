@@ -88,11 +88,17 @@ let main argv =
             let mutable generatedEntites : Entity list = List.empty
             let mutable finished = false
 
+            let namespaces = 
+                entities 
+                |> List.map Helpers.getNamespaceAndName
+                |> List.collect (fun x -> match x with | Some(v, _) -> [v] | _ -> [])
+                |> List.distinct
+
             generatedEntites <- 
                 (
                     if config.SplitFiles 
-                    then Printer.printEntities true config.OutputDir config entities
-                    else Printer.printEntities false config.OutputFile config entities
+                    then Printer.printEntities true config.OutputDir config entities namespaces
+                    else Printer.printEntities false config.OutputFile config entities namespaces
                 ) |> Set.toList
             finished <- generatedEntites.IsEmpty
             while not finished do
@@ -105,8 +111,8 @@ let main argv =
                     generatedEntites <-
                         (
                             if config.SplitFiles 
-                            then Printer.printEntities true config.OutputDir config generated
-                            else Printer.printEntities false config.OutputFile config generated
+                            then Printer.printEntities true config.OutputDir config generated namespaces
+                            else Printer.printEntities false config.OutputFile config generated namespaces
                         ) |> Set.toList
 
             printfn "Completed"

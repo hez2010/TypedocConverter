@@ -12887,6 +12887,14 @@ namespace Monaco
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralDoubleHeightDoubleLeftDoubleTop
     {
@@ -12904,6 +12912,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralIDocCommentDocComment
     {
@@ -12915,6 +12931,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralIRangeInsertIRangeReplace
     {
@@ -12929,6 +12953,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralStringAuthorityStringFragmentStringPathStringQueryStringScheme
     {
@@ -12952,6 +12984,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralStringContentStringFilePath
     {
@@ -12966,6 +13006,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralStringLineEndingBoolPreserveBOM
     {
@@ -12980,6 +13028,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralSystemArrayFileMatchObjectSchemaStringUri
     {
@@ -12997,6 +13053,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralUnionStringStringStringArgumentsInColorFunctionUnionStringStringStringBoxModelUnionStringStringStringCompatibleVendorPrefixesUnionStringStringStringDuplicatePropertiesUnionStringStringStringEmptyRulesUnionStringStringStringFloatUnionStringStringStringFontFacePropertiesUnionStringStringStringHexColorLengthUnionStringStringStringIdSelectorUnionStringStringStringIeHackUnionStringStringStringImportStatementUnionStringStringStringImportantUnionStringStringStringPropertyIgnoredDueToDisplayUnionStringStringStringUniversalSelectorUnionStringStringStringUnknownPropertiesUnionStringStringStringUnknownVendorSpecificPropertiesUnionStringStringStringVendorPrefixUnionStringStringStringZeroUnits
     {
@@ -13059,6 +13123,14 @@ namespace TypedocConverter.GeneratedTypes
 
 namespace TypedocConverter.GeneratedTypes
 {
+    using Monaco.Editor;
+    using Monaco.Languages.Css;
+    using Monaco.Languages.Html;
+    using Monaco.Languages.Json;
+    using Monaco.Languages.Typescript;
+    using Monaco.Languages;
+    using Monaco.Worker;
+    using Monaco;
 
     interface LiteralUriTargetStringValue
     {

@@ -3,6 +3,12 @@
 open Definitions
 open Entity
 
+let getNamespaceAndName entity =
+    match entity with
+    | ClassInterfaceEntity(_, ns, name, _, _, _, _, _, _) -> Some (ns, name)
+    | EnumEntity(_, ns, name, _, _, _) -> Some (ns, name)
+    | _ -> None
+
 let printWarning (warn: string) = 
     let backup = System.Console.ForegroundColor
     System.Console.ForegroundColor <- System.ConsoleColor.Yellow

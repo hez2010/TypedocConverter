@@ -224,12 +224,6 @@ let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (co
         fprintfn writer "    }"
     | _ -> ()
 
-let getNamespaceAndName entity =
-    match entity with
-    | ClassInterfaceEntity(_, ns, name, _, _, _, _, _, _) -> Some (ns, name)
-    | EnumEntity(_, ns, name, _, _, _) -> Some (ns, name)
-    | _ -> None
-
 let printEntity (writer: System.IO.TextWriter) (config: Config) (references: string list) (entity: Entity) = 
     let printHeader ns comment =
         fprintfn writer "namespace %s\n{" (toPascalCase ns)
@@ -420,19 +414,14 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "}\n"
     | _ -> ()
 
-let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) = 
+let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) (namespaces: string list) = 
     deferredEntities <- Set.empty
-    let namespaces = 
-        entities 
-        |> List.map getNamespaceAndName
-        |> List.collect (fun x -> match x with | Some(v, _) -> [v] | _ -> [])
-        |> List.distinct
     if (splitFile) then
         entities 
         |> List.iter
             (
                 fun x ->
-                    let info = getNamespaceAndName x
+                    let info = Helpers.getNamespaceAndName x
                     match info with
                     | Some(ns, name) -> 
                         let path = System.IO.Path.Combine([output]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
