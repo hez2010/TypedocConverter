@@ -47,13 +47,13 @@ let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: E
             | types ->
                 let entity = 
                     ClassInterfaceEntity(
-                        id, "TypedocConverter.GeneratedTypes", name, "", ["public"],
+                        id, "TypedocConverter.GeneratedTypes", name, "", [],
                         types |> List.map(fun t ->
                             let literal = 
                                 match t with
                                 | TypeLiteralElementEntity(_, eName, eType) -> (eName, eType)
                                 | _ -> failwith "Unexpected entity"
-                            PropertyEntity(id, fst literal, "", ["public"], snd literal, true, true, false, None)
+                            PropertyEntity(id, fst literal, "", [], snd literal, true, true, false, None)
                         ), [], [], true
                     )
                 deferredEntities <- Set.add entity deferredEntities
