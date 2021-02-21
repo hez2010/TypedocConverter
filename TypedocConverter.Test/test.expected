@@ -12888,16 +12888,16 @@ namespace Monaco
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralDoubleHeightDoubleLeftDoubleTop
+    interface LiteralDoubleHeightDoubleLeftDoubleTop
     {
         [Newtonsoft.Json.JsonProperty("height", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Height { get; set; }
+        double Height { get; set; }
 
         [Newtonsoft.Json.JsonProperty("left", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Left { get; set; }
+        double Left { get; set; }
 
         [Newtonsoft.Json.JsonProperty("top", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Top { get; set; }
+        double Top { get; set; }
 
     }
 }
@@ -12905,10 +12905,10 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralIDocCommentDocComment
+    interface LiteralIDocCommentDocComment
     {
         [Newtonsoft.Json.JsonProperty("docComment", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public IDocComment DocComment { get; set; }
+        IDocComment DocComment { get; set; }
 
     }
 }
@@ -12916,13 +12916,13 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralIRangeInsertIRangeReplace
+    interface LiteralIRangeInsertIRangeReplace
     {
         [Newtonsoft.Json.JsonProperty("insert", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public IRange Insert { get; set; }
+        IRange Insert { get; set; }
 
         [Newtonsoft.Json.JsonProperty("replace", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public IRange Replace { get; set; }
+        IRange Replace { get; set; }
 
     }
 }
@@ -12930,22 +12930,22 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralStringAuthorityStringFragmentStringPathStringQueryStringScheme
+    interface LiteralStringAuthorityStringFragmentStringPathStringQueryStringScheme
     {
         [Newtonsoft.Json.JsonProperty("authority", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Authority { get; set; }
+        string Authority { get; set; }
 
         [Newtonsoft.Json.JsonProperty("fragment", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Fragment { get; set; }
+        string Fragment { get; set; }
 
         [Newtonsoft.Json.JsonProperty("path", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Path { get; set; }
+        string Path { get; set; }
 
         [Newtonsoft.Json.JsonProperty("query", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Query { get; set; }
+        string Query { get; set; }
 
         [Newtonsoft.Json.JsonProperty("scheme", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Scheme { get; set; }
+        string Scheme { get; set; }
 
     }
 }
@@ -12953,13 +12953,13 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralStringContentStringFilePath
+    interface LiteralStringContentStringFilePath
     {
         [Newtonsoft.Json.JsonProperty("content", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Content { get; set; }
+        string Content { get; set; }
 
         [Newtonsoft.Json.JsonProperty("filePath", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FilePath { get; set; }
+        string FilePath { get; set; }
 
     }
 }
@@ -12967,13 +12967,13 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralStringLineEndingBoolPreserveBOM
+    interface LiteralStringLineEndingBoolPreserveBOM
     {
         [Newtonsoft.Json.JsonProperty("lineEnding", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LineEnding { get; set; }
+        string LineEnding { get; set; }
 
         [Newtonsoft.Json.JsonProperty("preserveBOM", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool PreserveBOM { get; set; }
+        bool PreserveBOM { get; set; }
 
     }
 }
@@ -12981,16 +12981,16 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralSystemArrayFileMatchObjectSchemaStringUri
+    interface LiteralSystemArrayFileMatchObjectSchemaStringUri
     {
         [Newtonsoft.Json.JsonProperty("fileMatch", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string[] FileMatch { get; set; }
+        string[] FileMatch { get; set; }
 
         [Newtonsoft.Json.JsonProperty("schema", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Schema { get; set; }
+        object Schema { get; set; }
 
         [Newtonsoft.Json.JsonProperty("uri", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Uri { get; set; }
+        string Uri { get; set; }
 
     }
 }
@@ -12998,61 +12998,61 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralUnionStringStringStringArgumentsInColorFunctionUnionStringStringStringBoxModelUnionStringStringStringCompatibleVendorPrefixesUnionStringStringStringDuplicatePropertiesUnionStringStringStringEmptyRulesUnionStringStringStringFloatUnionStringStringStringFontFacePropertiesUnionStringStringStringHexColorLengthUnionStringStringStringIdSelectorUnionStringStringStringIeHackUnionStringStringStringImportStatementUnionStringStringStringImportantUnionStringStringStringPropertyIgnoredDueToDisplayUnionStringStringStringUniversalSelectorUnionStringStringStringUnknownPropertiesUnionStringStringStringUnknownVendorSpecificPropertiesUnionStringStringStringVendorPrefixUnionStringStringStringZeroUnits
+    interface LiteralUnionStringStringStringArgumentsInColorFunctionUnionStringStringStringBoxModelUnionStringStringStringCompatibleVendorPrefixesUnionStringStringStringDuplicatePropertiesUnionStringStringStringEmptyRulesUnionStringStringStringFloatUnionStringStringStringFontFacePropertiesUnionStringStringStringHexColorLengthUnionStringStringStringIdSelectorUnionStringStringStringIeHackUnionStringStringStringImportStatementUnionStringStringStringImportantUnionStringStringStringPropertyIgnoredDueToDisplayUnionStringStringStringUniversalSelectorUnionStringStringStringUnknownPropertiesUnionStringStringStringUnknownVendorSpecificPropertiesUnionStringStringStringVendorPrefixUnionStringStringStringZeroUnits
     {
         [Newtonsoft.Json.JsonProperty("argumentsInColorFunction", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ArgumentsInColorFunction { get; set; }
+        string ArgumentsInColorFunction { get; set; }
 
         [Newtonsoft.Json.JsonProperty("boxModel", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string BoxModel { get; set; }
+        string BoxModel { get; set; }
 
         [Newtonsoft.Json.JsonProperty("compatibleVendorPrefixes", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string CompatibleVendorPrefixes { get; set; }
+        string CompatibleVendorPrefixes { get; set; }
 
         [Newtonsoft.Json.JsonProperty("duplicateProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string DuplicateProperties { get; set; }
+        string DuplicateProperties { get; set; }
 
         [Newtonsoft.Json.JsonProperty("emptyRules", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EmptyRules { get; set; }
+        string EmptyRules { get; set; }
 
         [Newtonsoft.Json.JsonProperty("float", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Float { get; set; }
+        string Float { get; set; }
 
         [Newtonsoft.Json.JsonProperty("fontFaceProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FontFaceProperties { get; set; }
+        string FontFaceProperties { get; set; }
 
         [Newtonsoft.Json.JsonProperty("hexColorLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string HexColorLength { get; set; }
+        string HexColorLength { get; set; }
 
         [Newtonsoft.Json.JsonProperty("idSelector", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string IdSelector { get; set; }
+        string IdSelector { get; set; }
 
         [Newtonsoft.Json.JsonProperty("ieHack", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string IeHack { get; set; }
+        string IeHack { get; set; }
 
         [Newtonsoft.Json.JsonProperty("importStatement", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ImportStatement { get; set; }
+        string ImportStatement { get; set; }
 
         [Newtonsoft.Json.JsonProperty("important", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Important { get; set; }
+        string Important { get; set; }
 
         [Newtonsoft.Json.JsonProperty("propertyIgnoredDueToDisplay", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PropertyIgnoredDueToDisplay { get; set; }
+        string PropertyIgnoredDueToDisplay { get; set; }
 
         [Newtonsoft.Json.JsonProperty("universalSelector", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UniversalSelector { get; set; }
+        string UniversalSelector { get; set; }
 
         [Newtonsoft.Json.JsonProperty("unknownProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UnknownProperties { get; set; }
+        string UnknownProperties { get; set; }
 
         [Newtonsoft.Json.JsonProperty("unknownVendorSpecificProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UnknownVendorSpecificProperties { get; set; }
+        string UnknownVendorSpecificProperties { get; set; }
 
         [Newtonsoft.Json.JsonProperty("vendorPrefix", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string VendorPrefix { get; set; }
+        string VendorPrefix { get; set; }
 
         [Newtonsoft.Json.JsonProperty("zeroUnits", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ZeroUnits { get; set; }
+        string ZeroUnits { get; set; }
 
     }
 }
@@ -13060,13 +13060,13 @@ namespace TypedocConverter.GeneratedTypes
 namespace TypedocConverter.GeneratedTypes
 {
 
-    public interface LiteralUriTargetStringValue
+    interface LiteralUriTargetStringValue
     {
         [Newtonsoft.Json.JsonProperty("target", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Uri Target { get; set; }
+        Uri Target { get; set; }
 
         [Newtonsoft.Json.JsonProperty("value", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Value { get; set; }
+        string Value { get; set; }
 
     }
 }
