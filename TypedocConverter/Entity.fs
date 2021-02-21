@@ -10,7 +10,8 @@ type Entity =
     Name: string *
     TypeId: string *
     InnerTypes: Entity list *
-    Type: TypeType
+    Type: TypeType *
+    AnnotatedName: string option
 | TypeParameterEntity of
     Id: int *
     Name: string // TODO: Add contraints support
@@ -88,4 +89,5 @@ type Entity =
 | UnionTypeEntity of // not used
     Id: int *
     TypeId: string *
-    Types: Entity list
+    Types: Entity list *
+    AnnotatedName: string option

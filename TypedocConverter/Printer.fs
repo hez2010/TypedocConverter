@@ -23,53 +23,57 @@ let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: E
         | "object" | "string" | "double" | "void" | "bool" | "ulong"
         | "uint" | "ushort" | "byte" | "long" | "int" | "short" | "char" -> name
         | _ -> toPascalCase name
-    match typeInfo with
-    | TypeEntity(_, "System.Array", _, innerTypes, _) ->
-        match config.ArrayType with
-        | "Array" -> 
-            (match innerTypes with
-            | [x] -> arrangeType config writer x
-            | _ -> "object") + "[]"
-        | _ ->
+    let arrangedType = 
+        match typeInfo with
+        | TypeEntity(_, "System.Array", _, innerTypes, _, _) ->
+            match config.ArrayType with
+            | "Array" -> 
+                (match innerTypes with
+                | [x] -> arrangeType config writer x
+                | _ -> "object") + "[]"
+            | _ ->
+                match innerTypes with
+                    | [] -> config.ArrayType
+                    | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
+        | TypeEntity(_, "System.ValueTuple", _, innerTypes, _, _) ->
+            "(" + System.String.Join(", ", innerTypes |> List.map (arrangeType config writer)) + ")"
+        | TypeEntity(_, name, _, innerTypes, Plain, _) ->
             match innerTypes with
-                | [] -> config.ArrayType
-                | types -> config.ArrayType + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
-    | TypeEntity(_, "System.ValueTuple", _, innerTypes, _) ->
-        "(" + System.String.Join(", ", innerTypes |> List.map (arrangeType config writer)) + ")"
-    | TypeEntity(_, name, _, innerTypes, Plain) ->
-        match innerTypes with
-        | [] -> pascalizeTypeName name
-        | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
-    | TypeEntity(id, name, _, innerTypes, Literal) ->
-        match innerTypes with
-        | [] -> "object"
-        | types ->
-            let entity = 
-                ClassInterfaceEntity(
-                    id, "TypedocConverter.GeneratedTypes", name, "", ["public"],
-                    types |> List.map(fun t ->
-                        let literal = 
-                            match t with
-                            | TypeLiteralElementEntity(_, eName, eType) -> (eName, eType)
-                            | _ -> failwith "Unexpected entity"
-                        PropertyEntity(id, fst literal, "", ["public"], snd literal, true, true, false, None)
-                    ), [], [], true
-                )
-            deferredEntities <- Set.add entity deferredEntities
-            "TypedocConverter.GeneratedTypes." + name
-    | UnionTypeEntity _ -> arrangeUnionType config writer typeInfo
-    | _ -> "object"
+            | [] -> pascalizeTypeName name
+            | types -> pascalizeTypeName name + "<" + System.String.Join(", ", types |> List.map (arrangeType config writer)) + ">"
+        | TypeEntity(id, name, _, innerTypes, Literal, _) ->
+            match innerTypes with
+            | [] -> "object"
+            | types ->
+                let entity = 
+                    ClassInterfaceEntity(
+                        id, "TypedocConverter.GeneratedTypes", name, "", ["public"],
+                        types |> List.map(fun t ->
+                            let literal = 
+                                match t with
+                                | TypeLiteralElementEntity(_, eName, eType) -> (eName, eType)
+                                | _ -> failwith "Unexpected entity"
+                            PropertyEntity(id, fst literal, "", ["public"], snd literal, true, true, false, None)
+                        ), [], [], true
+                    )
+                deferredEntities <- Set.add entity deferredEntities
+                "TypedocConverter.GeneratedTypes." + name
+        | UnionTypeEntity _ -> arrangeUnionType config writer typeInfo
+        | _ -> "object"
+    match typeInfo with
+    | TypeEntity(_, _, _, _, _, Some(annotatedName)) -> arrangedType + " " + (pascalizeTypeName annotatedName)
+    | _ -> arrangedType
 and arrangeUnionType (config: Config) (writer: System.IO.TextWriter) (typeInfo: Entity) = 
     let printUnionType (name: string) (types: string list) =
         printWarning ("Taking " + name + " for union type "+ System.String.Join(" | ", types) + ".")
     match typeInfo with
-    | UnionTypeEntity(_, _, inner) ->
+    | UnionTypeEntity(_, _, inner, _) ->
         let types = inner |> List.map (arrangeType config writer) |> List.distinct
         let objRemoved = types |> List.where(fun x -> x <> "object")
         match objRemoved with
         | [] -> "object"
         | [x] -> x
-        | (_::_) ->
+        | _ ->
             let takenType = inner |> List.sortWith typeSorter |> List.head
             let name = arrangeType config writer takenType
             printUnionType name types
@@ -86,10 +90,10 @@ and typeSorter typeA typeB =
         | (None, Some _) -> 1
         | (Some a, Some b) -> a.CompareTo b
     match (typeA, typeB) with
-    | (TypeEntity(_, _, typeIdA, _, _), TypeEntity(_, _, typeIdB, _, _)) -> compare typeIdA typeIdB
-    | (TypeEntity(_, _, typeIdA, _, _), UnionTypeEntity(_, typeIdB, _)) -> compare typeIdA typeIdB
-    | (UnionTypeEntity(_, typeIdA, _), TypeEntity(_, _, typeIdB, _, _)) -> compare typeIdA typeIdB
-    | (UnionTypeEntity(_, typeIdA, _), UnionTypeEntity(_, typeIdB, _)) -> compare typeIdA typeIdB
+    | (TypeEntity(_, _, typeIdA, _, _, _), TypeEntity(_, _, typeIdB, _, _, _)) -> compare typeIdA typeIdB
+    | (TypeEntity(_, _, typeIdA, _, _, _), UnionTypeEntity(_, typeIdB, _, _)) -> compare typeIdA typeIdB
+    | (UnionTypeEntity(_, typeIdA, _, _), TypeEntity(_, _, typeIdB, _, _, _)) -> compare typeIdA typeIdB
+    | (UnionTypeEntity(_, typeIdA, _, _), UnionTypeEntity(_, typeIdB, _, _)) -> compare typeIdA typeIdB
     | _ -> 0
 
 let arrangeParameterList config (writer: System.IO.TextWriter) paras = 
@@ -272,7 +276,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
     let isValueType (typeInfo: Entity) =
         let valueTypes = ["double"; "bool"; "ulong"; "uint"; "ushort"; "byte"; "long"; "int"; "short"; "char"; "System.DateTime"; "System.ValueTuple"]
         match typeInfo with
-        | TypeEntity(_, name, _, _, _) -> valueTypes |> List.contains name
+        | TypeEntity(_, name, _, _, _, _) -> valueTypes |> List.contains name
         | _ -> false
 
     let printConstructor name comment modifiers paras config =

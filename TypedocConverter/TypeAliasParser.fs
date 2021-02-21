@@ -11,7 +11,7 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
         | Some _ -> 
             printWarning ("Type alias " + node.Name + " is not fully supported.")
             nodes 
-            |> List.where (fun x -> x.Type = "stringLiteral")
+            |> List.where (fun x -> x.Type = "stringLiteral" || x.Type = "literal")
             |> List.collect
                 (fun x ->
                     match x.Value with

@@ -9,10 +9,10 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
     let comment = getComment node
     let exts = 
         (match node.ExtendedTypes with
-        | Some types -> types |> List.map(fun x -> getType config x)
+        | Some types -> types |> List.map(fun x -> getType config None x)
         | _ -> []) @
         (match node.ImplementedTypes with
-        | Some types -> types |> List.map(fun x -> getType config x)
+        | Some types -> types |> List.map(fun x -> getType config None x)
         | _ -> [])
     let genericType =
         let types = 
@@ -41,6 +41,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             let parameters = 
                                 getMethodParameters 
                                     config
+                                    None
                                     (match s.Parameters with
                                     | Some parameters -> parameters |> List.where(fun p -> p.Kind = ReflectionKind.Parameter)
                                     | _ -> [])
@@ -56,8 +57,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             (if isInterface then [] else getModifier x.Flags),
                             (
                                 match x.Type with
-                                | Some typeInfo -> getType config typeInfo
-                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                                | Some typeInfo -> getType config None typeInfo
+                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain, None)
                             ),
                             true,
                             true,
@@ -83,8 +84,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             (if isInterface then [] else getModifier x.Flags),
                             (
                                 match signature.Type with
-                                | Some typeInfo -> getType config typeInfo
-                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                                | Some typeInfo -> getType config None typeInfo
+                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain, None)
                             ),
                             true,
                             false,
@@ -109,8 +110,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                 (if isInterface then [] else getModifier x.Flags),
                                 (
                                     match signature.Type with
-                                    | Some typeInfo -> getType config typeInfo
-                                    | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                                    | Some typeInfo -> getType config None typeInfo
+                                    | _ -> TypeEntity(0, "object", "intrinsic", [], Plain, None)
                                 ),
                                 false,
                                 true,
@@ -143,9 +144,9 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                     match s.Parameters with
                                     | Some [front] | Some (front::_) -> 
                                         match front.Type with
-                                        | Some pType -> getType config pType
-                                        | _ -> TypeEntity(0, "System.Delegate", "reflection", [], Plain)
-                                    | _ -> TypeEntity(0, "System.Delegate", "reflection", [], Plain)
+                                        | Some pType -> getType config None pType
+                                        | _ -> TypeEntity(0, "System.Delegate", "reflection", [], Plain, None)
+                                    | _ -> TypeEntity(0, "System.Delegate", "reflection", [], Plain, None)
                                 )
                             )
                         )
@@ -159,7 +160,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                                     | Some optional -> optional
                                     | _ -> false
                                 ),
-                                getType config eType
+                                getType config None eType
                             )]
                         | _ -> []
                 | ReflectionKind.Method ->
@@ -170,8 +171,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                         |> List.map (fun s -> 
                             let retType = 
                                 match s.Type with
-                                | Some t -> getType config t
-                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain)
+                                | Some t -> getType config None t
+                                | _ -> TypeEntity(0, "object", "intrinsic", [], Plain, None)
                             let typeParameter = 
                                 let types = 
                                     match s.TypeParameter with
@@ -183,6 +184,7 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                             let parameters = 
                                 getMethodParameters 
                                     config
+                                    None
                                     (match s.Parameters with
                                     | Some parameters -> parameters |> List.where(fun p -> p.Kind = ReflectionKind.Parameter)
                                     | _ -> [])

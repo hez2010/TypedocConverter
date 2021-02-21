@@ -78,7 +78,7 @@ type Reflection = {
     Type: Type option
     TypeParameter: Reflection list option
     Signatures: Reflection list option
-    IndexSignature: Reflection list option
+    IndexSignature: Reflection option
     GetSignature: Reflection list option
     SetSignature: Reflection list option
     Overwrites: Type option
