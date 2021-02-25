@@ -119,6 +119,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Install Missing Packages
       run: |
+        apt update
         apt install -y libgssapi-krb5-2
     - name: Publish Native Linux x64 Release
       run: |
