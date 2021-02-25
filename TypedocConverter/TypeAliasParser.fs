@@ -28,7 +28,7 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
                         [EnumMemberEntity(x.Id, value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
                     | _ -> []
                 )
-    if members = [] then []
+    if List.isEmpty members then []
     else 
         [StringUnionEntity(node.Id, section, node.Name, 
             (

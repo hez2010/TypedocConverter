@@ -240,7 +240,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 | [] -> ""
                 | _ -> modifiers |> List.reduce (fun a b -> a + b + " ")
             )
-            (if modifiers = [] then "" else " ")
+            (if List.isEmpty modifiers then "" else " ")
             eType (toPascalCase name)
             (
                 match tps with
@@ -277,7 +277,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         fprintfn writer "        %s%s(%s) => throw new System.NotImplementedException();"
             (
-                if modifiers = [] then "public "
+                if List.isEmpty modifiers then "public "
                 else System.String.Join(" ", modifiers) + " "
             )
             (toPascalCase name)
@@ -290,7 +290,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
         fprintfn writer "        %s%s%s %s { %s%s}%s"
             (
-                if modifiers = [] then 
+                if List.isEmpty modifiers then 
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )
@@ -329,7 +329,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         fprintfn writer "        %sevent %s%s %s;"
             (
-                if modifiers = [] then 
+                if List.isEmpty modifiers then 
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )
@@ -342,7 +342,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
         fprintfn writer "        %s%s %s%s(%s)%s;"
             (
-                if modifiers = [] then 
+                if List.isEmpty modifiers then 
                     if isInInterface then "" else "public "
                 else System.String.Join(" ", modifiers) + " "
             )

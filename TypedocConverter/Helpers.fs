@@ -29,7 +29,7 @@ let rec toPascalCase (str: string) =
          else 
             str.Split([| "-"; "_" |], System.StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
-            |> Array.reduce (fun accu next -> accu + next)
+            |> Array.reduce (( + ))
 
 let escapeSymbols (text: string) = 
     if isNull text then ""
@@ -40,7 +40,7 @@ let escapeSymbols (text: string) =
 
 let toCommentText (text: string) = 
     if isNull text then ""
-    else text.Split "\n" |> Array.map (fun t -> "/// " + escapeSymbols t) |> Array.reduce(fun accu next -> accu + "\n" + next)
+    else text.Split "\n" |> Array.map (((+) "/// ") >> escapeSymbols) |> Array.reduce(fun accu next -> accu + "\n" + next)
 
 let getXmlDocComment (comment: Comment) =
     let prefix = "/// <summary>\n"
@@ -131,14 +131,11 @@ let rec getType (config: Config) (annotatedName: string option) (typeInfo: Type)
             let types = 
                 match typeInfo.Types with
                 | Some innerTypes -> 
-                    innerTypes 
-                    |> List.map (getType config None) 
-                    |> List.map (fun x ->
+                    List.map ((getType config None) >> (fun x ->
                         match x with 
                         | TypeEntity(_, name, _, _, _, _) -> name 
                         | UnionTypeEntity _ -> "union"
-                        | _ -> "object"
-                    )
+                        | _ -> "object")) innerTypes
                 | _ -> []
 
             printWarning ("Intersection type " + System.String.Join(" & ", types) + " is not supported.")
@@ -256,7 +253,7 @@ and handlePromiseType (containerType: Entity) (typeInfo: Type) (config: Config) 
         container <- UnionTypeEntity(id, typeId, inner |> List.map(fun x -> handlePromiseType x typeInfo config None), annotatedName)
     | _ -> ()
     match container with
-    | TypeEntity(id, name, typeId, inner, t, a) -> TypeEntity(id, name, typeId, (if innerTypes = [] then inner else innerTypes), t, a)
+    | TypeEntity(id, name, typeId, inner, t, a) -> TypeEntity(id, name, typeId, (if List.isEmpty innerTypes then inner else innerTypes), t, a)
     | UnionTypeEntity(id, typeId, inner, a) -> UnionTypeEntity(id, typeId, inner, a)
     | _ -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [], Plain, None)
 and getGenericTypeArguments (config: Config) (annotatedName: string option) (typeInfos: Type list): Entity list = 

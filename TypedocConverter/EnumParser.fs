@@ -9,7 +9,7 @@ let rec getEnumReferencedValue (nodes: Reflection list) value name =
     match nodes 
           |> List.where(fun x -> 
               match x.DefaultValue with
-              | Some v -> v <> value && not (name = x.Name)
+              | Some v -> v <> value && (name <> x.Name)
               | _ -> true
           ) 
           |> List.where(fun x -> x.Name = value)
