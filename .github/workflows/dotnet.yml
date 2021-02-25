@@ -98,7 +98,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Publish Native Linux x64 Release
-      run: dotnet publish -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
+      run: dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
     - name: Upload Linux x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
@@ -116,7 +116,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Publish Native Windows x64 Release
-      run: dotnet publish -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
+      run: dotnet publish TypedocConverter -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
     - name: Upload Windows x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
