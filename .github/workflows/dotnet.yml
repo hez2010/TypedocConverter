@@ -6,7 +6,7 @@ env:
   DOTNET_SDK_VERSION: '5.0.103'
 
 jobs:
-  build-managed:
+  build_and_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,11 +14,21 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 'env.DOTNET_SDK_VERSION'
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Build with dotnet
       run: dotnet build
     - name: Test with dotnet
       run: dotnet test
+
+  publish_managed:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Publish Windows x86 Release
       run: dotnet publish TypedocConverter -c Release -o WindowsBuildx86 -r win-x86 --no-self-contained /p:PublishSingleFile=true
     - name: Publish Windows x64 Release
@@ -76,38 +86,38 @@ jobs:
         name: macOS_x64
         path: macOSBuildx64
 
-  build-native-linux:
+  publish-native-linux:
     runs-on: ubuntu-latest
-    needs: build-managed
+    needs: build_and_test
 
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 'env.DOTNET_SDK_VERSION'
-    - name: Build native image with dotnet
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+    - name: Publish Native Linux x64 Release
       run: dotnet publish -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
     - name: Upload Linux x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Linux_x64_native
+        name: Linux_x64_Native
         path: LinuxNativeBuildx64
         
-  build-native-windows:
+  publish-native-windows:
     runs-on: windows-2019
-    needs: build-managed
+    needs: build_and_test
 
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 'env.DOTNET_SDK_VERSION'
-    - name: Build native image with dotnet
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+    - name: Publish Native Windows x64 Release
       run: dotnet publish -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
     - name: Upload Windows x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: Windows_x64_native
+        name: Windows_x64_Native
         path: WindowsNativeBuildx64
