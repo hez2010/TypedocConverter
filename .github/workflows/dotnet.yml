@@ -7,7 +7,7 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       run: dotnet test
 
   publish-managed:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build-and-test
 
     steps:
@@ -88,7 +88,7 @@ jobs:
         path: macOSBuildx64
 
   publish-native-windows:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: build-and-test
 
     steps:
@@ -108,7 +108,7 @@ jobs:
         path: WindowsNativeBuildx64
 
   publish-native-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build-and-test
 
     steps:
@@ -117,10 +117,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
-    - name: Install Missing Packages
-      run: |
-        sudo apt update
-        sudo apt install -y libgssapi-krb5-2
     - name: Publish Native Linux x64 Release
       run: |
         dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
@@ -132,7 +128,7 @@ jobs:
         path: LinuxNativeBuildx64
         
   publish-native-macos:
-    runs-on: macos-latest
+    runs-on: macos-11.0
     needs: build-and-test
 
     steps:
