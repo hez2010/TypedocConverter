@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ DOTNET_SDK_VERSION }}
+        dotnet-version: env.DOTNET_SDK_VERSION
     - name: Build with dotnet
       run: dotnet build
     - name: Test with dotnet
@@ -82,10 +82,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ DOTNET_SDK_VERSION }}
+        dotnet-version: env.DOTNET_SDK_VERSION
     - name: Build native image with dotnet
       run: dotnet publish -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
     - name: Upload Linux x64 native artifact
@@ -100,10 +100,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ DOTNET_SDK_VERSION }}
+        dotnet-version: env.DOTNET_SDK_VERSION
     - name: Build native image with dotnet
       run: dotnet publish -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
     - name: Upload Windows x64 native artifact
