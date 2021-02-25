@@ -124,7 +124,7 @@ jobs:
     - name: Publish Native Linux x64 Release
       run: |
         dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
-        rm LinuxNativeBuildx64\*.pdb
+        rm LinuxNativeBuildx64/*.pdb
     - name: Upload Linux x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
