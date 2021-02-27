@@ -1,6 +1,5 @@
 <Directives>
     <Application>
-
         <Assembly Name="FSharp.Core" Dynamic="Required All">
             <Type Name="Microsoft.FSharp.Collections.ListModule" Dynamic="Required All">
                 <Method Name="OfSeq" Dynamic="Required">
