@@ -1,4 +1,4 @@
-name: .NET Core
+name: .NET
 
 on: [push]
 
@@ -125,7 +125,7 @@ jobs:
       run: |
         dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
         rm LinuxNativeBuildx64/*.pdb
-        strip --strip-debug LinuxNativeBuildx64/TypedocConverter
+        strip LinuxNativeBuildx64/TypedocConverter
     - name: Upload Linux x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
@@ -146,7 +146,7 @@ jobs:
       run: |
         dotnet publish TypedocConverter -c Release -r osx-x64 -o macOSNativeBuildx64 /p:NativeBuild=true
         rm macOSNativeBuildx64/*.pdb
-        strip --strip-debug macOSNativeBuildx64/TypedocConverter
+        strip macOSNativeBuildx64/TypedocConverter
     - name: Upload macOS x64 native artifact
       uses: actions/upload-artifact@v1.0.0
       with:
