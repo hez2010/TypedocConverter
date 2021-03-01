@@ -1,7 +1,7 @@
 # Typedoc Converter
 This is a [typedoc](https://github.com/TypeStrong/typedoc) json to C# bindings converter.  
 
-Build status: ![.NET Core](https://github.com/hez2010/TypedocConverter/workflows/.NET%20Core/badge.svg)
+Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET/badge.svg)
 
 ## Languages support
 - [x] Enums
