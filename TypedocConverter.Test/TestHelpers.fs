@@ -20,7 +20,7 @@ let runCodegen fileName =
         use fs = new StreamWriter(new FileStream("tsconfig.json", FileMode.OpenOrCreate))
         fprintf fs "%s" (JsonConvert.SerializeObject(json, jsonSettings))
 
-    use proc = Process.Start((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc.sh"), [| fileName + ".ts"; "--json"; fileName + ".json" |])
+    use proc = Process.Start((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc"), [| fileName + ".ts"; "--json"; fileName + ".json" |])
     proc.WaitForExitAsync() |> Async.AwaitTask |> Async.RunSynchronously
     proc.ExitCode
     
