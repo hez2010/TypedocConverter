@@ -14,7 +14,7 @@ open System.Diagnostics.CodeAnalysis
 let runCodegen fileName = 
     if File.Exists "tsconfig.json" then ()
     else
-        let json = {| CompilerOptions = {| Target = "ES7" |} |}
+        let json = {| CompilerOptions = {| Target = "es2017" |} |}
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
         use fs = new StreamWriter(new FileStream("tsconfig.json", FileMode.OpenOrCreate))
