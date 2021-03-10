@@ -1,9 +1,6 @@
 open Helpers
-open Definitions
-open Entity
-open System.IO
-open Newtonsoft.Json
 open Xunit
+open TestHelpers
 
 [<Theory>]
 [<InlineData("camelCase")>]
@@ -25,61 +22,110 @@ let TestPascalCaseConverter (input: string) =
 
 
 [<Fact>]
-let TestParser () =
-    File.Delete "test.output"
-    let expected = File.ReadAllText "test.expected"
-    let config = { 
-        Help = false; 
-        InputFile = "test.input";
-        Namespace = "";
-        SplitFiles = false; 
-        OutputDir = ".";
-        OutputFile = "test.output";
-        AnyType = "object"; 
-        NumberType = "double";
-        UseWinRTPromise = false;
-        ArrayType = "Array";
-        UseSystemJson = false;
-        NrtDisabled = false;
-    }
-    let asciilize str =
-        str |> String.filter(fun c -> int c >= 33 && int c <= 126)
-    let json = File.ReadAllText config.InputFile
-    let jsonSettings = JsonSerializerSettings()
-    jsonSettings.Converters.Add(Converters.OptionConverter())
-    let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
-    let entities = Parser.parseNode config.Namespace root config
+let InterfaceTest () =
+    let code = """interface Test {
+    /**
+    * string property
+    */
+    prop1: string,
+
+    /**
+    * number property
+    */
+    prop2: number,
+
+    /**
+    * boolean property
+    */
+    prop3: boolean,
+
+    /**
+    * array property
+    */
+    prop4: number[],
     
-    let mutable printedEntities : Entity Set = Set.empty
-    let mutable generatedEntites : Entity list = List.empty
-    let mutable finished = false
+    /**
+    * delegate property 1
+    */
+    prop5: (n: number, s: string) => boolean,
+    
+    /**
+    * delegate property 2
+    */
+    prop6: (n: number, s: string) => void,
 
-    let namespaces = 
-        entities 
-        |> List.map Helpers.getNamespaceAndName
-        |> List.collect (fun x -> match x with | Some(v, _) -> [v] | _ -> [])
-        |> List.distinct
+    /**
+    * simple method 1
+    */
+    method1(s: string, n: number, b: boolean): void,
 
-    generatedEntites <- 
-        (
-            if config.SplitFiles 
-            then Printer.printEntities true config.OutputDir config entities namespaces
-            else Printer.printEntities false config.OutputFile config entities namespaces
-        ) |> Set.toList
-    finished <- generatedEntites.IsEmpty
-    while not finished do
-        let newGenerated = generatedEntites
-        let generated = newGenerated |> List.filter (fun x -> not (printedEntities |> Set.contains x))
-        for i in generated do 
-            printedEntities <- printedEntities |> Set.add i
-        finished <- generated.IsEmpty
-        if finished then () else
-            generatedEntites <-
-                (
-                    if config.SplitFiles 
-                    then Printer.printEntities true config.OutputDir config generated namespaces
-                    else Printer.printEntities false config.OutputFile config generated namespaces
-                ) |> Set.toList
+    /**
+    * simple method 2
+    */
+    method2(s: string, n: number, b: boolean): boolean,
 
-    let output = File.ReadAllText "test.output"
-    Assert.Equal(asciilize expected, asciilize output)
+    /**
+    * event
+    * @event
+    */
+    onEvent1(listener: (e: number) => void): void
+}
+"""
+    let expect = """namespace TypedocConverter
+{
+    interface Test
+    {
+        /// <summary>
+        /// event
+        /// </summary>
+        event System.Action<double> OnEvent;
+        
+        /// <summary>
+        /// string property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        string Prop1 { get; set; }
+
+        /// <summary>
+        /// number property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        double Prop2 { get; set; }
+
+        /// <summary>
+        /// boolean property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        bool Prop3 { get; set; }
+
+        /// <summary>
+        /// array property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        double[] Prop4 { get; set; }
+        
+        /// <summary>
+        /// delegate property 1
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop5", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        System.Func<double, string, bool> Prop5 { get; set; }
+        
+        /// <summary>
+        /// delegate property 2
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("prop6", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        System.Action<double, string> Prop6 { get; set; }
+
+        /// <summary>
+        /// simple method 1
+        /// </summary>
+        void Method1(string s, double n, bool b);
+
+        /// <summary>
+        /// simple method 2
+        /// </summary>
+        bool Method2(string s, double n, bool b);
+    }
+}
+"""
+    testCode code expect

@@ -211,5 +211,5 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
         )
     ClassInterfaceEntity(
         node.Id, (if section = "" then "TypedocConverter" else section), node.Name, comment, getModifier node.Flags,
-        members, exts, genericType, isInterface
+        mergedMembers, exts, genericType, isInterface
     )
