@@ -12,15 +12,21 @@ open System.Diagnostics.CodeAnalysis
 
 [<ExcludeFromCodeCoverage>]
 let runCodegen fileName = 
-    if File.Exists "tsconfig.json" then ()
+    let configFileName = Path.Join(Path.GetTempPath(), "tsconfig.json")
+    if File.Exists(configFileName) then ()
     else
-        let json = {| CompilerOptions = {| Target = "es2017" |} |}
+        let json = {| CompilerOptions = {| Target = "es2017" |}; Include = [| fileName + ".ts" |] |}
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
-        use fs = new StreamWriter(new FileStream("tsconfig.json", FileMode.OpenOrCreate))
+        use fs = new StreamWriter(new FileStream(configFileName, FileMode.OpenOrCreate))
         fprintf fs "%s" (JsonConvert.SerializeObject(json, jsonSettings))
 
-    use proc = Process.Start((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc"), [| fileName + ".ts"; "--json"; fileName + ".json" |])
+    let startupInfo = ProcessStartInfo((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc"))
+    startupInfo.WorkingDirectory <- Path.GetTempPath()
+    startupInfo.ArgumentList.Add (fileName + ".ts")
+    startupInfo.ArgumentList.Add ("--json")
+    startupInfo.ArgumentList.Add (fileName + ".json")
+    use proc = Process.Start startupInfo
     proc.WaitForExitAsync() |> Async.AwaitTask |> Async.RunSynchronously
     proc.ExitCode
     

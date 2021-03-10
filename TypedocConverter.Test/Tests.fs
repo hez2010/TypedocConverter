@@ -68,7 +68,7 @@ let InterfaceTest () =
     * event
     * @event
     */
-    onEvent1(listener: (e: number) => void): void
+    onEvent(listener: (e: number) => void): void
 }
 """
     let expect = """namespace TypedocConverter
