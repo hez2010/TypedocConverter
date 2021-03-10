@@ -11,18 +11,18 @@ open Newtonsoft.Json.Serialization
 open System.Diagnostics.CodeAnalysis
 
 [<ExcludeFromCodeCoverage>]
-let runCodegen fileName = 
-    let configFileName = Path.Join(Path.GetTempPath(), "tsconfig.json")
+let runCodegen fileDir fileName = 
+    let configFileName = Path.Join(fileDir, "tsconfig.json")
     if File.Exists(configFileName) then ()
     else
-        let json = {| CompilerOptions = {| Target = "es2017" |}; Include = [| fileName + ".ts" |] |}
+        let json = {| CompilerOptions = {| Target = "es2017" |} |}
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
         use fs = new StreamWriter(new FileStream(configFileName, FileMode.OpenOrCreate))
         fprintf fs "%s" (JsonConvert.SerializeObject(json, jsonSettings))
 
     let startupInfo = ProcessStartInfo((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc"))
-    startupInfo.WorkingDirectory <- Path.GetTempPath()
+    startupInfo.WorkingDirectory <- fileDir
     startupInfo.ArgumentList.Add (fileName + ".ts")
     startupInfo.ArgumentList.Add ("--json")
     startupInfo.ArgumentList.Add (fileName + ".json")
@@ -32,10 +32,9 @@ let runCodegen fileName =
     
 [<ExcludeFromCodeCoverage>]
 let testCode input expected =
-    let fileName = Path.Join(Path.GetTempPath(), Guid.NewGuid().ToString().Replace("-", ""))
-    File.Delete (fileName + ".cs")
-    File.Delete (fileName + ".ts")
-    File.Delete (fileName + ".json")
+    let fileDir = Path.Join(Path.GetTempPath(), Guid.NewGuid().ToString().Replace("-", ""))
+    Directory.CreateDirectory fileDir |> ignore
+    let fileName = Path.Join(fileDir, "TypedocConverter")
     File.WriteAllTextAsync((fileName + ".ts"), input) |> Async.AwaitTask |> Async.RunSynchronously
     let config = { 
         Help = false; 
@@ -54,7 +53,7 @@ let testCode input expected =
     let asciilize str =
         str |> String.filter(fun c -> int c >= 33 && int c <= 126)
 
-    let exitCode = runCodegen fileName
+    let exitCode = runCodegen fileDir fileName
 
     Assert.Equal(0, exitCode)
 
@@ -98,6 +97,4 @@ let testCode input expected =
     let output = File.ReadAllText (fileName + ".cs")
     Assert.Equal(asciilize expected, asciilize output)
     
-    File.Delete (fileName + ".cs")
-    File.Delete (fileName + ".ts")
-    File.Delete (fileName + ".json")
+    Directory.Delete(fileDir, true)
