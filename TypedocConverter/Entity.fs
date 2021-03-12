@@ -35,6 +35,12 @@ type Entity =
     WithSet: bool *
     IsOptional: bool *
     InitialValue: string option
+| IndexerEntity of
+    Id: int *
+    Comment: string *
+    Modifiers: string list *
+    Type: Entity *
+    Parameters: Entity list
 | EventEntity of
     Id: int *
     Name: string *
@@ -71,7 +77,8 @@ type Entity =
     Members: Entity list *
     InheritedFroms: Entity list *
     TypeParameters: Entity list *
-    IsInterface: bool
+    IsInterface: bool *
+    Indexer: Entity option
 | StringUnionEntity of
     Id: int *
     Namespace: string *

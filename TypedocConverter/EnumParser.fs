@@ -43,7 +43,7 @@ let parseEnum (section: string) (node: Reflection): Entity =
                                  | _ -> EnumMemberEntity(x.Id, x.Name, comment, None)
             | _ -> EnumMemberEntity(x.Id, x.Name, comment, None)
         )
-    EnumEntity(node.Id, (if section = "" then "TypedocConverter" else section), node.Name, 
+    EnumEntity(node.Id, section, node.Name, 
         (
             match node.Comment with
             | Some comment -> getXmlDocComment comment

@@ -54,7 +54,7 @@ let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: E
                                 | TypeLiteralElementEntity(_, eName, eType) -> (eName, eType)
                                 | _ -> failwith "Unexpected entity"
                             PropertyEntity(id, fst literal, "", [], snd literal, true, true, false, None)
-                        ), [], [], true
+                        ), [], [], true, None
                     )
                 deferredEntities <- Set.add entity deferredEntities
                 "TypedocConverter.GeneratedTypes." + name
@@ -96,7 +96,7 @@ and typeSorter typeA typeB =
     | (UnionTypeEntity(_, typeIdA, _, _), UnionTypeEntity(_, typeIdB, _, _)) -> compare typeIdA typeIdB
     | _ -> 0
 
-let arrangeParameterList config (writer: System.IO.TextWriter) paras = 
+let arrangeParameterList config (writer: System.IO.TextWriter) withName paras = 
     let mutable args = []
     let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte";
         "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; 
@@ -125,7 +125,8 @@ let arrangeParameterList config (writer: System.IO.TextWriter) paras =
             (fun i -> 
                 match i with
                 | ParameterEntity(_, pName, pType) ->
-                    [(arrangeType config writer pType) + " " + getArg pName 0]
+                    if withName then [(arrangeType config writer pType) + " " + getArg pName 0]
+                    else [arrangeType config writer pType]
                 | _ -> []
             )
     )
@@ -281,13 +282,16 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 else System.String.Join(" ", modifiers) + " "
             )
             (toPascalCase name)
-            (arrangeParameterList config writer paras)
+            (arrangeParameterList config writer true paras)
         fprintfn writer ""
 
     let printProperty name comment modifiers eType withGet withSet isOptional initValue isInInterface config =
         if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
-        if config.UseSystemJson then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
-        else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
+        let isPrivate = modifiers |> List.contains "private"
+        if isPrivate then ()
+        else
+            if config.UseSystemJson then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
+            else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
         fprintfn writer "        %s%s%s %s { %s%s}%s"
             (
                 if List.isEmpty modifiers then 
@@ -303,7 +307,12 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                     else "?"
                 else ""
             )
-            (toPascalCase name)
+            (
+                if isPrivate then 
+                    if name.StartsWith("#") then "_" + name.Substring(1)
+                    else name
+                else toPascalCase name
+            )
             (
                 if isInInterface
                 then
@@ -354,12 +363,19 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 | tps -> "<" + System.String.Join(", ", tps |> List.collect (fun x -> 
                     match x with | TypeParameterEntity(_, tpName) -> [toPascalCase tpName] | _ -> [])) + ">"
             )
-            (arrangeParameterList config writer paras)
+            (arrangeParameterList config writer true paras)
             (
                 if isInInterface then ""
                 else " => throw new System.NotImplementedException()"
             )
         fprintfn writer ""
+
+    let printIndexer comment (modifiers: string list) mType (paras: Entity list) = 
+        if (comment <> "") then fprintfn writer "%s" (arrangeComment comment 8) else ()
+        fprintfn writer "        %s%s this[%s] { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }"
+            (System.String.Join(" ", modifiers) + " ")
+            (arrangeType config writer mType)
+            (arrangeParameterList config writer false paras)
 
     match entity with
     | EnumEntity(_, ns, name, comment, modifiers, members) ->
@@ -391,7 +407,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         if config.UseSystemJson then printSystemJsonConverter writer entity config
         else printNewtonsoftJsonConverter writer entity config
         fprintfn writer "}\n"
-    | ClassInterfaceEntity(_, ns, name, comment, modifiers, members, exts, tps, isInterface) ->
+    | ClassInterfaceEntity(_, ns, name, comment, modifiers, members, exts, tps, isInterface, indexer) ->
         printHeader ns comment
         if isInterface then printName "interface" modifiers name exts tps
         else printName "class" modifiers name exts tps
@@ -410,6 +426,9 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                         printMethod mName mComment mModifier mTps mParas mType isInterface
                     | _ -> ()
             )
+        match indexer with
+        | Some(IndexerEntity(_, iComment, iModifier, iType, iParas)) -> printIndexer iComment iModifier iType iParas
+        | _ -> ()
         fprintfn writer "    }"
         fprintfn writer "}\n"
     | _ -> ()

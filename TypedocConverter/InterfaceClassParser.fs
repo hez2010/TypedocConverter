@@ -195,7 +195,29 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                 | _ -> []
             )
         | _ -> []
-
+        
+    let indexer = 
+        match node.IndexSignature with
+        | None -> None
+        | Some(index) -> 
+            Some(
+                IndexerEntity (
+                    index.Id, 
+                    getComment index, 
+                    ["public"], 
+                    (
+                        match index.Type with 
+                        | None -> TypeEntity(0, "object", "intrinsic", [], Plain, None)
+                        | Some(t) -> getType config None t
+                    ),
+                    (
+                        match index.Parameters with
+                        | None | Some([]) -> [TypeEntity(0, "object", "intrinsic", [], Plain, None)]
+                        | Some(ps) -> ps |> getMethodParameters config None
+                    )
+                )
+            )
+    
     let mutable processedProperties : string Set = Set.empty
     let mergedMembers = 
         members |> List.collect(
@@ -209,7 +231,8 @@ let parseInterfaceAndClass (section: string) (node: Reflection) (isInterface: bo
                         [PropertyEntity(id, name, comment, modifiers, pType, fst access || withGet, snd access || withSet, isOptional, defaultValue)]
                 | _ -> [x]
         )
+
     ClassInterfaceEntity(
-        node.Id, (if section = "" then "TypedocConverter" else section), node.Name, comment, getModifier node.Flags,
-        mergedMembers, exts, genericType, isInterface
+        node.Id, section, node.Name, comment, getModifier node.Flags,
+        mergedMembers, exts, genericType, isInterface, indexer
     )

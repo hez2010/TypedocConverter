@@ -7,34 +7,44 @@ open TypeAliasParser
 open Entity
 
 let rec parseNode (section: string) (node: Reflection) (config: Config): Entity list =
+    let childrenName = 
+        match section with
+        | "" | null -> node.Name
+        | _ -> section + "." + node.Name
+    
+    let sectionName = 
+        match section with
+        | "" | null -> "TypedocConverter"
+        | _ -> section
+
     match node.Kind with
     | ReflectionKind.Global ->
         match node.Children with
-        | Some children -> parseNodes section children config
+        | Some children -> parseNodes childrenName children config
         | _ -> []
     | ReflectionKind.Module ->
         match node.Children with
         | Some children ->
-            parseNodes (if section = "" then node.Name else section + "." + node.Name) children config
+            parseNodes childrenName children config
         | _ -> []
     | ReflectionKind.ExternalModule ->
         match node.Children with
-        | Some children -> parseNodes section children config
+        | Some children -> parseNodes childrenName children config
         | _ -> []
-    | ReflectionKind.Enum -> [parseEnum section node]
+    | ReflectionKind.Enum -> [parseEnum sectionName node]
     | ReflectionKind.Interface -> 
         match node.Children with
         | Some children ->
-            [parseInterfaceAndClass section node true config] @ parseNodes (if section = "" then node.Name else section + "." + node.Name) children config
-        | _ -> [parseInterfaceAndClass section node true config]
+            [parseInterfaceAndClass sectionName node true config] @ parseNodes childrenName children config
+        | _ -> [parseInterfaceAndClass sectionName node true config]
     | ReflectionKind.Class -> 
         match node.Children with
         | Some children ->
-            [parseInterfaceAndClass section node false config] @ parseNodes (if section = "" then node.Name else section + "." + node.Name) children config
-        | _ -> [parseInterfaceAndClass section node false config]
+            [parseInterfaceAndClass sectionName node false config] @ parseNodes childrenName children config
+        | _ -> [parseInterfaceAndClass sectionName node false config]
     | ReflectionKind.TypeAlias -> 
         match node.Type with
-        | Some _ -> parseTypeAlias section node
+        | Some _ -> parseTypeAlias sectionName node
         | _ -> []
     | _ -> []
 
