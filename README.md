@@ -22,11 +22,12 @@ Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET
   - [x] Properties
   - [x] Methods
   - [x] Events
+  - [x] Indexer
 - [ ] Types
   - [x] String literals
   - [x] Type literals
-  - [ ] Type alias
-  - [ ] Union types
+  - [x] Type alias*
+  - [x] Union types*
   - [ ] Intersection types
 - [x] Split entities to different files
 - [x] Auto rename conflict parameter names
@@ -34,6 +35,8 @@ Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET
 - [x] Newtonsoft.Json and System.Text.Json for JSON serialization
 - [x] Nullable Reference Types
 - [ ] ...
+
+`*: Partial support`
 
 ## Quick start
 TypeScript code `input.ts`:
@@ -134,7 +137,7 @@ declare namespace test {
 }
 ```
 
-With below commands: 
+With below commands (need a `tsconfig.json`): 
 ```bash
 typedoc input.ts --json output.json
 TypedocConverter --inputfile output.json --outputfile output.cs
@@ -375,4 +378,4 @@ Arguments:
 We have prepared some prebuilt binaries for Windows, Linux and macOS.  
 You can download them directly from [Releases](https://github.com/hez2010/TypedocConverter/releases)
 
-Prerequisites: [.NET Runtime 5.0](https://dotnet.microsoft.com/download/dotnet-core/5.0)
+Prerequisites for non-native binaries: [.NET Runtime 5.0](https://dotnet.microsoft.com/download/dotnet-core/5.0)
