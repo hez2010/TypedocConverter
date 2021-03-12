@@ -9,13 +9,25 @@ open Newtonsoft.Json
 open System.Diagnostics
 open Newtonsoft.Json.Serialization
 open System.Diagnostics.CodeAnalysis
+open System.Collections.Generic
+
+type TestComparer() =
+    let asciilize str =
+        str |> String.filter(fun c -> int c >= 33 && int c <= 126)
+
+    interface IEqualityComparer<string> with
+        member this.Equals(x: string, y: string): bool = 
+            (asciilize x) = (asciilize y)
+        member this.GetHashCode(obj: string): int = 
+            (asciilize obj).GetHashCode()
+
 
 [<ExcludeFromCodeCoverage>]
 let runCodegen fileDir fileName = 
     let configFileName = Path.Join(fileDir, "tsconfig.json")
     if File.Exists(configFileName) then ()
     else
-        let json = {| CompilerOptions = {| Target = "es2017" |} |}
+        let json = {| CompilerOptions = {| Target = "es2020" |} |}
         let jsonSettings = JsonSerializerSettings()
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
         use fs = new StreamWriter(new FileStream(configFileName, FileMode.OpenOrCreate))
@@ -50,8 +62,6 @@ let testCode input expected =
         UseSystemJson = false;
         NrtDisabled = false;
     }
-    let asciilize str =
-        str |> String.filter(fun c -> int c >= 33 && int c <= 126)
 
     let exitCode = runCodegen fileDir fileName
 
@@ -95,6 +105,6 @@ let testCode input expected =
                 ) |> Set.toList
 
     let output = File.ReadAllText (fileName + ".cs")
-    Assert.Equal(asciilize expected, asciilize output)
+    Assert.Equal(expected, output, TestComparer())
     
     Directory.Delete(fileDir, true)
