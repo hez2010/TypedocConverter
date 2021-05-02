@@ -1,5 +1,5 @@
 # Typedoc Converter
-This is a [typedoc](https://github.com/TypeStrong/typedoc) json to C# bindings converter.  
+This is a [typedoc](https://github.com/TypeStrong/typedoc) json to C# bindings converter. Can be used as a TypeScript to C# bindings converter. 
 
 Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET/badge.svg)
 
