@@ -111,6 +111,15 @@ jobs:
       with:
         name: Windows_x64_Native
         path: WindowsNativeBuildx64
+    - name: Publish Native Windows ARM64 Release
+      run: |
+        dotnet publish TypedocConverter -c Release -r win-arm64 -o WindowsNativeBuildARM64 /p:NativeBuild=true
+        del WindowsNativeBuildARM64\*.pdb
+    - name: Upload Windows ARM64 native artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Windows_ARM64_Native
+        path: WindowsNativeBuildARM64
 
   publish-native-linux:
     runs-on: ubuntu-latest
