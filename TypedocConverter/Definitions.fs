@@ -109,7 +109,7 @@ and Type = {
     Id: int
     Name: string option
     ElementType: Type option
-    Value: string option
+    Value: obj option
     Types: Type list option
     TypeArguments: Type list option
     Constraint: Type option

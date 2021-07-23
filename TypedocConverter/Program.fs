@@ -1,12 +1,11 @@
 ﻿module Program
 
 open System.IO
-open Newtonsoft.Json
-open Converters
 open Definitions
 open Entity
 open Helpers
 open System.Diagnostics.CodeAnalysis
+open System.Text.Json
 
 [<ExcludeFromCodeCoverage>]
 let rec parseArguments (state: string) (config: Config) (argv: string list) =
@@ -55,8 +54,8 @@ let printHelp () =
 [<EntryPoint>]
 [<ExcludeFromCodeCoverage>]
 let main argv =
-    let jsonSettings = JsonSerializerSettings()
-    jsonSettings.Converters.Add(OptionConverter())
+    let jsonOptions = JsonSerializerOptions()
+    jsonOptions.PropertyNamingPolicy <- JsonNamingPolicy.CamelCase
     let config = parseArguments "" { Help = false;
                                      InputFile = null; 
                                      Namespace = ""; 
@@ -82,7 +81,7 @@ let main argv =
             1
         else
             let json = File.ReadAllText config.InputFile
-            let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
+            let root = JsonSerializer.Deserialize<Reflection>(json, jsonOptions)
             let entities = Parser.parseNode config.Namespace root config
             let mutable printedEntities : Entity Set = Set.empty
             let mutable generatedEntites : Entity list = List.empty

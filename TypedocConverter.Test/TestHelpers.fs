@@ -5,11 +5,10 @@ open Entity
 open System.IO
 open Xunit
 open System
-open Newtonsoft.Json
 open System.Diagnostics
-open Newtonsoft.Json.Serialization
 open System.Diagnostics.CodeAnalysis
 open System.Collections.Generic
+open System.Text.Json
 
 type TestComparer() =
     let asciilize str =
@@ -28,10 +27,10 @@ let runCodegen fileDir fileName =
     if File.Exists(configFileName) then ()
     else
         let json = {| CompilerOptions = {| Target = "es2020" |} |}
-        let jsonSettings = JsonSerializerSettings()
-        jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
+        let jsonOptions = JsonSerializerOptions()
+        jsonOptions.PropertyNamingPolicy <- JsonNamingPolicy.CamelCase
         use fs = new StreamWriter(new FileStream(configFileName, FileMode.OpenOrCreate))
-        fprintf fs "%s" (JsonConvert.SerializeObject(json, jsonSettings))
+        fprintf fs "%s" (JsonSerializer.Serialize(json, jsonOptions))
 
     let startupInfo = ProcessStartInfo((if Environment.OSVersion.Platform = PlatformID.Win32NT then "typedoc.cmd" else "typedoc"))
     startupInfo.WorkingDirectory <- fileDir
@@ -68,9 +67,9 @@ let testCode input expected =
     Assert.Equal(0, exitCode)
 
     let json = File.ReadAllText config.InputFile
-    let jsonSettings = JsonSerializerSettings()
-    jsonSettings.Converters.Add(Converters.OptionConverter())
-    let root = JsonConvert.DeserializeObject<Reflection>(json, jsonSettings)
+    let jsonOptions = JsonSerializerOptions()
+    jsonOptions.PropertyNamingPolicy <- JsonNamingPolicy.CamelCase
+    let root = JsonSerializer.Deserialize<Reflection>(json, jsonOptions)
     let entities = Parser.parseNode config.Namespace root config
     
     let mutable printedEntities : Entity Set = Set.empty

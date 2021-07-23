@@ -378,4 +378,4 @@ Arguments:
 We have prepared some prebuilt binaries for Windows, Linux and macOS.  
 You can download them directly from [Releases](https://github.com/hez2010/TypedocConverter/releases)
 
-Prerequisites for non-native binaries: [.NET Runtime 5.0](https://dotnet.microsoft.com/download/dotnet-core/5.0)
+Prerequisites for non-native binaries: [.NET Runtime 6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)

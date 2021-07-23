@@ -15,8 +15,8 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
             |> List.collect
                 (fun x ->
                     match x.Value with
-                    | Some value -> 
-                        [EnumMemberEntity(x.Id, value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
+                    | Some value ->
+                        [EnumMemberEntity(x.Id, value.ToString(), "///<summary>\n" + toCommentText (value.ToString()) + "\n///</summary>", None)]
                     | _ -> []
                 )
         | None ->
@@ -24,8 +24,8 @@ let parseUnionTypeAlias (section: string) (node: Reflection) (nodes: Type list):
             |> List.collect
                 (fun x ->
                     match x.Value with
-                    | Some value -> 
-                        [EnumMemberEntity(x.Id, value, "///<summary>\n" + toCommentText value + "\n///</summary>", None)]
+                    | Some value ->
+                        [EnumMemberEntity(x.Id, value.ToString(), "///<summary>\n" + toCommentText (value.ToString()) + "\n///</summary>", None)]
                     | _ -> []
                 )
     if List.isEmpty members then []

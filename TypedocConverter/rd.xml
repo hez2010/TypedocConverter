@@ -3,39 +3,45 @@
         <Assembly Name="FSharp.Core" Dynamic="Required All">
             <Type Name="Microsoft.FSharp.Collections.ListModule" Dynamic="Required All">
                 <Method Name="OfSeq" Dynamic="Required">
-                    <GenericArgument Name="System.Int32, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Int32,System.Private.CoreLib" />
+                </Method>
+            </Type>
+            <Type Name="Microsoft.FSharp.Collections.MapModule" Dynamic="Required All">
+                <Method Name="OfSeq" Dynamic="Required">
+                    <GenericArgument Name="System.Int32,System.Private.CoreLib" />
+                    <GenericArgument Name="Definitions+Reflection,TypedocConverter" />
                 </Method>
             </Type>
             <Type Name="Microsoft.FSharp.Core.PrintfImpl+Specializations`3[[System.Object,System.Private.CoreLib],[System.Object,System.Private.CoreLib],[System.Object,System.Private.CoreLib]]" Dynamic="Required All">
                 <Method Name="CaptureFinal1" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="CaptureFinal2" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="CaptureFinal3" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="OneStepWithArg" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="Capture1" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="Capture2" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
                 <Method Name="Capture3" Dynamic="Required">
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
-                    <GenericArgument Name="System.Object, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
+                    <GenericArgument Name="System.Object,System.Private.CoreLib" />
                 </Method>
             </Type> 
         </Assembly>
@@ -43,9 +49,20 @@
         <Assembly Name="System.Linq" Dynamic="Required All">
             <Type Name="System.Linq.Enumerable" Dynamic="Required All">
                 <Method Name="ToArray" Dynamic="Required">
-                    <GenericArgument Name="System.Int32, System.Private.CoreLib" />
+                    <GenericArgument Name="System.Int32,System.Private.CoreLib" />
                 </Method>
             </Type>
+        </Assembly>
+
+        <Assembly Name="System.Text.Json" Dynamic="Required All">
+            <Type Name="System.Text.Json.Serialization.Converters.EnumConverter`1[[Definitions+ReflectionKind,TypedocConverter]]" Dynamic="Required All" />
+            <Type Name="System.Text.Json.Serialization.Converters.FSharpOptionConverter`2[[Microsoft.FSharp.Core.FSharpOption`1[[System.Boolean,System.Private.CoreLib]],FSharp.Core],[System.Boolean,System.Private.CoreLib]]" Dynamic="Required All" />
+            <Type Name="System.Text.Json.Serialization.Converters.FSharpMapConverter`3[[Microsoft.FSharp.Collections.FSharpMap`2[[System.Int32,System.Private.CoreLib],[Definitions+Reflection,TypedocConverter]],FSharp.Core],[System.Int32,System.Private.CoreLib],[Definitions+Reflection,TypedocConverter]]" Dynamic="Required All" />
+            <Type Name="System.Text.Json.Serialization.Converters.FSharpListConverter`2[[Microsoft.FSharp.Collections.FSharpList`1[[System.Int32,System.Private.CoreLib]],FSharp.Core],[System.Int32,System.Private.CoreLib]]" Dynamic="Required All" />
+        </Assembly>
+
+        <Assembly Name="TypedocConverter" Dynamic="Required All">
+            <Type Name="Definitions+ReflectionKind[]" Dynamic="Required All" />
         </Assembly>
 
     </Application>

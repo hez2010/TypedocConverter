@@ -6,5 +6,6 @@
   <ItemGroup Condition="'$(NativeBuild)'=='true'">
     <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
     <RdXmlFile Include="rd.xml" />
+    <IlcArg Include="--reflectedonly" />
   </ItemGroup>
 </Project>
