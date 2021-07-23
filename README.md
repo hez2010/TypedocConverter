@@ -342,14 +342,17 @@ namespace Test
 cd TypedocConverter/TypedocConverter
 dotnet publish -c Release -r win-x64 --no-self-contained /p:PublishSingleFile=true /p:PublishReadyToRun=true
 ```
-You can replace `win-x64` with other platform identifiers such as `linux-x64`, `linux-arm`, `osx-x64` and etc.  
-Then built dists will be placed in `bin/Release/net5.0/[platform identifier]/publish`
+You can replace `win-x64` with other platform identifiers such as `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64` and etc.  
+Then built dists will be placed in `bin/Release/net6.0/[platform identifier]/publish`
 
 ## Native Build
 ```bash
 cd TypedocConverter/TypedocConverter
 dotnet publish -c Release -r win-x64 /p:NativeBuild=true
 ```
+You can replace `win-x64` with other platform identifiers such as `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64` and etc.  
+Then built dists will be placed in `bin/Release/net6.0/[platform identifier]/publish`
+
 
 ## Run & Usage
 ```bash

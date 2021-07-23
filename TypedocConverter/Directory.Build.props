@@ -5,6 +5,8 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(NativeBuild)'=='true'">
     <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+    <PackageReference Condition="'$(RuntimeIdentifier)'=='win-arm64'" Include="runtime.win-x64.Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+    <PackageReference Condition="'$(RuntimeIdentifier)'=='linux-arm64'" Include="runtime.linux-x64.Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
     <RdXmlFile Include="rd.xml" />
     <IlcArg Include="--reflectedonly" />
   </ItemGroup>
