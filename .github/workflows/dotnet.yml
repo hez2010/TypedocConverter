@@ -3,7 +3,8 @@ name: .NET
 on: [push]
 
 env:
-  DOTNET_SDK_VERSION: '6.0.*'
+  DOTNET_SDK_VERSION: '6.0.100-rc.1.21373.26'
+  INCLUDE_PRERELEASE: true
 
 jobs:
   build-and-test:
@@ -15,7 +16,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
-        include-prerelease: true
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Setup Node.js
       uses: actions/setup-node@v2.1.5
     - name: Install TypeScript and typedoc
@@ -35,6 +36,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Windows x86 Release
       run: dotnet publish TypedocConverter -c Release -o WindowsBuildx86 -r win-x86 --no-self-contained /p:PublishSingleFile=true
     - name: Publish Windows x64 Release
@@ -102,6 +104,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Native Windows x64 Release
       run: |
         dotnet publish TypedocConverter -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
@@ -131,6 +134,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Install Kerberos 5 library
       run: |
         sudo apt update
@@ -156,6 +160,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Native macOS x64 Release
       run: |
         dotnet publish TypedocConverter -c Release -r osx-x64 -o macOSNativeBuildx64 /p:NativeBuild=true
