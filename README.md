@@ -3,6 +3,10 @@ This is a [typedoc](https://github.com/TypeStrong/typedoc) json to C# bindings c
 
 Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET/badge.svg)
 
+## Compatibility Status
+- typedoc: 0.20
+- TypeScript: 3.9, 4.0, 4.1, 4.2
+
 ## Languages support
 - [x] Enums
   - [x] Direct value
