@@ -5,6 +5,7 @@ open Helpers
 open Definitions
 
 let mutable deferredEntities : Entity Set = Set.empty
+let mutable printedFiles : string Set = Set.empty
 
 let append spliter accu next = accu + spliter + next
 
@@ -433,6 +434,10 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "}\n"
     | _ -> ()
 
+let truncateFileName (fileName: string) = 
+    if fileName.Length > 200 then $"{fileName.Substring(0, 200)}_{fileName.GetHashCode():X}"
+    else fileName
+
 let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) (namespaces: string list) = 
     deferredEntities <- Set.empty
     if (splitFile) then
@@ -447,7 +452,12 @@ let printEntities (splitFile: bool) (output: string) (config: Config) (entities:
                         if not (System.IO.Directory.Exists path) 
                         then System.IO.Directory.CreateDirectory path |> ignore
                         else ()
-                        use file = new System.IO.FileStream(System.IO.Path.Combine(path, toPascalCase name + ".cs"), System.IO.FileMode.OpenOrCreate)
+                        let fileName = System.IO.Path.Combine(path, truncateFileName (toPascalCase name) + ".cs")
+                        if not (printedFiles |> Set.contains fileName) then 
+                            System.IO.File.Delete fileName
+                            printedFiles <- Set.add fileName printedFiles
+                        else ()
+                        use file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
                         file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
                         use textWriter = new System.IO.StreamWriter(file)
                         printEntity textWriter config namespaces x
@@ -458,6 +468,10 @@ let printEntities (splitFile: bool) (output: string) (config: Config) (entities:
         let dir = System.IO.Path.GetDirectoryName path
         if dir <> "" && not (System.IO.Directory.Exists dir) 
         then System.IO.Directory.CreateDirectory dir |> ignore
+        else ()
+        if not (printedFiles |> Set.contains path) then 
+            System.IO.File.Delete path
+            printedFiles <- Set.add path printedFiles
         else ()
         use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
         file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
