@@ -287,15 +287,15 @@ let testBuiltInType () =
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             ulong[] Prop1 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop10", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Collections.Generic.ISet<double> Prop10 { get; set; }
+            System.Collections.Generic.HashSet<double> Prop10 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop11", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Collections.Generic.IDictionary<double, string> Prop11 { get; set; }
+            System.Collections.Generic.Dictionary<double, string> Prop11 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop12", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Threading.Tasks.Task<Test> Prop12 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop13", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Threading.Tasks.Task<double> Prop13 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop14", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<double, System.Threading.Tasks.Task<string>>> Prop14 { get; set; }
+            System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<double, System.Threading.Tasks.Task<string>>> Prop14 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             uint[] Prop2 { get; set; }
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -329,16 +329,336 @@ let testUnionType () =
     """
     let expect = """namespace TypedocConverter
     {
+    
         interface Test
         {
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            string Prop1 { get; set; }
+            TypedocConverter.GeneratedTypes.StringDoubleBoolUnion Prop1 { get; set; }
+    
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Collections.Generic.IDictionary<string, bool> Prop2 { get; set; }
+            TypedocConverter.GeneratedTypes.DictionaryStringBoolBoolUnion Prop2 { get; set; }
+    
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Collections.Generic.ISet<string> Prop3 { get; set; }
+            TypedocConverter.GeneratedTypes.HashSetStringBoolUnion Prop3 { get; set; }
+    
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-            System.Collections.Generic.ISet<string> Prop4 { get; set; }
+            TypedocConverter.GeneratedTypes.HashSetStringDictionaryStringDoubleBoolUnion Prop4 { get; set; }
+    
+        }
+    }
+    
+    namespace TypedocConverter.GeneratedTypes
+    {
+        using TypedocConverter;
+        class DictionaryStringBoolBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<DictionaryStringBoolBoolUnion>
+        {
+            public override DictionaryStringBoolBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, DictionaryStringBoolBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                try { return new DictionaryStringBoolBoolUnion { SystemCollectionsGenericDictionaryStringBoolValue = serializer.Deserialize<System.Collections.Generic.Dictionary<string, bool>>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new DictionaryStringBoolBoolUnion { BoolValue = serializer.Deserialize<bool>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                return default;
+            }
+            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, DictionaryStringBoolBoolUnion value, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                if (value.Type == typeof(System.Collections.Generic.Dictionary<string, bool>)) { serializer.Serialize(writer, value.SystemCollectionsGenericDictionaryStringBoolValue); return; }
+                if (value.Type == typeof(bool)) { serializer.Serialize(writer, value.BoolValue); return; }
+                writer.WriteNull();
+            }
+        }
+        [Newtonsoft.Json.JsonConverter(typeof(DictionaryStringBoolBoolUnionJsonConverter))]
+        struct DictionaryStringBoolBoolUnion
+        {
+            public System.Type? Type { get; set; }
+            private System.Collections.Generic.Dictionary<string, bool>? _systemCollectionsGenericDictionaryStringBoolValue;
+            public System.Collections.Generic.Dictionary<string, bool>? SystemCollectionsGenericDictionaryStringBoolValue
+            {
+                get => _systemCollectionsGenericDictionaryStringBoolValue;
+                set
+                {
+                    ClearValue();
+                    _systemCollectionsGenericDictionaryStringBoolValue = value;
+                    Type = typeof(System.Collections.Generic.Dictionary<string, bool>);
+                }
+            }
+            public static implicit operator DictionaryStringBoolBoolUnion(System.Collections.Generic.Dictionary<string, bool> value) => new DictionaryStringBoolBoolUnion { SystemCollectionsGenericDictionaryStringBoolValue = value };
+            public static implicit operator System.Collections.Generic.Dictionary<string, bool>?(DictionaryStringBoolBoolUnion value) => value.SystemCollectionsGenericDictionaryStringBoolValue;
+    
+            private bool? _boolValue;
+            public bool? BoolValue
+            {
+                get => _boolValue;
+                set
+                {
+                    ClearValue();
+                    _boolValue = value;
+                    Type = typeof(bool);
+                }
+            }
+            public static implicit operator DictionaryStringBoolBoolUnion(bool value) => new DictionaryStringBoolBoolUnion { BoolValue = value };
+            public static implicit operator bool?(DictionaryStringBoolBoolUnion value) => value.BoolValue;
+    
+            public override string? ToString()
+            {
+                if (Type == typeof(System.Collections.Generic.Dictionary<string, bool>)) return SystemCollectionsGenericDictionaryStringBoolValue?.ToString();
+                if (Type == typeof(bool)) return BoolValue?.ToString();
+                return default;
+            }
+            public override int GetHashCode()
+            {
+                if (Type == typeof(System.Collections.Generic.Dictionary<string, bool>)) return SystemCollectionsGenericDictionaryStringBoolValue?.GetHashCode() ?? 0;
+                if (Type == typeof(bool)) return BoolValue?.GetHashCode() ?? 0;
+                return 0;
+            }
+            private void ClearValue()
+            {
+                _systemCollectionsGenericDictionaryStringBoolValue = default;
+                _boolValue = default;
+            }
+        }
+    }
+    namespace TypedocConverter.GeneratedTypes
+    {
+        using TypedocConverter;
+        class HashSetStringDictionaryStringDoubleBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringDictionaryStringDoubleBoolUnion>
+        {
+            public override HashSetStringDictionaryStringDoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringDictionaryStringDoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                try { return new HashSetStringDictionaryStringDoubleBoolUnion { SystemCollectionsGenericHashSetStringValue = serializer.Deserialize<System.Collections.Generic.HashSet<string>>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new HashSetStringDictionaryStringDoubleBoolUnion { SystemCollectionsGenericDictionaryStringDoubleValue = serializer.Deserialize<System.Collections.Generic.Dictionary<string, double>>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new HashSetStringDictionaryStringDoubleBoolUnion { BoolValue = serializer.Deserialize<bool>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                return default;
+            }
+            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, HashSetStringDictionaryStringDoubleBoolUnion value, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                if (value.Type == typeof(System.Collections.Generic.HashSet<string>)) { serializer.Serialize(writer, value.SystemCollectionsGenericHashSetStringValue); return; }
+                if (value.Type == typeof(System.Collections.Generic.Dictionary<string, double>)) { serializer.Serialize(writer, value.SystemCollectionsGenericDictionaryStringDoubleValue); return; }
+                if (value.Type == typeof(bool)) { serializer.Serialize(writer, value.BoolValue); return; }
+                writer.WriteNull();
+            }
+        }
+        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringDictionaryStringDoubleBoolUnionJsonConverter))]
+        struct HashSetStringDictionaryStringDoubleBoolUnion
+        {
+            public System.Type? Type { get; set; }
+            private System.Collections.Generic.HashSet<string>? _systemCollectionsGenericHashSetStringValue;
+            public System.Collections.Generic.HashSet<string>? SystemCollectionsGenericHashSetStringValue
+            {
+                get => _systemCollectionsGenericHashSetStringValue;
+                set
+                {
+                    ClearValue();
+                    _systemCollectionsGenericHashSetStringValue = value;
+                    Type = typeof(System.Collections.Generic.HashSet<string>);
+                }
+            }
+            public static implicit operator HashSetStringDictionaryStringDoubleBoolUnion(System.Collections.Generic.HashSet<string> value) => new HashSetStringDictionaryStringDoubleBoolUnion { SystemCollectionsGenericHashSetStringValue = value };
+            public static implicit operator System.Collections.Generic.HashSet<string>?(HashSetStringDictionaryStringDoubleBoolUnion value) => value.SystemCollectionsGenericHashSetStringValue;
+    
+            private System.Collections.Generic.Dictionary<string, double>? _systemCollectionsGenericDictionaryStringDoubleValue;
+            public System.Collections.Generic.Dictionary<string, double>? SystemCollectionsGenericDictionaryStringDoubleValue
+            {
+                get => _systemCollectionsGenericDictionaryStringDoubleValue;
+                set
+                {
+                    ClearValue();
+                    _systemCollectionsGenericDictionaryStringDoubleValue = value;
+                    Type = typeof(System.Collections.Generic.Dictionary<string, double>);
+                }
+            }
+            public static implicit operator HashSetStringDictionaryStringDoubleBoolUnion(System.Collections.Generic.Dictionary<string, double> value) => new HashSetStringDictionaryStringDoubleBoolUnion { SystemCollectionsGenericDictionaryStringDoubleValue = value };
+            public static implicit operator System.Collections.Generic.Dictionary<string, double>?(HashSetStringDictionaryStringDoubleBoolUnion value) => value.SystemCollectionsGenericDictionaryStringDoubleValue;
+    
+            private bool? _boolValue;
+            public bool? BoolValue
+            {
+                get => _boolValue;
+                set
+                {
+                    ClearValue();
+                    _boolValue = value;
+                    Type = typeof(bool);
+                }
+            }
+            public static implicit operator HashSetStringDictionaryStringDoubleBoolUnion(bool value) => new HashSetStringDictionaryStringDoubleBoolUnion { BoolValue = value };
+            public static implicit operator bool?(HashSetStringDictionaryStringDoubleBoolUnion value) => value.BoolValue;
+    
+            public override string? ToString()
+            {
+                if (Type == typeof(System.Collections.Generic.HashSet<string>)) return SystemCollectionsGenericHashSetStringValue?.ToString();
+                if (Type == typeof(System.Collections.Generic.Dictionary<string, double>)) return SystemCollectionsGenericDictionaryStringDoubleValue?.ToString();
+                if (Type == typeof(bool)) return BoolValue?.ToString();
+                return default;
+            }
+            public override int GetHashCode()
+            {
+                if (Type == typeof(System.Collections.Generic.HashSet<string>)) return SystemCollectionsGenericHashSetStringValue?.GetHashCode() ?? 0;
+                if (Type == typeof(System.Collections.Generic.Dictionary<string, double>)) return SystemCollectionsGenericDictionaryStringDoubleValue?.GetHashCode() ?? 0;
+                if (Type == typeof(bool)) return BoolValue?.GetHashCode() ?? 0;
+                return 0;
+            }
+            private void ClearValue()
+            {
+                _systemCollectionsGenericHashSetStringValue = default;
+                _systemCollectionsGenericDictionaryStringDoubleValue = default;
+                _boolValue = default;
+            }
+        }
+    }
+    namespace TypedocConverter.GeneratedTypes
+    {
+        using TypedocConverter;
+        class HashSetStringBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringBoolUnion>
+        {
+            public override HashSetStringBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                try { return new HashSetStringBoolUnion { SystemCollectionsGenericHashSetStringValue = serializer.Deserialize<System.Collections.Generic.HashSet<string>>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new HashSetStringBoolUnion { BoolValue = serializer.Deserialize<bool>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                return default;
+            }
+            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, HashSetStringBoolUnion value, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                if (value.Type == typeof(System.Collections.Generic.HashSet<string>)) { serializer.Serialize(writer, value.SystemCollectionsGenericHashSetStringValue); return; }
+                if (value.Type == typeof(bool)) { serializer.Serialize(writer, value.BoolValue); return; }
+                writer.WriteNull();
+            }
+        }
+        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringBoolUnionJsonConverter))]
+        struct HashSetStringBoolUnion
+        {
+            public System.Type? Type { get; set; }
+            private System.Collections.Generic.HashSet<string>? _systemCollectionsGenericHashSetStringValue;
+            public System.Collections.Generic.HashSet<string>? SystemCollectionsGenericHashSetStringValue
+            {
+                get => _systemCollectionsGenericHashSetStringValue;
+                set
+                {
+                    ClearValue();
+                    _systemCollectionsGenericHashSetStringValue = value;
+                    Type = typeof(System.Collections.Generic.HashSet<string>);
+                }
+            }
+            public static implicit operator HashSetStringBoolUnion(System.Collections.Generic.HashSet<string> value) => new HashSetStringBoolUnion { SystemCollectionsGenericHashSetStringValue = value };
+            public static implicit operator System.Collections.Generic.HashSet<string>?(HashSetStringBoolUnion value) => value.SystemCollectionsGenericHashSetStringValue;
+    
+            private bool? _boolValue;
+            public bool? BoolValue
+            {
+                get => _boolValue;
+                set
+                {
+                    ClearValue();
+                    _boolValue = value;
+                    Type = typeof(bool);
+                }
+            }
+            public static implicit operator HashSetStringBoolUnion(bool value) => new HashSetStringBoolUnion { BoolValue = value };
+            public static implicit operator bool?(HashSetStringBoolUnion value) => value.BoolValue;
+    
+            public override string? ToString()
+            {
+                if (Type == typeof(System.Collections.Generic.HashSet<string>)) return SystemCollectionsGenericHashSetStringValue?.ToString();
+                if (Type == typeof(bool)) return BoolValue?.ToString();
+                return default;
+            }
+            public override int GetHashCode()
+            {
+                if (Type == typeof(System.Collections.Generic.HashSet<string>)) return SystemCollectionsGenericHashSetStringValue?.GetHashCode() ?? 0;
+                if (Type == typeof(bool)) return BoolValue?.GetHashCode() ?? 0;
+                return 0;
+            }
+            private void ClearValue()
+            {
+                _systemCollectionsGenericHashSetStringValue = default;
+                _boolValue = default;
+            }
+        }
+    }
+    namespace TypedocConverter.GeneratedTypes
+    {
+        using TypedocConverter;
+        class StringDoubleBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<StringDoubleBoolUnion>
+        {
+            public override StringDoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, StringDoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                try { return new StringDoubleBoolUnion { StringValue = serializer.Deserialize<string>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new StringDoubleBoolUnion { DoubleValue = serializer.Deserialize<double>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                try { return new StringDoubleBoolUnion { BoolValue = serializer.Deserialize<bool>(reader) }; } catch (Newtonsoft.Json.JsonException) { }
+                return default;
+            }
+            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, StringDoubleBoolUnion value, Newtonsoft.Json.JsonSerializer serializer)
+            {
+                if (value.Type == typeof(string)) { serializer.Serialize(writer, value.StringValue); return; }
+                if (value.Type == typeof(double)) { serializer.Serialize(writer, value.DoubleValue); return; }
+                if (value.Type == typeof(bool)) { serializer.Serialize(writer, value.BoolValue); return; }
+                writer.WriteNull();
+            }
+        }
+        [Newtonsoft.Json.JsonConverter(typeof(StringDoubleBoolUnionJsonConverter))]
+        struct StringDoubleBoolUnion
+        {
+            public System.Type? Type { get; set; }
+            private string? _stringValue;
+            public string? StringValue
+            {
+                get => _stringValue;
+                set
+                {
+                    ClearValue();
+                    _stringValue = value;
+                    Type = typeof(string);
+                }
+            }
+            public static implicit operator StringDoubleBoolUnion(string value) => new StringDoubleBoolUnion { StringValue = value };
+            public static implicit operator string?(StringDoubleBoolUnion value) => value.StringValue;
+    
+            private double? _doubleValue;
+            public double? DoubleValue
+            {
+                get => _doubleValue;
+                set
+                {
+                    ClearValue();
+                    _doubleValue = value;
+                    Type = typeof(double);
+                }
+            }
+            public static implicit operator StringDoubleBoolUnion(double value) => new StringDoubleBoolUnion { DoubleValue = value };
+            public static implicit operator double?(StringDoubleBoolUnion value) => value.DoubleValue;
+    
+            private bool? _boolValue;
+            public bool? BoolValue
+            {
+                get => _boolValue;
+                set
+                {
+                    ClearValue();
+                    _boolValue = value;
+                    Type = typeof(bool);
+                }
+            }
+            public static implicit operator StringDoubleBoolUnion(bool value) => new StringDoubleBoolUnion { BoolValue = value };
+            public static implicit operator bool?(StringDoubleBoolUnion value) => value.BoolValue;
+    
+            public override string? ToString()
+            {
+                if (Type == typeof(string)) return StringValue?.ToString();
+                if (Type == typeof(double)) return DoubleValue?.ToString();
+                if (Type == typeof(bool)) return BoolValue?.ToString();
+                return default;
+            }
+            public override int GetHashCode()
+            {
+                if (Type == typeof(string)) return StringValue?.GetHashCode() ?? 0;
+                if (Type == typeof(double)) return DoubleValue?.GetHashCode() ?? 0;
+                if (Type == typeof(bool)) return BoolValue?.GetHashCode() ?? 0;
+                return 0;
+            }
+            private void ClearValue()
+            {
+                _stringValue = default;
+                _doubleValue = default;
+                _boolValue = default;
+            }
         }
     }
     """

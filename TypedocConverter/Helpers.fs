@@ -27,8 +27,8 @@ let rec toPascalCase (str: string) =
     else if str.Contains "." then 
          str.Split "." |> Array.map toPascalCase |> Array.reduce (fun a n -> a + "." + n)
          else 
-            str.Split([| "-"; "_" |], System.StringSplitOptions.RemoveEmptyEntries)
-            |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
+            str.Split([| "-"; "_"; |], System.StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (fun x -> x.Substring(0, 1).ToUpperInvariant() + x.Substring 1)
             |> Array.reduce (( + ))
 
 let escapeSymbols (text: string) = 
@@ -93,8 +93,8 @@ let rec getType (config: Config) (annotatedName: string option) (typeInfo: Type)
             | Some name -> 
                 match name with
                 | "Promise" -> TypeEntity(typeInfo.Id, "System.Threading.Tasks.Task", typeInfo.Type, [], Plain, annotatedName)
-                | "Set" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.ISet", typeInfo.Type, [], Plain, annotatedName)
-                | "Map" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.IDictionary", typeInfo.Type, [], Plain, annotatedName)
+                | "Set" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.HashSet", typeInfo.Type, [], Plain, annotatedName)
+                | "Map" -> TypeEntity(typeInfo.Id, "System.Collections.Generic.Dictionary", typeInfo.Type, [], Plain, annotatedName)
                 | "Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [], Plain, annotatedName)
                 | "Date" -> TypeEntity(typeInfo.Id, "System.DateTime", typeInfo.Type, [], Plain, annotatedName)
                 | "BigUint64Array" -> TypeEntity(typeInfo.Id, "System.Array", typeInfo.Type, [TypeEntity(0, "ulong", "intrinsic", [], Plain, None)], Plain, annotatedName)
@@ -200,7 +200,7 @@ let rec getType (config: Config) (annotatedName: string option) (typeInfo: Type)
                                         | None -> TypeEntity(p.Id, "object", typeInfo.Type, [], Plain, Some(p.Name))
                                         | Some(pType) -> getType config (Some(p.Name)) pType
                                     ), Plain, None)
-                        TypeEntity(index.Id, "System.Collections.Generic.IDictionary", "reflection", [indexParams; indexRetType], Plain, annotatedName)
+                        TypeEntity(index.Id, "System.Collections.Generic.Dictionary", "reflection", [indexParams; indexRetType], Plain, annotatedName)
                     | _ ->
                         match dec.Children with
                         | None | Some [] -> TypeEntity(typeInfo.Id, "object", typeInfo.Type, [], Plain, None)

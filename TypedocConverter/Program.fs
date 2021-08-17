@@ -85,6 +85,7 @@ let main argv =
             let entities = Parser.parseNode config.Namespace root config
             let mutable printedEntities : Entity Set = Set.empty
             let mutable generatedEntites : Entity list = List.empty
+            let mutable unionTypes : string list Set = Set.empty
             let mutable finished = false
 
             let namespaces = 
@@ -93,12 +94,14 @@ let main argv =
                 |> List.collect (fun x -> match x with | Some(v, _) -> [v] | _ -> [])
                 |> List.distinct
 
-            generatedEntites <- 
-                (
-                    if config.SplitFiles 
-                    then Printer.printEntities true config.OutputDir config entities namespaces
-                    else Printer.printEntities false config.OutputFile config entities namespaces
-                ) |> Set.toList
+            let result = 
+                if config.SplitFiles 
+                then Printer.printEntities config entities namespaces
+                else Printer.printEntities config entities namespaces
+
+            generatedEntites <- fst result |> Set.toList
+            snd result |> Set.iter (fun x -> unionTypes <- unionTypes |> Set.add x)
+
             finished <- generatedEntites.IsEmpty
             while not finished do
                 let newGenerated = generatedEntites
@@ -107,12 +110,14 @@ let main argv =
                     printedEntities <- printedEntities |> Set.add i
                 finished <- generated.IsEmpty
                 if finished then () else
-                    generatedEntites <-
-                        (
-                            if config.SplitFiles 
-                            then Printer.printEntities true config.OutputDir config generated namespaces
-                            else Printer.printEntities false config.OutputFile config generated namespaces
-                        ) |> Set.toList
+                    let result = 
+                        if config.SplitFiles 
+                        then Printer.printEntities config generated namespaces
+                        else Printer.printEntities config generated namespaces
+                    generatedEntites <- fst result |> Set.toList
+                    snd result |> Set.iter (fun x -> unionTypes <- unionTypes |> Set.add x)
+
+            Printer.printUnionTypes config namespaces unionTypes
 
             printfn "Completed"
             0

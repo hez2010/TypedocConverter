@@ -6,6 +6,7 @@ open Definitions
 
 let mutable deferredEntities : Entity Set = Set.empty
 let mutable printedFiles : string Set = Set.empty
+let mutable unionTypes : string List Set = Set.empty
 
 let append spliter accu next = accu + spliter + next
 
@@ -17,6 +18,21 @@ let arrangeComment (comment: string) blankSpace =
     comment.Split("\n")
     |> Array.map(fun x -> blanks + x)
     |> Array.reduce (append "\n")
+
+let escapeTypeSegment (t: string) =
+    t.Split([|"."; ","; "<"; ">"; " " |], System.StringSplitOptions.RemoveEmptyEntries)
+    |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
+    |> Array.reduce (( + ))
+
+let getUnionTypeFieldName (t: string) = 
+    let escapedName = escapeTypeSegment t
+    "_" + escapedName.Substring(0, 1).ToLowerInvariant() + escapedName.Substring 1 + "Value"
+let getUnionTypePropName (t: string) = escapeTypeSegment t + "Value"
+let rec getUnionTypeName (names: string list) =
+    match names with
+    | head::tails -> escapeTypeSegment (head.Split "." |> Array.last) + getUnionTypeName tails
+    | _ -> "Union"
+
 
 let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: Entity) =
     let pascalizeTypeName name =
@@ -65,8 +81,6 @@ let rec arrangeType (config: Config) (writer: System.IO.TextWriter) (typeInfo: E
     | TypeEntity(_, _, _, _, _, Some(annotatedName)) -> arrangedType + " " + (pascalizeTypeName annotatedName)
     | _ -> arrangedType
 and arrangeUnionType (config: Config) (writer: System.IO.TextWriter) (typeInfo: Entity) = 
-    let printUnionType (name: string) (types: string list) =
-        printWarning ("Taking " + name + " for union type "+ System.String.Join(" | ", types) + ".")
     match typeInfo with
     | UnionTypeEntity(_, _, inner, _) ->
         let types = inner |> List.map (arrangeType config writer) |> List.distinct
@@ -75,9 +89,11 @@ and arrangeUnionType (config: Config) (writer: System.IO.TextWriter) (typeInfo: 
         | [] -> "object"
         | [x] -> x
         | _ ->
-            let takenType = inner |> List.sortWith typeSorter |> List.head
-            let name = arrangeType config writer takenType
-            printUnionType name types
+            let typeNameList = inner
+                            |> List.sortWith typeSorter
+                            |> List.map (arrangeType config writer)
+            unionTypes <- unionTypes |> Set.add typeNameList
+            let name = "TypedocConverter.GeneratedTypes." + (typeNameList |> getUnionTypeName)
             name
     | _ -> "object"
 and typeSorter typeA typeB = 
@@ -434,13 +450,140 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "}\n"
     | _ -> ()
 
+let printUnionTypeSystemJsonConverter (writer: System.IO.TextWriter) (unionType: string list) = 
+    let name = getUnionTypeName unionType
+
+    fprintfn writer "    class %sJsonConverter : System.Text.Json.Serialization.JsonConverter<%s>" name name
+    fprintfn writer "    {"
+    fprintfn writer "        public override %s Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)" name
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            try { return new %s { %s = System.Text.Json.JsonSerializer.Deserialize<%s>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }" name (getUnionTypePropName t) t)
+    fprintfn writer "            return default;"
+    fprintfn writer "        }"
+    fprintfn writer "        public override void Write(System.Text.Json.Utf8JsonWriter writer, %s value, System.Text.Json.JsonSerializerOptions options)" name
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            if (value.Type == typeof(%s)) { System.Text.Json.JsonSerializer.Serialize(writer, value.%s, options); return; }" t (getUnionTypePropName t))
+    fprintfn writer "            writer.WriteNullValue();"
+    fprintfn writer "        }"
+    fprintfn writer "    }"
+
+let printUnionTypeNewtonsoftJsonConverter (writer: System.IO.TextWriter) (unionType: string list) = 
+    let name = getUnionTypeName unionType
+
+    fprintfn writer "    class %sJsonConverter : Newtonsoft.Json.JsonConverter<%s>" name name
+    fprintfn writer "    {"
+    fprintfn writer "        public override %s ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, %s value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)" name name
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            try { return new %s { %s = serializer.Deserialize<%s>(reader) }; } catch (Newtonsoft.Json.JsonException) { }" name (getUnionTypePropName t) t)
+    fprintfn writer "            return default;"
+    fprintfn writer "        }"
+    fprintfn writer "        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, %s value, Newtonsoft.Json.JsonSerializer serializer)" name
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            if (value.Type == typeof(%s)) { serializer.Serialize(writer, value.%s); return; }" t (getUnionTypePropName t))
+    fprintfn writer "            writer.WriteNull();"
+    fprintfn writer "        }"
+    fprintfn writer "    }"
+
+let printUnionType (writer: System.IO.TextWriter) (config: Config) (references: string list) (unionType: string list) = 
+    fprintfn writer "namespace TypedocConverter.GeneratedTypes"
+    fprintfn writer "{"
+    references |> List.iter (fun x -> fprintfn writer "    using %s;" x)
+    let name = getUnionTypeName unionType
+    let typeMark = if config.NrtDisabled then "" else "?"
+    if config.UseSystemJson then
+        printUnionTypeSystemJsonConverter writer unionType
+        fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%sJsonConverter))]" name
+    else
+        printUnionTypeNewtonsoftJsonConverter writer unionType
+        fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%sJsonConverter))]" name
+    fprintfn writer "    struct %s" name
+    fprintfn writer "    {"
+    fprintfn writer "        public System.Type%s Type { get; set; }" typeMark
+    unionType
+    |> List.iter 
+        (
+            fun t -> 
+                fprintfn writer "        private %s%s %s;" t typeMark (getUnionTypeFieldName t)
+                fprintfn writer "        public %s%s %s" t typeMark (getUnionTypePropName t)
+                fprintfn writer "        {"
+                fprintfn writer "            get => %s;" (getUnionTypeFieldName t)
+                fprintfn writer "            set"
+                fprintfn writer "            {"
+                fprintfn writer "                ClearValue();"
+                fprintfn writer "                %s = value;" (getUnionTypeFieldName t)
+                fprintfn writer "                Type = typeof(%s);" t
+                fprintfn writer "            }"
+                fprintfn writer "        }"
+                fprintfn writer "        public static implicit operator %s(%s value) => new %s { %s = value };" name t name (getUnionTypePropName t)
+                fprintfn writer "        public static implicit operator %s%s(%s value) => value.%s;" t typeMark name (getUnionTypePropName t)
+                fprintfn writer ""
+        )
+
+    fprintfn writer "        public override string%s ToString()" typeMark
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            if (Type == typeof(%s)) return %s%s.ToString();" t (getUnionTypePropName t) typeMark)
+    fprintfn writer "            return default;"
+    fprintfn writer "        }"
+    
+    fprintfn writer "        public override int GetHashCode()"
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            if (Type == typeof(%s)) return %s%s.GetHashCode() ?? 0;" t (getUnionTypePropName t) typeMark)
+    fprintfn writer "            return 0;"
+    fprintfn writer "        }"
+
+    fprintfn writer "        private void ClearValue()"
+    fprintfn writer "        {"
+    unionType |> List.iter (fun t -> fprintfn writer "            %s = default;" (getUnionTypeFieldName t))
+    fprintfn writer "        }"
+
+    fprintfn writer "    }"
+    fprintfn writer "}"
+
 let truncateFileName (fileName: string) = 
     if fileName.Length > 200 then $"{fileName.Substring(0, 200)}_{fileName.GetHashCode():X}"
     else fileName
 
-let printEntities (splitFile: bool) (output: string) (config: Config) (entities: Entity list) (namespaces: string list) = 
+let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: string list Set) =
+    if config.SplitFiles then
+        unionTypes 
+        |> Set.iter
+            (
+                fun x ->
+                    let ns = "TypedocConverter.GeneratedTypes"
+                    let name = getUnionTypeName x
+                    let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
+                    if not (System.IO.Directory.Exists path) 
+                    then System.IO.Directory.CreateDirectory path |> ignore
+                    else ()
+                    let fileName = System.IO.Path.Combine(path, truncateFileName (toPascalCase name) + ".cs")
+                    if not (printedFiles |> Set.contains fileName) then 
+                        System.IO.File.Delete fileName
+                        printedFiles <- Set.add fileName printedFiles
+                    else ()
+                    use file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
+                    file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
+                    use textWriter = new System.IO.StreamWriter(file)
+                    printUnionType textWriter config namespaces x
+            )
+    else
+        let path = config.OutputFile
+        let dir = System.IO.Path.GetDirectoryName path
+        if dir <> "" && not (System.IO.Directory.Exists dir) 
+        then System.IO.Directory.CreateDirectory dir |> ignore
+        else ()
+        if not (printedFiles |> Set.contains path) then 
+            System.IO.File.Delete path
+            printedFiles <- Set.add path printedFiles
+        else ()
+        use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
+        file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
+        use textWriter = new System.IO.StreamWriter(file)
+        unionTypes |> Set.iter(printUnionType textWriter config namespaces)
+
+let printEntities (config: Config) (entities: Entity list) (namespaces: string list) = 
     deferredEntities <- Set.empty
-    if (splitFile) then
+    unionTypes <- Set.empty
+    if config.SplitFiles then
         entities 
         |> List.iter
             (
@@ -448,7 +591,7 @@ let printEntities (splitFile: bool) (output: string) (config: Config) (entities:
                     let info = Helpers.getNamespaceAndName x
                     match info with
                     | Some(ns, name) -> 
-                        let path = System.IO.Path.Combine([output]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
+                        let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
                         if not (System.IO.Directory.Exists path) 
                         then System.IO.Directory.CreateDirectory path |> ignore
                         else ()
@@ -464,7 +607,7 @@ let printEntities (splitFile: bool) (output: string) (config: Config) (entities:
                     | _ -> ()
             )
     else
-        let path = output
+        let path = config.OutputFile
         let dir = System.IO.Path.GetDirectoryName path
         if dir <> "" && not (System.IO.Directory.Exists dir) 
         then System.IO.Directory.CreateDirectory dir |> ignore
@@ -476,7 +619,6 @@ let printEntities (splitFile: bool) (output: string) (config: Config) (entities:
         use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
         file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
         use textWriter = new System.IO.StreamWriter(file)
-        entities 
-        |> List.iter(printEntity textWriter config namespaces)
+        entities |> List.iter(printEntity textWriter config namespaces)
 
-    deferredEntities
+    (deferredEntities, unionTypes)
