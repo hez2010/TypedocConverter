@@ -487,7 +487,7 @@ let printUnionTypeNewtonsoftJsonConverter (writer: System.IO.TextWriter) (unionT
 let printUnionType (writer: System.IO.TextWriter) (config: Config) (references: string list) (unionType: string list) = 
     fprintfn writer "namespace TypedocConverter.GeneratedTypes"
     fprintfn writer "{"
-    references |> List.iter (fun x -> fprintfn writer "    using %s;" x)
+    references |> List.iter (fun x -> fprintfn writer "    using %s;" (toPascalCase x))
     let name = getUnionTypeName unionType
     let typeMark = if config.NrtDisabled then "" else "?"
     if config.UseSystemJson then
