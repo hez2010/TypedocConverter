@@ -149,7 +149,28 @@ jobs:
       with:
         name: Linux_x64_Native
         path: LinuxNativeBuildx64
-        
+  
+  public-native-linux-arm64:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-16.04-cross-arm64-20201022204150-b2c2436
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+        include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
+    - name: Publish Native Linux ARM64 Release
+      run: |
+        dotnet publish TypedocConverter -c Release -r linux-arm64 -o LinuxNativeBuildARM64 /p:NativeBuild=true /p:CppCompilerAndLinker=clang-9 /p:SysRoot=/crossrootfs/arm64
+        rm LinuxNativeBuildARM64/*.pdb
+        aarch64-linux-gnu-strip LinuxNativeBuildARM64/TypedocConverter
+    - name: Upload Linux ARM64 native artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Linux_ARM64_Native
+        path: LinuxNativeBuildARM64
+
   publish-native-macos:
     runs-on: macos-latest
     needs: build-and-test
