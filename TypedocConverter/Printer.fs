@@ -20,8 +20,8 @@ let arrangeComment (comment: string) blankSpace =
     |> Array.reduce (append "\n")
 
 let escapeTypeSegment (t: string) =
-    t.Split([|"."; ","; "<"; ">"; " "; "["; "]" |], System.StringSplitOptions.RemoveEmptyEntries)
-    |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
+    t.Replace(",", "_").Replace("]", "Array").Replace(">", "_").Split([|"."; "<"; " "; "[" |], System.StringSplitOptions.RemoveEmptyEntries)
+    |> Array.map (fun x -> x.Substring(0, 1).ToUpperInvariant() + x.Substring 1)
     |> Array.reduce (( + ))
 
 let getUnionTypeFieldName (t: string) = 
@@ -543,29 +543,23 @@ let truncateFileName (fileName: string) =
     if fileName.Length > 200 then $"{fileName.Substring(0, 200)}_{fileName.GetHashCode():X}"
     else fileName
 
-let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: string list Set) =
+let getTextWriter (config: Config) (ns: string option) (name: string option) =
     if config.SplitFiles then
-        unionTypes 
-        |> Set.iter
-            (
-                fun x ->
-                    let ns = "TypedocConverter.GeneratedTypes"
-                    let types = x |> List.map (fun t -> if t = "void" then "object" else t) |> List.distinct
-                    let name = getUnionTypeName types
-                    let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
-                    if not (System.IO.Directory.Exists path) 
-                    then System.IO.Directory.CreateDirectory path |> ignore
-                    else ()
-                    let fileName = System.IO.Path.Combine(path, truncateFileName (toPascalCase name) + ".cs")
-                    if not (printedFiles |> Set.contains fileName) then 
-                        System.IO.File.Delete fileName
-                        printedFiles <- Set.add fileName printedFiles
-                    else ()
-                    use file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
-                    file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
-                    use textWriter = new System.IO.StreamWriter(file)
-                    printUnionType textWriter config namespaces types
-            )
+        match ns, name with
+        | Some(ns_), Some(name_) ->
+            let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns_).Split(".") |> List.ofArray) |> Array.ofList)
+            if not (System.IO.Directory.Exists path) 
+            then System.IO.Directory.CreateDirectory path |> ignore
+            else ()
+            let fileName = System.IO.Path.Combine(path, truncateFileName (toPascalCase name_) + ".cs")
+            if not (printedFiles |> Set.contains fileName) then 
+                System.IO.File.Delete fileName
+                printedFiles <- Set.add fileName printedFiles
+            else ()
+            let file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
+            file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
+            new System.IO.StreamWriter(file)
+        | _ -> failwith "Empty namespace or type"
     else
         let path = config.OutputFile
         let dir = System.IO.Path.GetDirectoryName path
@@ -576,9 +570,22 @@ let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: stri
             System.IO.File.Delete path
             printedFiles <- Set.add path printedFiles
         else ()
-        use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
+        let file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
         file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
-        use textWriter = new System.IO.StreamWriter(file)
+        new System.IO.StreamWriter(file)
+
+let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: string list Set) =
+    if config.SplitFiles then
+        unionTypes 
+        |> Set.iter
+            (
+                fun x ->
+                    let types = x |> List.map (fun t -> if t = "void" then "object" else t) |> List.distinct
+                    use textWriter = getTextWriter config (Some("TypedocConverter.GeneratedTypes")) (Some(getUnionTypeName types))
+                    printUnionType textWriter config namespaces types
+            )
+    else
+        use textWriter = getTextWriter config None None
         unionTypes 
         |> Set.iter(fun x -> 
             let types = x |> List.map (fun t -> if t = "void" then "object" else t) |> List.distinct
@@ -595,34 +602,12 @@ let printEntities (config: Config) (entities: Entity list) (namespaces: string l
                     let info = Helpers.getNamespaceAndName x
                     match info with
                     | Some(ns, name) -> 
-                        let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
-                        if not (System.IO.Directory.Exists path) 
-                        then System.IO.Directory.CreateDirectory path |> ignore
-                        else ()
-                        let fileName = System.IO.Path.Combine(path, truncateFileName (toPascalCase name) + ".cs")
-                        if not (printedFiles |> Set.contains fileName) then 
-                            System.IO.File.Delete fileName
-                            printedFiles <- Set.add fileName printedFiles
-                        else ()
-                        use file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
-                        file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
-                        use textWriter = new System.IO.StreamWriter(file)
+                        use textWriter = getTextWriter config (Some(ns)) (Some(name))
                         printEntity textWriter config namespaces x
                     | _ -> ()
             )
     else
-        let path = config.OutputFile
-        let dir = System.IO.Path.GetDirectoryName path
-        if dir <> "" && not (System.IO.Directory.Exists dir) 
-        then System.IO.Directory.CreateDirectory dir |> ignore
-        else ()
-        if not (printedFiles |> Set.contains path) then 
-            System.IO.File.Delete path
-            printedFiles <- Set.add path printedFiles
-        else ()
-        use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
-        file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
-        use textWriter = new System.IO.StreamWriter(file)
+        use textWriter = getTextWriter config None None
         entities |> List.iter(printEntity textWriter config namespaces)
 
     (deferredEntities, unionTypes)
