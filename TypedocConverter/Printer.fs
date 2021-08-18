@@ -20,7 +20,7 @@ let arrangeComment (comment: string) blankSpace =
     |> Array.reduce (append "\n")
 
 let escapeTypeSegment (t: string) =
-    t.Replace(",", "_").Replace("]", "Array").Replace(">", "_").Split([|"."; "<"; " "; "[" |], System.StringSplitOptions.RemoveEmptyEntries)
+    t.Replace(",", "_").Replace("]", "Array").Split([|"."; "<"; ">"; " "; "[" |], System.StringSplitOptions.RemoveEmptyEntries)
     |> Array.map (fun x -> x.Substring(0, 1).ToUpperInvariant() + x.Substring 1)
     |> Array.reduce (( + ))
 
@@ -527,7 +527,7 @@ let printUnionType (writer: System.IO.TextWriter) (config: Config) (references: 
     
     fprintfn writer "        public override int GetHashCode()"
     fprintfn writer "        {"
-    unionType |> List.iter (fun t -> fprintfn writer "            if (Type == typeof(%s)) return %s%s.GetHashCode() ?? 0;" t (getUnionTypePropName t) typeMark)
+    unionType |> List.iter (fun t -> fprintfn writer "            if (Type == typeof(%s)) return %s%s.GetHashCode()%s;" t (getUnionTypePropName t) typeMark (if config.NrtDisabled then "" else " ?? 0"))
     fprintfn writer "            return 0;"
     fprintfn writer "        }"
 
