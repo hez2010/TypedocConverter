@@ -20,7 +20,7 @@ let arrangeComment (comment: string) blankSpace =
     |> Array.reduce (append "\n")
 
 let escapeTypeSegment (t: string) =
-    t.Split([|"."; ","; "<"; ">"; " " |], System.StringSplitOptions.RemoveEmptyEntries)
+    t.Split([|"."; ","; "<"; ">"; " "; "["; "]" |], System.StringSplitOptions.RemoveEmptyEntries)
     |> Array.map (fun x -> x.Substring(0, 1).ToUpper() + x.Substring 1)
     |> Array.reduce (( + ))
 
@@ -550,7 +550,8 @@ let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: stri
             (
                 fun x ->
                     let ns = "TypedocConverter.GeneratedTypes"
-                    let name = getUnionTypeName x
+                    let types = x |> List.map (fun t -> if t = "void" then "object" else t) |> List.distinct
+                    let name = getUnionTypeName types
                     let path = System.IO.Path.Combine([config.OutputDir]@((toPascalCase ns).Split(".") |> List.ofArray) |> Array.ofList)
                     if not (System.IO.Directory.Exists path) 
                     then System.IO.Directory.CreateDirectory path |> ignore
@@ -563,7 +564,7 @@ let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: stri
                     use file = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate)
                     file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
                     use textWriter = new System.IO.StreamWriter(file)
-                    printUnionType textWriter config namespaces x
+                    printUnionType textWriter config namespaces types
             )
     else
         let path = config.OutputFile
@@ -578,7 +579,10 @@ let printUnionTypes (config: Config) (namespaces: string list) (unionTypes: stri
         use file = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate)
         file.Seek(int64 0, System.IO.SeekOrigin.End) |> ignore
         use textWriter = new System.IO.StreamWriter(file)
-        unionTypes |> Set.iter(printUnionType textWriter config namespaces)
+        unionTypes 
+        |> Set.iter(fun x -> 
+            let types = x |> List.map (fun t -> if t = "void" then "object" else t) |> List.distinct
+            printUnionType textWriter config namespaces types)
 
 let printEntities (config: Config) (entities: Entity list) (namespaces: string list) = 
     deferredEntities <- Set.empty
