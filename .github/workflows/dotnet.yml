@@ -150,7 +150,7 @@ jobs:
         name: Linux_x64_Native
         path: LinuxNativeBuildx64
   
-  public-native-linux-arm64:
+  publish-native-linux-arm64:
     runs-on: ubuntu-latest
     needs: build-and-test
     container: mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-16.04-cross-arm64-20201022204150-b2c2436
