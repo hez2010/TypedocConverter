@@ -31,14 +31,14 @@ Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET
   - [x] String literals
   - [x] Type literals
   - [x] Type alias*
-  - [x] Union types*
+  - [x] Union types
   - [ ] Intersection types
 - [x] Split entities to different files
 - [x] Auto rename conflict parameter names
 - [x] WinRT/CLR async types support (`IAsyncAction`/`IAsyncOperation<T>` or `Task`/`Task<T>`)
 - [x] Newtonsoft.Json and System.Text.Json for JSON serialization
 - [x] Nullable Reference Types
-- [ ] ...
+- [ ] Type validation
 
 `*: Partial support`
 
