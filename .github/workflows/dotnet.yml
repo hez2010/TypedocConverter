@@ -3,7 +3,7 @@ name: .NET
 on: [push]
 
 env:
-  DOTNET_SDK_VERSION: '6.0.x'
+  DOTNET_SDK_VERSION: '7.0.x'
   INCLUDE_PRERELEASE: false
 
 jobs:
@@ -107,7 +107,7 @@ jobs:
         include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Native Windows x64 Release
       run: |
-        dotnet publish TypedocConverter -c Release -r win-x64 -o WindowsNativeBuildx64 /p:NativeBuild=true
+        dotnet publish TypedocConverter -c Release -r win-x64 -o WindowsNativeBuildx64 /p:PublishAot=true
         del WindowsNativeBuildx64\*.pdb
     - name: Upload Windows x64 native artifact
       uses: actions/upload-artifact@v1.0.0
@@ -116,7 +116,7 @@ jobs:
         path: WindowsNativeBuildx64
     - name: Publish Native Windows ARM64 Release
       run: |
-        dotnet publish TypedocConverter -c Release -r win-arm64 -o WindowsNativeBuildARM64 /p:NativeBuild=true
+        dotnet publish TypedocConverter -c Release -r win-arm64 -o WindowsNativeBuildARM64 /p:PublishAot=true
         del WindowsNativeBuildARM64\*.pdb
     - name: Upload Windows ARM64 native artifact
       uses: actions/upload-artifact@v1.0.0
@@ -141,7 +141,7 @@ jobs:
         sudo apt install -y libkrb5-dev
     - name: Publish Native Linux x64 Release
       run: |
-        dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:NativeBuild=true
+        dotnet publish TypedocConverter -c Release -r linux-x64 -o LinuxNativeBuildx64 /p:PublishAot=true
         rm LinuxNativeBuildx64/*.pdb
         strip LinuxNativeBuildx64/TypedocConverter
     - name: Upload Linux x64 native artifact
@@ -164,7 +164,7 @@ jobs:
         include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Native Linux ARM64 Release
       run: |
-        dotnet publish TypedocConverter -c Release -r linux-arm64 -o LinuxNativeBuildARM64 /p:NativeBuild=true /p:CppCompilerAndLinker=clang-9 /p:SysRoot=/crossrootfs/arm64
+        dotnet publish TypedocConverter -c Release -r linux-arm64 -o LinuxNativeBuildARM64 /p:PublishAot=true /p:CppCompilerAndLinker=clang-9 /p:SysRoot=/crossrootfs/arm64
         rm LinuxNativeBuildARM64/*.pdb
         aarch64-linux-gnu-strip LinuxNativeBuildARM64/TypedocConverter
     - name: Upload Linux ARM64 native artifact
@@ -186,7 +186,7 @@ jobs:
         include-prerelease: ${{ env.INCLUDE_PRERELEASE }}
     - name: Publish Native macOS x64 Release
       run: |
-        dotnet publish TypedocConverter -c Release -r osx-x64 -o macOSNativeBuildx64 /p:NativeBuild=true
+        dotnet publish TypedocConverter -c Release -r osx-x64 -o macOSNativeBuildx64 /p:PublishAot=true
         rm macOSNativeBuildx64/*.pdb
         strip macOSNativeBuildx64/TypedocConverter
     - name: Upload macOS x64 native artifact
