@@ -113,7 +113,7 @@ and typeSorter typeA typeB =
     | (UnionTypeEntity(_, typeIdA, _, _), UnionTypeEntity(_, typeIdB, _, _)) -> compare typeIdA typeIdB
     | _ -> 0
 
-let arrangeParameterList config (writer: System.IO.TextWriter) withName paras = 
+let arrangeParameterList config (writer: System.IO.TextWriter) paras = 
     let mutable args = []
     let conflictNames = ["abstract"; "as"; "base"; "bool"; "break"; "byte";
         "case"; "catch"; "char"; "checked"; "class"; "const"; "continue"; 
@@ -141,9 +141,7 @@ let arrangeParameterList config (writer: System.IO.TextWriter) withName paras =
         paras |> List.collect 
             (fun i -> 
                 match i with
-                | ParameterEntity(_, pName, pType) ->
-                    if withName then [(arrangeType config writer pType) + " " + getArg pName 0]
-                    else [arrangeType config writer pType]
+                | ParameterEntity(_, pName, pType) -> [(arrangeType config writer pType) + " " + getArg pName 0]
                 | _ -> []
             )
     )
@@ -299,7 +297,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 else System.String.Join(" ", modifiers) + " "
             )
             (toPascalCase name)
-            (arrangeParameterList config writer true paras)
+            (arrangeParameterList config writer paras)
         fprintfn writer ""
 
     let printProperty name comment modifiers eType withGet withSet isOptional initValue isInInterface config =
@@ -380,7 +378,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
                 | tps -> "<" + System.String.Join(", ", tps |> List.collect (fun x -> 
                     match x with | TypeParameterEntity(_, tpName) -> [toPascalCase tpName] | _ -> [])) + ">"
             )
-            (arrangeParameterList config writer true paras)
+            (arrangeParameterList config writer paras)
             (
                 if isInInterface then ""
                 else " => throw new System.NotImplementedException()"
@@ -392,7 +390,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "        %s%s this[%s] { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }"
             (System.String.Join(" ", modifiers) + " ")
             (arrangeType config writer mType)
-            (arrangeParameterList config writer false paras)
+            (arrangeParameterList config writer paras)
 
     match entity with
     | EnumEntity(_, ns, name, comment, modifiers, members) ->

@@ -1003,7 +1003,7 @@ let testIndexer () =
         class Test
         {
             public Test() => throw new System.NotImplementedException();
-            public double this[string] { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public double this[string v] { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         }
     }
     """
