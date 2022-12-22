@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{18F14863-A3F7-44CA-8DC6-47DED7197A41}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		TypedocConverter\rd.xml = TypedocConverter\rd.xml
 		README.md = README.md
 	EndProjectSection
 EndProject

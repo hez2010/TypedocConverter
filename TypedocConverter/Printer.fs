@@ -491,9 +491,11 @@ let printUnionType (writer: System.IO.TextWriter) (config: Config) (references: 
     let typeMark = if config.NrtDisabled then "" else "?"
     if config.JsonMode &&& JsonMode.System = JsonMode.System then
         printUnionTypeSystemJsonConverter writer unionType
-        fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%sSystemJsonConverter))]" name
     if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then
         printUnionTypeNewtonsoftJsonConverter writer unionType
+    if config.JsonMode &&& JsonMode.System = JsonMode.System then
+        fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%sSystemJsonConverter))]" name
+    if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then
         fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%sNewtonsoftJsonConverter))]" name
     fprintfn writer "    struct %s" name
     fprintfn writer "    {"

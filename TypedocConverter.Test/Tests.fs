@@ -400,7 +400,6 @@ let testUnionType () =
                 writer.WriteNullValue();
             }
         }
-        [System.Text.Json.Serialization.JsonConverter(typeof(DictionaryString_BoolBoolUnionSystemJsonConverter))]
         class DictionaryString_BoolBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<DictionaryString_BoolBoolUnion>
         {
             public override DictionaryString_BoolBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, DictionaryString_BoolBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -416,6 +415,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
+        [System.Text.Json.Serialization.JsonConverter(typeof(DictionaryString_BoolBoolUnionSystemJsonConverter))]
         [Newtonsoft.Json.JsonConverter(typeof(DictionaryString_BoolBoolUnionNewtonsoftJsonConverter))]
         struct DictionaryString_BoolBoolUnion
         {
@@ -487,7 +487,6 @@ let testUnionType () =
                 writer.WriteNullValue();
             }
         }
-        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionSystemJsonConverter))]
         class HashSetStringDictionaryString_DoubleBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringDictionaryString_DoubleBoolUnion>
         {
             public override HashSetStringDictionaryString_DoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringDictionaryString_DoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -505,6 +504,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
+        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionSystemJsonConverter))]
         [Newtonsoft.Json.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionNewtonsoftJsonConverter))]
         struct HashSetStringDictionaryString_DoubleBoolUnion
         {
@@ -591,7 +591,6 @@ let testUnionType () =
                 writer.WriteNullValue();
             }
         }
-        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringBoolUnionSystemJsonConverter))]
         class HashSetStringBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringBoolUnion>
         {
             public override HashSetStringBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -607,6 +606,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
+        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringBoolUnionSystemJsonConverter))]
         [Newtonsoft.Json.JsonConverter(typeof(HashSetStringBoolUnionNewtonsoftJsonConverter))]
         struct HashSetStringBoolUnion
         {
@@ -678,7 +678,6 @@ let testUnionType () =
                 writer.WriteNullValue();
             }
         }
-        [System.Text.Json.Serialization.JsonConverter(typeof(StringDoubleBoolUnionSystemJsonConverter))]
         class StringDoubleBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<StringDoubleBoolUnion>
         {
             public override StringDoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, StringDoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -696,6 +695,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
+        [System.Text.Json.Serialization.JsonConverter(typeof(StringDoubleBoolUnionSystemJsonConverter))]
         [Newtonsoft.Json.JsonConverter(typeof(StringDoubleBoolUnionNewtonsoftJsonConverter))]
         struct StringDoubleBoolUnion
         {
