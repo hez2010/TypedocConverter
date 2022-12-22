@@ -1,5 +1,7 @@
 module Definitions
 
+type JsonMode = System = 1 | Newtonsoft = 2 | Both = 3
+
 type Config = {
     Namespace: string
     SplitFiles: bool
@@ -12,7 +14,7 @@ type Config = {
     AnyType: string
     ArrayType: string
     NrtDisabled: bool
-    UseSystemJson: bool
+    JsonMode: JsonMode
 }
 
 type ReflectionKind = 

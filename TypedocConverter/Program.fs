@@ -26,7 +26,7 @@ let rec parseArguments (state: string) (config: Config) (argv: string list) =
             | "any-type" -> parseArguments "" { config with AnyType = front } tails
             | "array-type" -> parseArguments "" { config with ArrayType = front } tails
             | "nrt-disabled" -> parseArguments "" { config with NrtDisabled = front = "true" } tails
-            | "use-system-json" -> parseArguments "" { config with UseSystemJson = front = "true" } tails
+            | "json-mode" -> parseArguments "" { config with JsonMode = match front.ToLowerInvariant() with | "both" -> JsonMode.Both | "newtonsoft" -> JsonMode.Newtonsoft | _ -> JsonMode.System } tails
             | _ -> 
                 printfn "Not supported argument: --%s %s" state front
                 parseArguments "" config tails
@@ -49,7 +49,7 @@ let printHelp () =
     printfn "--any-type [object/dynamic...]: config for any type mapping"
     printfn "--array-type [Array/IEnumerable/List...]: config for array type mapping"
     printfn "--nrt-disabled [true|false]: whether to disable Nullable Reference Types"
-    printfn "--use-system-json [true|false]: whether to use System.Text.Json instead of Newtonsoft.Json"
+    printfn "--json-mode [system|newtonsoft|both]: whether to use System.Text.Json or Newtonsoft.Json or both"
 
 [<EntryPoint>]
 [<ExcludeFromCodeCoverage>]
@@ -67,7 +67,7 @@ let main argv =
                                      AnyType = "object"
                                      ArrayType = "Array"
                                      NrtDisabled = false
-                                     UseSystemJson = false
+                                     JsonMode = JsonMode.System
                                    } (argv |> List.ofArray)
     if config.Help 
     then 

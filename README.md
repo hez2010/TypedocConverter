@@ -377,7 +377,7 @@ Arguments:
 --any-type [object/dynamic...]: config for any type mapping
 --array-type [Array/IEnumerable/List...]: config for array type mapping
 --nrt-disabled [true|false]: whether to disable Nullable Reference Types
---use-system-json [true|false]: whether to use System.Text.Json instead of Newtonsoft.Json
+--json-mode [system|newtonsoft|both]: whether to use System.Text.Json or Newtonsoft.Json or both
 ```
 
 ## Prebuilt binaries

@@ -72,58 +72,66 @@ let testSimpleInterface () =
     """
     let expect = """namespace TypedocConverter
     {
+              
         interface Test
         {
             /// <summary>
             /// event
             /// </summary>
             event System.Action<double> OnEvent;
-    
+              
             /// <summary>
             /// string property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             string Prop1 { get; set; }
-
+              
             /// <summary>
             /// number property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             double Prop2 { get; set; }
-
+              
             /// <summary>
             /// boolean property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             bool Prop3 { get; set; }
-
+              
             /// <summary>
             /// array property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop4")]
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             double[] Prop4 { get; set; }
-    
+              
             /// <summary>
             /// delegate property 1
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop5")]
             [Newtonsoft.Json.JsonProperty("prop5", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Func<double, string, bool> Prop5 { get; set; }
-    
+              
             /// <summary>
             /// delegate property 2
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop6")]
             [Newtonsoft.Json.JsonProperty("prop6", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Action<double, string> Prop6 { get; set; }
-
+              
             /// <summary>
             /// simple method 1
             /// </summary>
             void Method1(string s, double n, bool b);
-
+              
             /// <summary>
             /// simple method 2
             /// </summary>
             bool Method2(string s, double n, bool b);
+              
         }
     }
     """
@@ -149,6 +157,7 @@ let testGenericInterface () =
             /// <summary>
             /// </summary>
             event System.Action<T> OnEvent;
+            [System.Text.Json.Serialization.JsonPropertyName("prop")]
             [Newtonsoft.Json.JsonProperty("prop", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             T Prop { get; set; }
             void Method1(T v);
@@ -197,12 +206,16 @@ let testSimpleType () =
     {
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             double Prop1 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             string Prop2 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             bool Prop3 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop4")]
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             object Prop4 { get; set; }
         }
@@ -220,6 +233,7 @@ let testInlineType () =
     {
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop")]
             [Newtonsoft.Json.JsonProperty("prop", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             TypedocConverter.GeneratedTypes.LiteralStringProp1DoubleProp2BoolProp3 Prop { get; set; }
         }
@@ -230,10 +244,13 @@ let testInlineType () =
         using TypedocConverter;
         interface LiteralStringProp1DoubleProp2BoolProp3 
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             string Prop1 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             double Prop2 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             bool Prop3 { get; set; }
         }
@@ -252,6 +269,7 @@ let testInlineStringLiteralType () =
     {
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop")]
             [Newtonsoft.Json.JsonProperty("prop", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             string Prop { get; set; }
         }
@@ -284,32 +302,46 @@ let testBuiltInType () =
     {
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             ulong[] Prop1 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop10")]
             [Newtonsoft.Json.JsonProperty("prop10", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Collections.Generic.HashSet<double> Prop10 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop11")]
             [Newtonsoft.Json.JsonProperty("prop11", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Collections.Generic.Dictionary<double, string> Prop11 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop12")]
             [Newtonsoft.Json.JsonProperty("prop12", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Threading.Tasks.Task<Test> Prop12 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop13")]
             [Newtonsoft.Json.JsonProperty("prop13", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Threading.Tasks.Task<double> Prop13 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop14")]
             [Newtonsoft.Json.JsonProperty("prop14", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<double, System.Threading.Tasks.Task<string>>> Prop14 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             uint[] Prop2 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             ushort[] Prop3 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop4")]
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             byte[] Prop4 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop5")]
             [Newtonsoft.Json.JsonProperty("prop5", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             long[] Prop5 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop6")]
             [Newtonsoft.Json.JsonProperty("prop6", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             int[] Prop6 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop7")]
             [Newtonsoft.Json.JsonProperty("prop7", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             short[] Prop7 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop8")]
             [Newtonsoft.Json.JsonProperty("prop8", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             char[] Prop8 { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("prop9")]
             [Newtonsoft.Json.JsonProperty("prop9", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             string Prop9 { get; set; }
         }
@@ -329,18 +361,21 @@ let testUnionType () =
     """
     let expect = """namespace TypedocConverter
     {
-    
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             TypedocConverter.GeneratedTypes.StringDoubleBoolUnion Prop1 { get; set; }
     
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             TypedocConverter.GeneratedTypes.DictionaryString_BoolBoolUnion Prop2 { get; set; }
     
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             TypedocConverter.GeneratedTypes.HashSetStringBoolUnion Prop3 { get; set; }
     
+            [System.Text.Json.Serialization.JsonPropertyName("prop4")]
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             TypedocConverter.GeneratedTypes.HashSetStringDictionaryString_DoubleBoolUnion Prop4 { get; set; }
     
@@ -350,7 +385,23 @@ let testUnionType () =
     namespace TypedocConverter.GeneratedTypes
     {
         using TypedocConverter;
-        class DictionaryString_BoolBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<DictionaryString_BoolBoolUnion>
+        class DictionaryString_BoolBoolUnionSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<DictionaryString_BoolBoolUnion>
+        {
+            public override DictionaryString_BoolBoolUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)
+            {
+                try { return new DictionaryString_BoolBoolUnion { SystemCollectionsGenericDictionaryString_BoolValue = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, bool>>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new DictionaryString_BoolBoolUnion { BoolValue = System.Text.Json.JsonSerializer.Deserialize<bool>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                return default;
+            }
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, DictionaryString_BoolBoolUnion value, System.Text.Json.JsonSerializerOptions options)
+            {
+                if (value.Type == typeof(System.Collections.Generic.Dictionary<string, bool>)) { System.Text.Json.JsonSerializer.Serialize(writer, value.SystemCollectionsGenericDictionaryString_BoolValue, options); return; }
+                if (value.Type == typeof(bool)) { System.Text.Json.JsonSerializer.Serialize(writer, value.BoolValue, options); return; }
+                writer.WriteNullValue();
+            }
+        }
+        [System.Text.Json.Serialization.JsonConverter(typeof(DictionaryString_BoolBoolUnionSystemJsonConverter))]
+        class DictionaryString_BoolBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<DictionaryString_BoolBoolUnion>
         {
             public override DictionaryString_BoolBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, DictionaryString_BoolBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
@@ -365,7 +416,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
-        [Newtonsoft.Json.JsonConverter(typeof(DictionaryString_BoolBoolUnionJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(DictionaryString_BoolBoolUnionNewtonsoftJsonConverter))]
         struct DictionaryString_BoolBoolUnion
         {
             public System.Type? Type { get; set; }
@@ -419,7 +470,25 @@ let testUnionType () =
     namespace TypedocConverter.GeneratedTypes
     {
         using TypedocConverter;
-        class HashSetStringDictionaryString_DoubleBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringDictionaryString_DoubleBoolUnion>
+        class HashSetStringDictionaryString_DoubleBoolUnionSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<HashSetStringDictionaryString_DoubleBoolUnion>
+        {
+            public override HashSetStringDictionaryString_DoubleBoolUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)
+            {
+                try { return new HashSetStringDictionaryString_DoubleBoolUnion { SystemCollectionsGenericHashSetStringValue = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.HashSet<string>>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new HashSetStringDictionaryString_DoubleBoolUnion { SystemCollectionsGenericDictionaryString_DoubleValue = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, double>>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new HashSetStringDictionaryString_DoubleBoolUnion { BoolValue = System.Text.Json.JsonSerializer.Deserialize<bool>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                return default;
+            }
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, HashSetStringDictionaryString_DoubleBoolUnion value, System.Text.Json.JsonSerializerOptions options)
+            {
+                if (value.Type == typeof(System.Collections.Generic.HashSet<string>)) { System.Text.Json.JsonSerializer.Serialize(writer, value.SystemCollectionsGenericHashSetStringValue, options); return; }
+                if (value.Type == typeof(System.Collections.Generic.Dictionary<string, double>)) { System.Text.Json.JsonSerializer.Serialize(writer, value.SystemCollectionsGenericDictionaryString_DoubleValue, options); return; }
+                if (value.Type == typeof(bool)) { System.Text.Json.JsonSerializer.Serialize(writer, value.BoolValue, options); return; }
+                writer.WriteNullValue();
+            }
+        }
+        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionSystemJsonConverter))]
+        class HashSetStringDictionaryString_DoubleBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringDictionaryString_DoubleBoolUnion>
         {
             public override HashSetStringDictionaryString_DoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringDictionaryString_DoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
@@ -436,7 +505,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
-        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringDictionaryString_DoubleBoolUnionNewtonsoftJsonConverter))]
         struct HashSetStringDictionaryString_DoubleBoolUnion
         {
             public System.Type? Type { get; set; }
@@ -507,7 +576,23 @@ let testUnionType () =
     namespace TypedocConverter.GeneratedTypes
     {
         using TypedocConverter;
-        class HashSetStringBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringBoolUnion>
+        class HashSetStringBoolUnionSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<HashSetStringBoolUnion>
+        {
+            public override HashSetStringBoolUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)
+            {
+                try { return new HashSetStringBoolUnion { SystemCollectionsGenericHashSetStringValue = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.HashSet<string>>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new HashSetStringBoolUnion { BoolValue = System.Text.Json.JsonSerializer.Deserialize<bool>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                return default;
+            }
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, HashSetStringBoolUnion value, System.Text.Json.JsonSerializerOptions options)
+            {
+                if (value.Type == typeof(System.Collections.Generic.HashSet<string>)) { System.Text.Json.JsonSerializer.Serialize(writer, value.SystemCollectionsGenericHashSetStringValue, options); return; }
+                if (value.Type == typeof(bool)) { System.Text.Json.JsonSerializer.Serialize(writer, value.BoolValue, options); return; }
+                writer.WriteNullValue();
+            }
+        }
+        [System.Text.Json.Serialization.JsonConverter(typeof(HashSetStringBoolUnionSystemJsonConverter))]
+        class HashSetStringBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<HashSetStringBoolUnion>
         {
             public override HashSetStringBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, HashSetStringBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
@@ -522,7 +607,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
-        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringBoolUnionJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(HashSetStringBoolUnionNewtonsoftJsonConverter))]
         struct HashSetStringBoolUnion
         {
             public System.Type? Type { get; set; }
@@ -576,7 +661,25 @@ let testUnionType () =
     namespace TypedocConverter.GeneratedTypes
     {
         using TypedocConverter;
-        class StringDoubleBoolUnionJsonConverter : Newtonsoft.Json.JsonConverter<StringDoubleBoolUnion>
+        class StringDoubleBoolUnionSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<StringDoubleBoolUnion>
+        {
+            public override StringDoubleBoolUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)
+            {
+                try { return new StringDoubleBoolUnion { StringValue = System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new StringDoubleBoolUnion { DoubleValue = System.Text.Json.JsonSerializer.Deserialize<double>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                try { return new StringDoubleBoolUnion { BoolValue = System.Text.Json.JsonSerializer.Deserialize<bool>(ref reader, options) }; } catch (System.Text.Json.JsonException) { }
+                return default;
+            }
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, StringDoubleBoolUnion value, System.Text.Json.JsonSerializerOptions options)
+            {
+                if (value.Type == typeof(string)) { System.Text.Json.JsonSerializer.Serialize(writer, value.StringValue, options); return; }
+                if (value.Type == typeof(double)) { System.Text.Json.JsonSerializer.Serialize(writer, value.DoubleValue, options); return; }
+                if (value.Type == typeof(bool)) { System.Text.Json.JsonSerializer.Serialize(writer, value.BoolValue, options); return; }
+                writer.WriteNullValue();
+            }
+        }
+        [System.Text.Json.Serialization.JsonConverter(typeof(StringDoubleBoolUnionSystemJsonConverter))]
+        class StringDoubleBoolUnionNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<StringDoubleBoolUnion>
         {
             public override StringDoubleBoolUnion ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, StringDoubleBoolUnion value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
@@ -593,7 +696,7 @@ let testUnionType () =
                 writer.WriteNull();
             }
         }
-        [Newtonsoft.Json.JsonConverter(typeof(StringDoubleBoolUnionJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringDoubleBoolUnionNewtonsoftJsonConverter))]
         struct StringDoubleBoolUnion
         {
             public System.Type? Type { get; set; }
@@ -676,18 +779,25 @@ let testTypeAlias () =
     """
     let expect = """namespace TypedocConverter
     {
+              
         interface Test
         {
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             Alias1 Prop1 { get; set; }
+              
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             Alias2 Prop2 { get; set; }
+              
         }
     }
-
+    
     namespace TypedocConverter
     {
-        [Newtonsoft.Json.JsonConverter(typeof(Alias1Converter))]
+              
+        [System.Text.Json.Serialization.JsonConverter(typeof(Alias1SystemJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(Alias1NewtonsoftJsonConverter))]
         enum Alias1
         {
             ///<summary>
@@ -703,9 +813,39 @@ let testTypeAlias () =
             ///</summary>
             C
         }
-        class Alias1Converter : Newtonsoft.Json.JsonConverter
+              
+        class Alias1SystemJsonConverter : System.Text.Json.Serialization.JsonConverter<Alias1>
+        {
+            public override Alias1 Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+                => reader.TokenType switch
+                {
+                    System.Text.Json.JsonTokenType.String =>
+                        System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options) switch
+                        {
+                            "a" => Alias1.A,
+                            "b" => Alias1.B,
+                            "c" => Alias1.C,
+                            _ => throw new System.NotSupportedException("Cannot unmarshal type Alias1")
+                        },
+                    _ => throw new System.NotSupportedException("Cannot unmarshal type Alias1")
+                };
+              
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, [System.Diagnostics.CodeAnalysis.DisallowNull] Alias1 value, System.Text.Json.JsonSerializerOptions options)
+            {
+                switch (value)
+                {
+                    case Alias1.A: System.Text.Json.JsonSerializer.Serialize<string>(writer, "a", options); return;
+                    case Alias1.B: System.Text.Json.JsonSerializer.Serialize<string>(writer, "b", options); return;
+                    case Alias1.C: System.Text.Json.JsonSerializer.Serialize<string>(writer, "c", options); return;
+                    default: break;
+                }
+                throw new System.NotSupportedException("Cannot marshal type Alias1");
+            }
+        }
+        class Alias1NewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
         {
             public override bool CanConvert(System.Type t) => t == typeof(Alias1) || t == typeof(Alias1?);
+              
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)
                 => reader.TokenType switch
                 {
@@ -719,6 +859,7 @@ let testTypeAlias () =
                         },
                     _ => throw new System.NotSupportedException("Cannot unmarshal type Alias1")
                 };
+              
             public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
             {
                 if (untypedValue is null) { serializer.Serialize(writer, null); return; }
@@ -734,10 +875,12 @@ let testTypeAlias () =
             }
         }
     }
-
+    
     namespace TypedocConverter
     {
-        [Newtonsoft.Json.JsonConverter(typeof(Alias2Converter))]
+              
+        [System.Text.Json.Serialization.JsonConverter(typeof(Alias2SystemJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(Alias2NewtonsoftJsonConverter))]
         enum Alias2
         {
             ///<summary>
@@ -753,9 +896,39 @@ let testTypeAlias () =
             ///</summary>
             C
         }
-        class Alias2Converter : Newtonsoft.Json.JsonConverter
+              
+        class Alias2SystemJsonConverter : System.Text.Json.Serialization.JsonConverter<Alias2>
+        {
+            public override Alias2 Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+                => reader.TokenType switch
+                {
+                    System.Text.Json.JsonTokenType.String =>
+                        System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options) switch
+                        {
+                            "a" => Alias2.A,
+                            "b" => Alias2.B,
+                            "c" => Alias2.C,
+                            _ => throw new System.NotSupportedException("Cannot unmarshal type Alias2")
+                        },
+                    _ => throw new System.NotSupportedException("Cannot unmarshal type Alias2")
+                };
+              
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, [System.Diagnostics.CodeAnalysis.DisallowNull] Alias2 value, System.Text.Json.JsonSerializerOptions options)
+            {
+                switch (value)
+                {
+                    case Alias2.A: System.Text.Json.JsonSerializer.Serialize<string>(writer, "a", options); return;
+                    case Alias2.B: System.Text.Json.JsonSerializer.Serialize<string>(writer, "b", options); return;
+                    case Alias2.C: System.Text.Json.JsonSerializer.Serialize<string>(writer, "c", options); return;
+                    default: break;
+                }
+                throw new System.NotSupportedException("Cannot marshal type Alias2");
+            }
+        }
+        class Alias2NewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
         {
             public override bool CanConvert(System.Type t) => t == typeof(Alias2) || t == typeof(Alias2?);
+              
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)
                 => reader.TokenType switch
                 {
@@ -769,6 +942,7 @@ let testTypeAlias () =
                         },
                     _ => throw new System.NotSupportedException("Cannot unmarshal type Alias2")
                 };
+              
             public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
             {
                 if (untypedValue is null) { serializer.Serialize(writer, null); return; }
@@ -859,36 +1033,42 @@ let testSimpleClass () =
             /// <summary>
             /// string property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop1")]
             [Newtonsoft.Json.JsonProperty("prop1", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public string? Prop1 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
             /// <summary>
             /// number property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop2")]
             [Newtonsoft.Json.JsonProperty("prop2", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public double? Prop2 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
             /// <summary>
             /// boolean property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop3")]
             [Newtonsoft.Json.JsonProperty("prop3", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public bool? Prop3 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
             /// <summary>
             /// array property
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop4")]
             [Newtonsoft.Json.JsonProperty("prop4", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public double[]? Prop4 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
             /// <summary>
             /// delegate property 1
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop5")]
             [Newtonsoft.Json.JsonProperty("prop5", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public System.Func<double, string, bool>? Prop5 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
             /// <summary>
             /// delegate property 2
             /// </summary>
+            [System.Text.Json.Serialization.JsonPropertyName("prop6")]
             [Newtonsoft.Json.JsonProperty("prop6", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public System.Action<double, string>? Prop6 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -974,12 +1154,15 @@ let testGetterAndSetter () =
 
             private string _z { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); } = "test";
 
+            [System.Text.Json.Serialization.JsonPropertyName("x")]
             [Newtonsoft.Json.JsonProperty("x", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public string X { get => throw new System.NotImplementedException(); }
 
+            [System.Text.Json.Serialization.JsonPropertyName("y")]
             [Newtonsoft.Json.JsonProperty("y", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public string Y { get => throw new System.NotImplementedException(); }
 
+            [System.Text.Json.Serialization.JsonPropertyName("z")]
             [Newtonsoft.Json.JsonProperty("z", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
             public void Z { set => throw new System.NotImplementedException(); }
         }
@@ -1016,8 +1199,9 @@ let testStringLiteralType () =
 
     let expect = """namespace TypedocConverter
     {
-    
-        [Newtonsoft.Json.JsonConverter(typeof(BuiltinThemeConverter))]
+              
+        [System.Text.Json.Serialization.JsonConverter(typeof(BuiltinThemeSystemJsonConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(BuiltinThemeNewtonsoftJsonConverter))]
         enum BuiltinTheme
         {
             ///<summary>
@@ -1033,11 +1217,39 @@ let testStringLiteralType () =
             ///</summary>
             HcBlack
         }
-    
-        class BuiltinThemeConverter : Newtonsoft.Json.JsonConverter
+              
+        class BuiltinThemeSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<BuiltinTheme>
+        {
+            public override BuiltinTheme Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+                => reader.TokenType switch
+                {
+                    System.Text.Json.JsonTokenType.String =>
+                        System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options) switch
+                        {
+                            "vs" => BuiltinTheme.Vs,
+                            "vs-dark" => BuiltinTheme.VsDark,
+                            "hc-black" => BuiltinTheme.HcBlack,
+                            _ => throw new System.NotSupportedException("Cannot unmarshal type BuiltinTheme")
+                        },
+                    _ => throw new System.NotSupportedException("Cannot unmarshal type BuiltinTheme")
+                };
+              
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, [System.Diagnostics.CodeAnalysis.DisallowNull] BuiltinTheme value, System.Text.Json.JsonSerializerOptions options)
+            {
+                switch (value)
+                {
+                    case BuiltinTheme.Vs: System.Text.Json.JsonSerializer.Serialize<string>(writer, "vs", options); return;
+                    case BuiltinTheme.VsDark: System.Text.Json.JsonSerializer.Serialize<string>(writer, "vs-dark", options); return;
+                    case BuiltinTheme.HcBlack: System.Text.Json.JsonSerializer.Serialize<string>(writer, "hc-black", options); return;
+                    default: break;
+                }
+                throw new System.NotSupportedException("Cannot marshal type BuiltinTheme");
+            }
+        }
+        class BuiltinThemeNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
         {
             public override bool CanConvert(System.Type t) => t == typeof(BuiltinTheme) || t == typeof(BuiltinTheme?);
-    
+              
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type t, object? existingValue, Newtonsoft.Json.JsonSerializer serializer)
                 => reader.TokenType switch
                 {
@@ -1051,7 +1263,7 @@ let testStringLiteralType () =
                         },
                     _ => throw new System.NotSupportedException("Cannot unmarshal type BuiltinTheme")
                 };
-    
+              
             public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? untypedValue, Newtonsoft.Json.JsonSerializer serializer)
             {
                 if (untypedValue is null) { serializer.Serialize(writer, null); return; }

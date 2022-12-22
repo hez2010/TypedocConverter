@@ -149,7 +149,7 @@ let arrangeParameterList config (writer: System.IO.TextWriter) paras =
 let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
     match entity with
     | StringUnionEntity(_, _, name, _, _, members) ->
-        fprintfn writer "    class %s%s" (toPascalCase name) "Converter : Newtonsoft.Json.JsonConverter"
+        fprintfn writer "    class %s%s" (toPascalCase name) "NewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter"
         fprintfn writer "    {"
         fprintfn writer "        public override bool CanConvert(System.Type t) => t == typeof(%s) || t == typeof(%s?);" (toPascalCase name) (toPascalCase name)
         fprintfn writer ""
@@ -198,7 +198,7 @@ let printNewtonsoftJsonConverter (writer: System.IO.TextWriter) (entity: Entity)
 let printSystemJsonConverter (writer: System.IO.TextWriter) (entity: Entity) (config: Config) = 
     match entity with
     | StringUnionEntity(_, _, name, _, _, members) ->
-        fprintfn writer "    class %s%s<%s>" (toPascalCase name) "Converter : System.Text.Json.Serialization.JsonConverter" (toPascalCase name)
+        fprintfn writer "    class %s%s<%s>" (toPascalCase name) "SystemJsonConverter : System.Text.Json.Serialization.JsonConverter" (toPascalCase name)
         fprintfn writer "    {"
         fprintfn writer "        public override %s Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)" (toPascalCase name)
         fprintfn writer "            => reader.TokenType switch"
@@ -305,8 +305,8 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         let isPrivate = modifiers |> List.contains "private"
         if isPrivate then ()
         else
-            if config.UseSystemJson then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
-            else fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
+            if config.JsonMode &&& JsonMode.System = JsonMode.System then fprintfn writer "        [System.Text.Json.Serialization.JsonPropertyName(\"%s\")]" name
+            if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then fprintfn writer "        [Newtonsoft.Json.JsonProperty(\"%s\", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]" name
         fprintfn writer "        %s%s%s %s { %s%s}%s"
             (
                 if List.isEmpty modifiers then 
@@ -407,8 +407,8 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
         fprintfn writer "}\n"
     | StringUnionEntity(_, ns, name, comment, modifiers, members) ->
         printHeader ns comment
-        if config.UseSystemJson then fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
-        else fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase name) "Converter"
+        if config.JsonMode &&& JsonMode.System = JsonMode.System then fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%s%s))]" (toPascalCase name) "SystemJsonConverter"
+        if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%s%s))]" (toPascalCase name) "NewtonsoftJsonConverter"
         printName "enum" modifiers name [] []
         members |> List.iteri
             (
@@ -419,8 +419,8 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
             )
         fprintfn writer "    }"
         fprintfn writer ""
-        if config.UseSystemJson then printSystemJsonConverter writer entity config
-        else printNewtonsoftJsonConverter writer entity config
+        if config.JsonMode &&& JsonMode.System = JsonMode.System then printSystemJsonConverter writer entity config
+        if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then printNewtonsoftJsonConverter writer entity config
         fprintfn writer "}\n"
     | ClassInterfaceEntity(_, ns, name, comment, modifiers, members, exts, tps, isInterface, indexer) ->
         printHeader ns comment
@@ -451,7 +451,7 @@ let printEntity (writer: System.IO.TextWriter) (config: Config) (references: str
 let printUnionTypeSystemJsonConverter (writer: System.IO.TextWriter) (unionType: string list) = 
     let name = getUnionTypeName unionType
 
-    fprintfn writer "    class %sJsonConverter : System.Text.Json.Serialization.JsonConverter<%s>" name name
+    fprintfn writer "    class %sSystemJsonConverter : System.Text.Json.Serialization.JsonConverter<%s>" name name
     fprintfn writer "    {"
     fprintfn writer "        public override %s Read(ref System.Text.Json.Utf8JsonReader reader, System.Type type, System.Text.Json.JsonSerializerOptions options)" name
     fprintfn writer "        {"
@@ -468,7 +468,7 @@ let printUnionTypeSystemJsonConverter (writer: System.IO.TextWriter) (unionType:
 let printUnionTypeNewtonsoftJsonConverter (writer: System.IO.TextWriter) (unionType: string list) = 
     let name = getUnionTypeName unionType
 
-    fprintfn writer "    class %sJsonConverter : Newtonsoft.Json.JsonConverter<%s>" name name
+    fprintfn writer "    class %sNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter<%s>" name name
     fprintfn writer "    {"
     fprintfn writer "        public override %s ReadJson(Newtonsoft.Json.JsonReader reader, System.Type type, %s value, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)" name name
     fprintfn writer "        {"
@@ -488,12 +488,12 @@ let printUnionType (writer: System.IO.TextWriter) (config: Config) (references: 
     references |> List.iter (fun x -> fprintfn writer "    using %s;" (toPascalCase x))
     let name = getUnionTypeName unionType
     let typeMark = if config.NrtDisabled then "" else "?"
-    if config.UseSystemJson then
+    if config.JsonMode &&& JsonMode.System = JsonMode.System then
         printUnionTypeSystemJsonConverter writer unionType
-        fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%sJsonConverter))]" name
-    else
+        fprintfn writer "    [System.Text.Json.Serialization.JsonConverter(typeof(%sSystemJsonConverter))]" name
+    if config.JsonMode &&& JsonMode.Newtonsoft = JsonMode.Newtonsoft then
         printUnionTypeNewtonsoftJsonConverter writer unionType
-        fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%sJsonConverter))]" name
+        fprintfn writer "    [Newtonsoft.Json.JsonConverter(typeof(%sNewtonsoftJsonConverter))]" name
     fprintfn writer "    struct %s" name
     fprintfn writer "    {"
     fprintfn writer "        public System.Type%s Type { get; set; }" typeMark

@@ -58,7 +58,7 @@ let testCode input expected =
         NumberType = "double";
         UseWinRTPromise = false;
         ArrayType = "Array";
-        UseSystemJson = false;
+        JsonMode = JsonMode.Both;
         NrtDisabled = false;
     }
 
