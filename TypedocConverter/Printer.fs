@@ -135,7 +135,8 @@ let arrangeParameterList config (writer: System.IO.TextWriter) paras =
                 let newArg = if cnt = 0 then arg else arg + string cnt
                 args <- args @ [newArg]
                 newArg
-        if conflictNames |> List.contains outArg then "@" + outArg else outArg
+        let unsanitzed = if conflictNames |> List.contains outArg then "@" + outArg else outArg
+        unsanitzed.Replace ('$', '_')
     System.String.Join(
         ", ", 
         paras |> List.collect 

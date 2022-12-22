@@ -1282,3 +1282,39 @@ let testStringLiteralType () =
     """
     
     testCode code expect
+
+[<Fact>]
+let testMemberNameSantization () =
+    let code = """export interface Foo {
+        $ref?: string;
+    }"""
+
+    let expect = """namespace TypedocConverter
+    {
+        interface Foo
+        {
+            [System.Text.Json.Serialization.JsonPropertyName("$ref")]
+            [Newtonsoft.Json.JsonProperty("$ref", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+            string? Ref { get; set; }
+        }
+    }
+    """
+
+    testCode code expect
+
+[<Fact>]
+let testParameterNameSantization () =
+    let code = """export interface Foo {
+        method($ref: number): number
+    }"""
+
+    let expect = """namespace TypedocConverter
+    {
+        interface Foo
+        {
+            double Method(double _ref);  
+        }
+    }
+    """
+
+    testCode code expect
