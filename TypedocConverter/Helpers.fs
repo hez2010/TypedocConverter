@@ -25,7 +25,7 @@ let rec toPascalCase (str: string) =
     if str.Length = 0
     then str
     else if str.Contains "." then 
-         str.Split "." |> Array.map toPascalCase |> Array.reduce (fun a n -> a + "." + n)
+         str.Split(".", System.StringSplitOptions.RemoveEmptyEntries) |> Array.map toPascalCase |> Array.reduce (fun a n -> a + "." + n)
          else 
             str.Replace('$', '_').Split([| "-"; "_"; |], System.StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (fun x -> x.Substring(0, 1).ToUpperInvariant() + x.Substring 1)
