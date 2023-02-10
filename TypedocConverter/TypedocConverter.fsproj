@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <TrimMode>Full</TrimMode>
     <Version>3.3</Version>
 
@@ -9,6 +9,9 @@
     <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
     <EventSourceSupport>false</EventSourceSupport>
     <UseSystemResourceKeys>true</UseSystemResourceKeys>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>TypedocConverter</ToolCommandName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Definitions.fs" />
