@@ -42,6 +42,11 @@ Build status: ![.NET](https://github.com/hez2010/TypedocConverter/workflows/.NET
 
 `*: Partial support`
 
+## Installation
+```
+dotnet tool install -g TypedocConverter
+```
+
 ## Quick start
 TypeScript code `input.ts`:
 ```typescript
